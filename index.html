@@ -349,7 +349,21 @@ a.refl{display:contents}
 .bform textarea{width:100%;min-height:110px;border:1px solid var(--line);background:rgba(255,255,255,.5);padding:10px;font-size:14px;line-height:1.5}
 .bform label{display:flex;flex-direction:column;gap:6px;font-size:11.5px;font-weight:700;color:var(--mute);margin-bottom:14px}
 .bform input[type=text]{border:0;border-bottom:1px solid var(--ink);background:transparent;padding:6px 0;font-size:14px}
+/* ---- editor ---- */
+.gedit{min-width:0;flex-wrap:wrap}
+.gedit textarea{width:100%;border:1px solid var(--line);background:rgba(255,255,255,.7);padding:8px;font-size:14px;line-height:1.5;color:var(--ink);font-weight:500}
+.gacts{flex-basis:100%;display:flex;gap:14px;align-items:center}
+.dcard .gedit,.ref .gedit,.gph .gedit{padding:10px 0 0;border:0;background:transparent;min-width:0}
+.lk .gedit{flex-basis:100%}
+.chg.vis{opacity:1}
 /* ---- dove siamo ---- */
+.globe-tip{position:absolute;left:0;top:0;z-index:3;pointer-events:none;background:rgba(255,255,255,.97);border:1px solid var(--line);box-shadow:0 10px 28px rgba(0,0,0,.1);padding:10px 12px;font-size:12.5px;line-height:1.45;color:var(--ink);max-width:240px}
+.globe-tip b{display:block;font-size:13.5px}
+.globe-tip span{display:block;color:var(--mute);font-size:11.5px;margin-bottom:4px}
+.globe-leg{position:absolute;right:16px;bottom:14px;display:flex;gap:14px;font-size:11.5px;color:var(--mute);background:rgba(255,255,255,.8);padding:6px 10px}
+.globe-leg span{display:flex;gap:3px;align-items:center}
+.globe-leg i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.globe-leg i.o{border:1.5px dashed var(--red);background:#fff;margin-right:3px}
 .globe-wrap{position:relative;height:min(640px,72vh);min-height:420px;border:1px solid var(--line);background:radial-gradient(ellipse at 50% 40%,rgba(255,255,255,.7),rgba(255,255,255,.15) 70%);overflow:hidden;touch-action:none;cursor:grab}
 .globe-wrap:active{cursor:grabbing}
 .globe-wrap canvas{display:block;width:100%;height:100%}
@@ -432,7 +446,7 @@ const APPROVER='Gabriele Caponnetto';
 
 const S={tasks:[],links:[],refs:[],drafts:[],deadlines:[],uploads:[],drop:{},drive:{},
   loaded:{tasks:false,links:false,refs:false,drafts:false,deadlines:false,uploads:false,suppliers:false,mailtpl:false,outbox:false,refitems:false,pending:false},
-  db:null,user:null,me:null,editingMember:null,reassigning:null,editingTask:null,editingCity:null,pending:[],globeMode:'italia',editingBrand:false,editingSupplier:null,editingTpl:null,scheduling:null,supCat:'all',supReg:'',suppliers:[],mailtpl:[],outbox:[],refitems:[],brandkit:null,myCanBrand:false,email:'',myName:'',isAdmin:false,members:[],token:null,tokenAt:0,names:{},canWrite:true,
+  db:null,user:null,me:null,editingMember:null,reassigning:null,editingTask:null,editingCity:null,gedit:null,gdraft:null,pending:[],globeMode:'italia',editingBrand:false,editingSupplier:null,editingTpl:null,scheduling:null,supCat:'all',supReg:'',suppliers:[],mailtpl:[],outbox:[],refitems:[],brandkit:null,myCanBrand:false,email:'',myName:'',isAdmin:false,members:[],token:null,tokenAt:0,names:{},canWrite:true,
   taskFilter:'all',refFilter:'all',draftFilter:'attivi',editingLink:null,editingDraft:null,reviewing:null,openBody:{},confirmDel:null,busy:false};
 
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -478,6 +492,41 @@ function multiBox(id,selEmails){const P=people().filter(p=>p.email);
   const sel=new Set((selEmails||[]).map(lc));
   return `<details class="multi" id="${id}"><summary>${sel.size?sel.size+' persone':'Nessuno'}</summary><div>${P.map(p=>`<label><input type="checkbox" value="${esc(p.email)}" ${sel.has(lc(p.email))?'checked':''}> ${esc(p.name)}</label>`).join('')}</div></details>`}
 function readMulti(id){const el=$(id);if(!el)return [];return [...el.querySelectorAll('input[type=checkbox]:checked')].map(i=>{const p=people().find(x=>lc(x.email)===lc(i.value));return {name:p?p.name:i.value,email:lc(i.value)}})}
+/* ---- editor unico per ogni sezione ---- */
+const AREA_OPTS=()=>AREAS.map(a=>[a.id,a.name]);
+const dtLocal=ms=>{if(!ms)return '';const d=new Date(ms);return new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,16)};
+const peopleNames=()=>[...new Set([...people().map(p=>p.name),...S.pending.map(p=>p.name).filter(Boolean)])];
+const GSPEC={
+  tasks:t=>[{k:'title',l:'Attività',t:'text',v:t.title,w:2},{k:'area',l:'Area',t:'select',o:AREA_OPTS(),v:t.area},{k:'owner',l:'Responsabile',t:'owner',v:ownerVal(t)},{k:'helpers',l:'Con',t:'helpers',v:(t.helpers||[]).map(h=>h.email)},{k:'dueDate',l:'Entro il',t:'date',v:t.dueDate},{k:'location',l:'Dove',t:'loc',v:t.location}],
+  deadlines:d=>[{k:'title',l:'Scadenza',t:'text',v:d.title,w:2},{k:'date',l:'Data',t:'date',v:d.date,req:1},{k:'area',l:'Area',t:'select',o:AREA_OPTS(),v:d.area},{k:'owner',l:'Responsabile',t:'owner',v:ownerVal(d)},{k:'helpers',l:'Con',t:'helpers',v:(d.helpers||[]).map(h=>h.email)},{k:'location',l:'Dove',t:'loc',v:d.location}],
+  drafts:d=>[{k:'title',l:'Titolo',t:'text',v:d.title,w:2},{k:'kind',l:'Tipo',t:'select',o:DKINDS.map(x=>[x,x]),v:d.kind},{k:'channel',l:'Canale',t:'select',o:DCHANNELS.map(x=>[x,x]),v:d.channel},{k:'area',l:'Area',t:'select',o:AREA_OPTS(),v:d.area},{k:'date',l:'Uscita prevista',t:'date',v:d.date},{k:'location',l:'Dove',t:'loc',v:d.location},{k:'author',l:"Chi l'ha scritta",t:'author',v:d.author},{k:'fileUrl',l:'Link allegato',t:'url',v:d.fileUrl,w:2},{k:'body',l:'Testo',t:'textarea',v:d.body,w:3}],
+  refs:r=>[{k:'title',l:'Titolo',t:'text',v:r.title,w:2},{k:'area',l:'Area',t:'select',o:[['','Nessuna'],...AREA_OPTS()],v:r.area||''},{k:'url',l:'Link',t:'url',v:r.url,w:2},{k:'tags',l:'Tag (separati da virgola)',t:'tags',v:(r.tags||[]).join(', ')},{k:'note',l:'Nota',t:'text',v:r.note,w:3}],
+  refitems:i=>[...(i.kind==='link'?[{k:'url',l:'Link',t:'url',v:i.url,w:2,req:1}]:[]),{k:'note',l:'Nota',t:'text',v:i.note,w:2}],
+  links:l=>[{k:'label',l:'Nome',t:'text',v:l.label,w:2},{k:'url',l:'Link',t:'url',v:l.url,w:2},{k:'group',l:'Gruppo',t:'select',o:LGROUPS.map(x=>[x,x]),v:l.group||'Altro'},{k:'note',l:'Nota',t:'text',v:l.note,w:2}],
+  outbox:o=>[{k:'to',l:'Email',t:'email',v:o.to,w:2},{k:'sendAt',l:'Invio il',t:'datetime',v:o.sendAt},{k:'subject',l:'Oggetto',t:'text',v:o.subject,w:3},{k:'body',l:'Testo',t:'textarea',v:o.body,w:3}],
+  pending:p=>[{k:'role',l:'Cosa serve',t:'text',v:p.role,w:2},{k:'city',l:'Città',t:'city',v:p.city},{k:'name',l:'Chi potrebbe coprirla',t:'person',v:p.name},{k:'note',l:'Nota',t:'text',v:p.note,w:2}],
+  uploads:u=>[{k:'note',l:'Nota',t:'text',v:u.note,w:3}]
+};
+function gField(f){const k=f.k,d=S.gdraft&&k in S.gdraft?S.gdraft[k]:f.v,v=d==null?'':d,id='ge-'+k,st=f.w?`style="flex:${f.w} 1 ${f.w*180}px"`:'';
+  let inp;
+  if(f.t==='select')inp=`<select id="${id}" data-gf="${k}">${f.o.map(([a,b])=>`<option value="${esc(a)}" ${String(a)===String(v)?'selected':''}>${esc(b)}</option>`).join('')}</select>`;
+  else if(f.t==='owner')inp=`<select id="${id}" data-gf="${k}">${teamOpts(v)}</select>`;
+  else if(f.t==='author')inp=`<select id="${id}" data-gf="${k}">${teamOpts(people().find(p=>p.name===v)?.v||v)}</select>`;
+  else if(f.t==='helpers')inp=multiBox(id,Array.isArray(v)?v:[]);
+  else if(f.t==='textarea')inp=`<textarea id="${id}" data-gf="${k}" maxlength="8000" rows="6">${esc(v)}</textarea>`;
+  else if(f.t==='date')inp=`<input id="${id}" data-gf="${k}" type="date" value="${isDate(v)?v:''}">`;
+  else if(f.t==='datetime')inp=`<input id="${id}" data-gf="${k}" type="datetime-local" value="${typeof v==='number'?dtLocal(v):esc(v)}">`;
+  else if(f.t==='loc')inp=`<input id="${id}" data-gf="${k}" list="nk-locs" maxlength="60" autocomplete="off" value="${esc(v)}" placeholder="Online, Firenze… o scrivi tu">`;
+  else if(f.t==='city')inp=`<input id="${id}" data-gf="${k}" list="nk-cities" maxlength="60" value="${esc(v)}">`;
+  else if(f.t==='person')inp=`<input id="${id}" data-gf="${k}" list="nk-people" maxlength="60" value="${esc(v)}" placeholder="Scegli o scrivi un nome">`;
+  else inp=`<input id="${id}" data-gf="${k}" type="${f.t==='url'?'url':f.t==='email'?'email':'text'}" maxlength="${f.t==='url'?500:200}" value="${esc(v)}">`;
+  return `<label for="${id}" ${st}>${esc(f.l)}${inp}</label>`}
+function gEditor(col,doc){const F=GSPEC[col](doc);
+  return `<div class="tedit gedit" data-gcol="${col}" data-gid="${esc(doc.id)}">${F.map(gField).join('')}
+    <datalist id="nk-people">${peopleNames().map(n=>`<option value="${esc(n)}">`).join('')}</datalist>
+    <div class="gacts"><button class="btn sm" data-act="gsave" data-col="${col}" data-id="${esc(doc.id)}" type="button">Salva modifiche</button><button class="linkish" data-act="gcancel" type="button">Annulla</button></div></div>`}
+const gOpen=(col,id)=>S.gedit===col+':'+id;
+const gBtn=(col,id,label)=>`<button class="chg" data-act="gedit" data-col="${col}" data-id="${esc(id)}" type="button">${label||'modifica'}</button>`;
 const canBrand=()=>S.isAdmin||!!S.myCanBrand;
 const brandData=()=>({...DEFAULT_BRAND,...(S.brandkit||{})});
 const fillTpl=(s,sup,d)=>String(s||'').replace(/\{fornitore\}/g,sup.name||'').replace(/\{contatto\}/g,sup.contact||sup.name||'').replace(/\{titolo\}/g,d?d.title||'':'').replace(/\{link\}/g,d&&safeUrl(d.fileUrl)?safeUrl(d.fileUrl):'').replace(/\{testo\}/g,d?d.body||'':'').replace(/\{firma\}/g,'Il team NoKap');
@@ -703,7 +752,8 @@ function brandForm(){const b=brandData();
   </section>`}
 const palRow=p=>`<div class="prow"><input type="text" class="pname" value="${esc(p.name||'')}" placeholder="Nome colore" aria-label="Nome colore"><input type="color" class="phex" value="${/^#[0-9a-fA-F]{6}$/.test(p.hex||'')?p.hex:'#cccccc'}" aria-label="Colore"><input type="number" class="ppct" min="0" max="100" value="${+p.pct||0}" aria-label="Percentuale"><button class="x" data-act="bdelcol" type="button" aria-label="Togli colore">×</button></div>`;
 function viewRef(id){const r=S.refs.find(x=>x.id===id);
-  return `<div class="pagehead"><div class="lab">Reference</div><h1 id="rf-h">${esc(r?r.title:'Reference')}</h1><p id="rf-p">${r&&r.note?esc(r.note):''}</p><p><a class="linkish" href="#moodboard">← Torna alla moodboard</a></p></div>
+  return `<div class="pagehead"><div class="lab">Reference</div><h1 id="rf-h">${esc(r?r.title:'Reference')}</h1><p id="rf-p">${r&&r.note?esc(r.note):''}</p><p><a class="linkish" href="#moodboard">← Torna alla moodboard</a>${r&&S.canWrite?' · '+gBtn('refs',r.id,'Modifica reference'):''}</p></div>
+    <div id="rf-edit"></div>
     <div id="netnote" class="status-note"></div>
     <section><form class="form" id="riform" data-ref="${esc(id)}">
       <label class="wide" for="ri-file">Foto, vanno su Drive<input id="ri-file" type="file" accept="image/*" multiple></label>
@@ -749,14 +799,18 @@ function viewDove(){
     <section><div class="globe-wrap" id="globe"><canvas id="globe-c" aria-label="Globo con le città del team" role="img"></canvas>
       <div class="globe-msg" id="globe-msg">Carico il globo…</div>
       <div class="globe-stat" id="globe-stat"></div>
+      <div class="globe-tip" id="globe-tip" hidden></div>
+      <div class="globe-leg"><span><i style="background:#E86A63"></i><i style="background:#CC3129"></i><i style="background:#A51A14"></i><i style="background:#7E0F0B"></i> 1 → 4+ persone</span><span><i class="o"></i> da coprire</span></div>
       <div class="globe-ui"><button type="button" data-act="gmode" data-k="italia" class="${S.globeMode==='italia'?'on':''}">Italia</button><button type="button" data-act="gmode" data-k="mondo" class="${S.globeMode==='mondo'?'on':''}">Mondo</button></div></div></section>
     <section><div class="sec-head"><h2>Chi dove</h2><span class="note">Trascina il globo per girarlo</span></div>
       <div class="panel" id="citylist"></div>
-      <details class="addbox" style="margin-top:16px"><summary class="btn ghost">Aggiungi persona da confermare</summary>
+      <details class="addbox" style="margin-top:16px"><summary class="btn ghost">Aggiungi posizione da coprire</summary>
       <form class="form" id="pendform">
-        <label for="pd-name">Nome<input id="pd-name" required maxlength="60" placeholder="Es. Greta"></label>
-        <label for="pd-city">Città<input id="pd-city" maxlength="60" list="nk-cities" placeholder="Es. Firenze"></label>
-        <label class="wide" for="pd-note">Nota<input id="pd-note" maxlength="120" placeholder="Es. prodotto, foto e video"></label>
+        <label class="wide" for="pd-role">Cosa serve<input id="pd-role" required maxlength="80" placeholder="Es. prodotto, foto e video, PR"></label>
+        <label for="pd-city">Città<input id="pd-city" required maxlength="60" list="nk-cities" placeholder="Es. Firenze"></label>
+        <label for="pd-name">Chi potrebbe coprirla<input id="pd-name" maxlength="60" list="nk-people2" placeholder="Facoltativo, es. Greta"></label>
+        <datalist id="nk-people2"></datalist>
+        <label class="wide" for="pd-note">Nota<input id="pd-note" maxlength="120" placeholder="Facoltativa, es. da confermare entro dicembre"></label>
         <button class="btn" type="submit" id="pd-btn">Aggiungi</button></form></details></section>
 `;
 }
@@ -786,6 +840,8 @@ function strokeLines(ctx,lines,cx,cy,w,h){const l0=G.lon*D2R,p0=G.lat*D2R,s0=Mat
     if(pen)ctx.lineTo(x,y);else{ctx.moveTo(x,y);pen=true}}}
   ctx.stroke()}
 const D2R=Math.PI/180;
+const REDS=['#E86A63','#CC3129','#A51A14','#7E0F0B','#5A0805'];
+const hexA=(hx,a)=>{const n=parseInt(hx.slice(1),16);return `rgba(${n>>16},${(n>>8)&255},${n&255},${a})`};
 function proj(lon,lat,k,cx,cy){const l=(lon-G.lon)*D2R,p=lat*D2R,p0=G.lat*D2R,cp=Math.cos(p),R=G.R*(k||1);
   const z=Math.sin(p0)*Math.sin(p)+Math.cos(p0)*cp*Math.cos(l);return [cx+R*cp*Math.sin(l),cy-R*(Math.cos(p0)*Math.sin(p)-Math.sin(p0)*cp*Math.cos(l)),z]}
 const vec=(lo,la)=>[Math.cos(la*D2R)*Math.cos(lo*D2R),Math.cos(la*D2R)*Math.sin(lo*D2R),Math.sin(la*D2R)];
@@ -798,8 +854,10 @@ function startGlobe(){const wrap=$('globe'),cv=$('globe-c');if(!wrap||!cv||cv.da
   const size=()=>{dpr=Math.min(2,window.devicePixelRatio||1);w=wrap.clientWidth;h=wrap.clientHeight;cv.width=w*dpr;cv.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);globeTarget(w,h);if(!G.R)G.R=G.tR};
   size();window.addEventListener('resize',size);
   loadMesh('110m').then(()=>{const m=$('globe-msg');if(m)m.remove()}).catch(()=>{const m=$('globe-msg');if(m)m.textContent='Non riesco a caricare la mappa del mondo, si vedono solo le città.'});if(S.globeMode!=='mondo')loadMesh('50m').catch(()=>{});
-  wrap.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;G.drag={x:e.clientX,y:e.clientY,lon:G.lon,lat:G.lat};G.spin=false;wrap.setPointerCapture(e.pointerId)});
-  wrap.addEventListener('pointermove',e=>{if(!G.drag)return;const f=57/G.R;G.lon=G.drag.lon-(e.clientX-G.drag.x)*f;G.lat=Math.max(-80,Math.min(80,G.drag.lat+(e.clientY-G.drag.y)*f));G.tLon=G.lon;G.tLat=G.lat});
+  wrap.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;G.mouse=rel(e);G.drag={x:e.clientX,y:e.clientY,lon:G.lon,lat:G.lat};G.spin=false;wrap.setPointerCapture(e.pointerId)});
+  const rel=e=>{const b=wrap.getBoundingClientRect();return {x:e.clientX-b.left,y:e.clientY-b.top}};
+  wrap.addEventListener('pointerleave',()=>{G.mouse=null});
+  wrap.addEventListener('pointermove',e=>{G.mouse=rel(e);if(!G.drag)return;const f=57/G.R;G.lon=G.drag.lon-(e.clientX-G.drag.x)*f;G.lat=Math.max(-80,Math.min(80,G.drag.lat+(e.clientY-G.drag.y)*f));G.tLon=G.lon;G.tLat=G.lat});
   const up=()=>{G.drag=null};wrap.addEventListener('pointerup',up);wrap.addEventListener('pointercancel',up);
   wrap.addEventListener('wheel',e=>{e.preventDefault();G.tR=Math.max(Math.min(w,h)*0.3,Math.min(Math.max(w,h)*4,G.tR*(e.deltaY>0?0.9:1.1)))},{passive:false});
   const frame=t=>{if(!document.body.contains(cv)){window.removeEventListener('resize',size);G.raf=0;return}
@@ -812,22 +870,21 @@ function startGlobe(){const wrap=$('globe'),cv=$('globe-c');if(!wrap||!cv||cv.da
     if(g){ctx.strokeStyle='rgba(17,17,17,.62)';ctx.lineWidth=G.R>900?1.1:0.9;ctx.lineJoin='round';strokeLines(ctx,g,cx,cy,w,h)}
     ctx.restore();
     const P=globePeople();
-    // punti e etichette
-    const pulse=(t%2000)/2000;const groups={};P.forEach(m=>{const k=m.lat.toFixed(2)+','+m.lng.toFixed(2);(groups[k]=groups[k]||{lat:m.lat,lng:m.lng,city:m.city,names:[]}).names.push(m.name||m.email.split('@')[0])});
-    const labs=[];Object.values(groups).forEach(g=>{const [x,y,z]=proj(g.lng,g.lat,1,cx,cy);if(z<=0)return;
-      ctx.beginPath();ctx.arc(x,y,4+pulse*14,0,Math.PI*2);ctx.strokeStyle=`rgba(185,30,26,${0.5*(1-pulse)})`;ctx.lineWidth=1.5;ctx.stroke();
-      ctx.beginPath();ctx.arc(x,y,4.5,0,Math.PI*2);ctx.fillStyle='#B91E1A';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();
-      labs.push({x,y,t1:g.names.join(', '),t2:g.city||''})});
+    // punti: scala di rossi per numero di persone, vuoti per le posizioni da coprire
+    const pulse=(t%2400)/2400,groups={};P.forEach(m=>{const k=m.lat.toFixed(2)+','+m.lng.toFixed(2);(groups[k]=groups[k]||{lat:m.lat,lng:m.lng,city:m.city,names:[]}).names.push(m.name||m.email.split('@')[0])});
+    const hits=[];
+    Object.values(groups).forEach(g=>{const [x,y,z]=proj(g.lng,g.lat,1,cx,cy);if(z<=0)return;const n=g.names.length,col=REDS[Math.min(n,REDS.length)-1],r=4.2+Math.min(n,5)*1.1;
+      ctx.beginPath();ctx.arc(x,y,r+2+pulse*(10+n*2),0,Math.PI*2);ctx.strokeStyle=hexA(col,0.55*(1-pulse));ctx.lineWidth=1.4;ctx.stroke();
+      ctx.save();ctx.shadowColor=hexA(col,0.9);ctx.shadowBlur=12+n*5;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();ctx.restore();
+      ctx.beginPath();ctx.arc(x-r*0.3,y-r*0.3,r*0.35,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,.55)';ctx.fill();
+      hits.push({x,y,r:r+6,key:'g'+g.lat+g.lng,html:`<b>${esc(g.city||'')}</b><span>${n} ${n===1?'persona':'persone'}</span>${g.names.map(esc).join('<br>')}`})});
     S.pending.filter(o=>typeof o.lat==='number'&&typeof o.lng==='number').forEach(o=>{const [x,y,z]=proj(o.lng,o.lat,1,cx,cy);if(z<=0)return;
-      ctx.beginPath();ctx.arc(x,y,6,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,.9)';ctx.fill();ctx.setLineDash([3,2.5]);ctx.strokeStyle='#B91E1A';ctx.lineWidth=1.6;ctx.stroke();ctx.setLineDash([]);
-      labs.push({x,y,t1:(o.name||'')+' · da confermare',t2:o.city||'',open:true})});
-    labs.sort((a,b)=>a.y-b.y);const placed=[];ctx.font='700 12px "Creato Display",system-ui,sans-serif';
-    labs.forEach(l=>{const tw=Math.max(ctx.measureText(l.t1).width,(ctx.font='500 11px "Creato Display",system-ui,sans-serif',ctx.measureText(l.t2).width));ctx.font='700 12px "Creato Display",system-ui,sans-serif';
-      let bx=l.x+12,by=l.y-17;const bw=tw+16,bh=34;if(bx+bw>w-6)bx=l.x-12-bw;
-      placed.forEach(p=>{if(bx<p.x+p.w&&bx+bw>p.x&&by<p.y+p.h+4&&by+bh+4>p.y)by=p.y+p.h+4});placed.push({x:bx,y:by,w:bw,h:bh});
-      ctx.strokeStyle='rgba(17,17,17,.35)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(l.x,l.y);ctx.lineTo(bx<l.x?bx+bw:bx,by+bh/2);ctx.stroke();
-      ctx.fillStyle='rgba(255,255,255,.94)';ctx.fillRect(bx,by,bw,bh);if(l.open){ctx.setLineDash([3,2]);ctx.strokeStyle='#B91E1A'}ctx.strokeRect(bx+.5,by+.5,bw-1,bh-1);ctx.setLineDash([]);
-      ctx.fillStyle=l.open?'#B91E1A':'#111';ctx.fillText(l.t1,bx+8,by+15);ctx.font='500 11px "Creato Display",system-ui,sans-serif';ctx.fillStyle='#6C6967';ctx.fillText(l.t2,bx+8,by+28);ctx.font='700 12px "Creato Display",system-ui,sans-serif'});
+      ctx.beginPath();ctx.arc(x,y,6,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,.85)';ctx.fill();ctx.setLineDash([3,2.5]);ctx.strokeStyle='#B91E1A';ctx.lineWidth=1.6;ctx.stroke();ctx.setLineDash([]);
+      hits.push({x,y,r:11,key:'p'+o.id,html:`<b>Da coprire${o.role?' · '+esc(o.role):''}</b><span>${esc(o.city||'')}</span>${o.name?'Potrebbe coprirla: '+esc(o.name):'Nessuno indicato'}`})});
+    const tip=$('globe-tip');if(tip){let hit=null;if(G.mouse&&!G.drag){let best=1e9;hits.forEach(p=>{const d=Math.hypot(p.x-G.mouse.x,p.y-G.mouse.y);if(d<p.r&&d<best){best=d;hit=p}})}
+      wrap.style.cursor=hit?'pointer':'';
+      if(hit){if(tip.dataset.k!==hit.key){tip.dataset.k=hit.key;tip.innerHTML=hit.html}tip.hidden=false;const tw=tip.offsetWidth,th=tip.offsetHeight;let tx=hit.x+14,ty=hit.y-th/2;if(tx+tw>w-8)tx=hit.x-14-tw;ty=Math.max(8,Math.min(h-th-8,ty));tip.style.transform=`translate(${tx}px,${ty}px)`}
+      else if(!tip.hidden){tip.hidden=true;tip.dataset.k=''}}
     G.raf=requestAnimationFrame(frame)};
   G.raf=requestAnimationFrame(frame)}
 function viewTeam(){
@@ -870,22 +927,17 @@ function trackRows(list,empty){
     return `<div class="tr ${st==='done'?'done':''}">
       <span class="n">${String(i+1).padStart(2,'0')}</span>
       <span class="tt">${esc(t.title)}<small>${esc(a?a.name:'Senza area')}${locTag(t.location)}</small></span>
-      <span class="who ${noOwner(t)?'warn':''}">${false?`<select class="osel" data-act="reassign" data-id="${esc(t.id)}" aria-label="Responsabile di ${esc(t.title)}">${teamOpts(ownerVal(t))}</select>`:`${noOwner(t)?'Senza responsabile':esc(t.owner)}${helpersTxt(t)}${S.canWrite?` <button class="chg" data-act="tedit" data-id="${esc(t.id)}" type="button" aria-label="Modifica attività">modifica</button>`:''}`}${t.ownerEmail&&(t.notifiedOwner===lc(t.ownerEmail)||String(t.notified||'').split(',').includes(lc(t.ownerEmail)))?'<small class="ntf">avvisato</small>':''}</span>
+      <span class="who ${noOwner(t)?'warn':''}">${false?`<select class="osel" data-act="reassign" data-id="${esc(t.id)}" aria-label="Responsabile di ${esc(t.title)}">${teamOpts(ownerVal(t))}</select>`:`${noOwner(t)?'Senza responsabile':esc(t.owner)}${helpersTxt(t)}${S.canWrite?' '+gBtn('tasks',t.id):''}`}${t.ownerEmail&&(t.notifiedOwner===lc(t.ownerEmail)||String(t.notified||'').split(',').includes(lc(t.ownerEmail)))?'<small class="ntf">avvisato</small>':''}</span>
       <span class="note">${dueHtml(t)}</span>
       <span><button class="st ${st}" data-act="cycle" data-id="${esc(t.id)}" ${S.canWrite?'':'disabled'} aria-label="Stato ${STATUS[st]}: clicca per cambiare">${STATUS[st]}</button></span>
       <span>${S.canWrite?`<button class="x ${S.confirmDel===ck?'confirm':''}" data-act="deltask" data-id="${esc(t.id)}" aria-label="Elimina attività">${S.confirmDel===ck?'Ok?':'×'}</button>`:''}</span>
-    </div>${S.editingTask===t.id?`<div class="tedit">
-      <label for="te-owner">Responsabile<select id="te-owner">${teamOpts(ownerVal(t))}</select></label>
-      <label>Con${multiBox('te-helpers',(t.helpers||[]).map(h=>h.email))}</label>
-      <label for="te-date">Entro il<input id="te-date" type="date" value="${isDate(t.dueDate)?t.dueDate:''}"></label>
-      <label for="te-loc">Dove${locInput('te-loc',t.location||'')}</label>
-      <div style="display:flex;gap:12px;align-items:center"><button class="btn sm" data-act="tsave" data-id="${esc(t.id)}" type="button">Salva</button><button class="linkish" data-act="tcancel" type="button">Annulla</button></div></div>`:''}`}).join('');
+    </div>${gOpen('tasks',t.id)?gEditor('tasks',t):''}`}).join('');
 }
 function allDeadlines(){
   const L=[];
-  S.deadlines.forEach(d=>{if(isDate(d.date))L.push({key:'d:'+d.id,id:d.id,date:d.date,title:d.title,src:'Scadenza',area:d.area,owner:d.owner,helpers:d.helpers,location:d.location,del:true})});
-  S.tasks.forEach(t=>{if(isDate(t.dueDate)&&t.status!=='done')L.push({key:'t:'+t.id,date:t.dueDate,title:t.title,src:'Attività',area:t.area,owner:t.owner,helpers:t.helpers,location:t.location})});
-  S.drafts.forEach(d=>{if(isDate(d.date)&&d.status!=='pubblicato')L.push({key:'x:'+d.id,date:d.date,title:d.title,src:'Uscita '+(d.kind||'contenuto').toLowerCase(),area:d.area,owner:d.author})});
+  S.deadlines.forEach(d=>{if(isDate(d.date))L.push({key:'d:'+d.id,id:d.id,col:'deadlines',date:d.date,title:d.title,src:'Scadenza',area:d.area,owner:d.owner,helpers:d.helpers,location:d.location,del:true})});
+  S.tasks.forEach(t=>{if(isDate(t.dueDate)&&t.status!=='done')L.push({key:'t:'+t.id,id:t.id,col:'tasks',date:t.dueDate,title:t.title,src:'Attività',area:t.area,owner:t.owner,helpers:t.helpers,location:t.location})});
+  S.drafts.forEach(d=>{if(isDate(d.date)&&d.status!=='pubblicato')L.push({key:'x:'+d.id,id:d.id,col:'drafts',date:d.date,title:d.title,src:'Uscita '+(d.kind||'contenuto').toLowerCase(),area:d.area,owner:d.author})});
   if(isDate(S.drop.date))L.push({key:'drop',date:S.drop.date,title:'Giorno T: uscita del drop 01',src:'Drop',area:'dir',owner:''});
   return L.sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0);
 }
@@ -895,15 +947,15 @@ function dlRows(list,grouped){
   if(!list.length) return `<div class="empty">Nessuna scadenza con una data. Aggiungine una dalla pagina Scadenze o dai una data alle attività.</div>`;
   const row=x=>{const n=daysTo(x.date),a=AREA[x.area],ck='d:'+x.id;
     return `<div class="dl"><span class="d ${n<0?'late':''}">${fmtDate(x.date)}<small>${n<0?'scaduta':n===0?'oggi':n===1?'domani':'tra '+n+' giorni'}</small></span>
-      <span class="tt" style="font-weight:700">${esc(x.title)}</span><span class="src">${esc(x.src)}</span>
+      <span class="tt" style="font-weight:700">${esc(x.title)}${x.col&&S.canWrite&&x.col!=='drafts'?' '+gBtn(x.col,x.id):''}</span><span class="src">${esc(x.src)}</span>
       <span class="note">${esc(a?a.name:'')}${locTag(x.location)}</span><span class="who ${x.owner==='Da assegnare'?'warn':''}">${x.owner==='Da assegnare'?'Senza responsabile':esc(x.owner||'')}${helpersTxt(x)}</span>
-      <span>${x.del&&S.canWrite?`<button class="x ${S.confirmDel===ck?'confirm':''}" data-act="deldl" data-id="${esc(x.id)}" aria-label="Elimina scadenza">${S.confirmDel===ck?'Ok?':'×'}</button>`:''}</span></div>`};
+      <span>${x.del&&S.canWrite?`<button class="x ${S.confirmDel===ck?'confirm':''}" data-act="deldl" data-id="${esc(x.id)}" aria-label="Elimina scadenza">${S.confirmDel===ck?'Ok?':'×'}</button>`:''}</span></div>${x.col&&x.col!=='drafts'&&gOpen(x.col,x.id)?gEditor(x.col,(x.col==='tasks'?S.tasks:S.deadlines).find(y=>y.id===x.id)||{id:x.id}):''}`};
   if(!grouped) return list.map(row).join('');
   const g={late:[],week:[],later:[]};list.forEach(x=>{const n=daysTo(x.date);(n<0?g.late:n<=7?g.week:g.later).push(x)});
   return [['late','Scadute'],['week','Entro 7 giorni'],['later','Più avanti']].map(([k,l])=>g[k].length?`<div class="dlgroup">${l}</div>`+g[k].map(row).join(''):'').join('');
 }
 function draftCard(d){
-  const st=DSTATUS[d.status]?d.status:'bozza',a=AREA[d.area],ck='x:'+d.id,ed=S.editingDraft===d.id,rv=S.reviewing===d.id;
+  const st=DSTATUS[d.status]?d.status:'bozza',a=AREA[d.area],ck='x:'+d.id,ed=gOpen('drafts',d.id),rv=S.reviewing===d.id;
   const file=safeUrl(d.fileUrl);
   let acts='';
   if(S.canWrite&&!ed&&!rv){
@@ -911,11 +963,10 @@ function draftCard(d){
     if(st==='revisione'&&canApprove())acts+=`<button class="btn sm" data-act="dapprove" data-id="${esc(d.id)}" type="button">Approva</button><button class="btn sm ghost" data-act="dreview" data-id="${esc(d.id)}" type="button">Chiedi modifiche</button>`;
     if(st==='approvato')acts+=`<button class="btn sm ghost" data-act="dpublish" data-id="${esc(d.id)}" type="button">Segna pubblicato</button>`;
     if((st==='approvato'||st==='pubblicato')&&canApprove())acts+=`<button class="linkish dark" data-act="dsched" data-id="${esc(d.id)}" type="button">Email ai fornitori</button>`;
-    if(st!=='pubblicato')acts+=`<button class="linkish dark" data-act="dedit" data-id="${esc(d.id)}" type="button">Modifica</button>`;
+    acts+=`<button class="linkish dark" data-act="gedit" data-col="drafts" data-id="${esc(d.id)}" type="button">Modifica</button>`;
     acts+=`<button class="x ${S.confirmDel===ck?'confirm':''}" data-act="ddel" data-id="${esc(d.id)}" aria-label="Elimina bozza">${S.confirmDel===ck?'Ok?':'×'}</button>`;
   }
-  const body=ed?`<input id="de-title-${esc(d.id)}" value="${esc(d.title)}" maxlength="120" aria-label="Titolo"><textarea id="de-body-${esc(d.id)}" maxlength="8000" aria-label="Testo">${esc(d.body||'')}</textarea>
-      <div class="acts"><button class="btn sm" data-act="dsave" data-id="${esc(d.id)}" type="button">Salva modifiche</button><button class="linkish" data-act="dcancel" type="button">Annulla</button></div>`
+  const body=ed?gEditor('drafts',d)
     :(d.body?`<div class="body ${S.openBody[d.id]?'open':''}">${esc(d.body)}</div>${(d.body||'').length>320?`<button class="linkish" data-act="dtoggle" data-id="${esc(d.id)}" type="button" style="align-self:start">${S.openBody[d.id]?'Riduci':'Leggi tutto'}</button>`:''}`:'');
   return `<article class="dcard s-${st}">
     <div class="meta"><span>${esc(d.kind||'Bozza')}</span><span>·</span><span>${esc(d.channel||'')}</span>${isDate(d.date)?`<span>·</span><span>Uscita ${fmtDate(d.date)}</span>`:''}${d.location?`<span>·</span><span>${esc(d.location)}</span>`:''}</div>
@@ -944,7 +995,8 @@ function refCard(r){
     <div class="nm">${esc(r.title)}</div></a>${r.note?`<p>${esc(r.note)}</p>`:''}${n?`<span class="cnt2">${n} tra foto e link</span>`:''}
     <div class="tags">${(r.tags||[]).map(t=>`<span>${esc(t)}</span>`).join('')}</div>
     <div class="refacts">${safeUrl(r.driveUrl)?`<a class="linkish" href="${esc(safeUrl(r.driveUrl))}" target="_blank" rel="noopener">Originale su Drive</a>`:''}${safeUrl(r.url)?`<a class="linkish" href="${esc(safeUrl(r.url))}" target="_blank" rel="noopener">Link</a>`:''}
-      ${S.canWrite?`<button class="x ${S.confirmDel===ck?'confirm':''}" data-act="delref" data-id="${esc(r.id)}" aria-label="Elimina reference">${S.confirmDel===ck?'Ok?':'×'}</button>`:''}</div>
+      ${S.canWrite?gBtn('refs',r.id,'Modifica'):''}${S.canWrite?`<button class="x ${S.confirmDel===ck?'confirm':''}" data-act="delref" data-id="${esc(r.id)}" aria-label="Elimina reference">${S.confirmDel===ck?'Ok?':'×'}</button>`:''}</div>
+    ${gOpen('refs',r.id)?gEditor('refs',r):''}
   </figure>`;
 }
 function refsHtml(list,empty){
@@ -967,27 +1019,32 @@ function countdown(){
 
 /* ---------- fill sezioni nuove ---------- */
 function fillExtra(r){
-  if($('globe')){startGlobe();const P=globePeople(),cities=new Set(P.map(m=>normCity(m.city)));const st=$('globe-stat');if(st)st.innerHTML=`<b>${cities.size}</b>città · ${P.length} ${P.length===1?'persona':'persone'}${S.pending.length?`<br><span style="color:var(--red)">${S.pending.length} da confermare</span>`:''}`;
-    const el=$('citylist');if(el&&!(el.contains(document.activeElement)&&document.activeElement.tagName==='INPUT')){const mg=canManageTeam();
+  {const dl=$('nk-people2');if(dl){const html=peopleNames().map(n=>`<option value="${esc(n)}">`).join('');if(dl.dataset.h!==html){dl.dataset.h=html;dl.innerHTML=html}}}
+  if($('globe')){startGlobe();const P=globePeople(),cities=new Set(P.map(m=>normCity(m.city)));const st=$('globe-stat');if(st)st.innerHTML=`<b>${cities.size}</b>città · ${P.length} ${P.length===1?'persona':'persone'}${S.pending.length?`<br><span style="color:var(--red)">${S.pending.length} ${S.pending.length===1?'posizione':'posizioni'} da coprire</span>`:''}`;
+    const el=$('citylist');if(el&&!(el.contains(document.activeElement)&&/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName))){const mg=canManageTeam();
       const rows=[...S.members.map(m=>({...m,key:m.email})),...S.pending.map(p=>({...p,key:'p:'+p.id,pend:true}))].sort((a,b)=>normCity(a.city||'zzz').localeCompare(normCity(b.city||'zzz'))||(a.name||a.email||'').localeCompare(b.name||b.email||''));
-      el.innerHTML=rows.length?rows.map(m=>{const k=esc(m.key),self=!m.pend&&lc(m.email)===S.email,can=m.pend?S.canWrite:(self||mg),ed=can&&S.editingCity===m.key,has=typeof m.lat==='number',ck='pd:'+m.id;
-        return `<div class="crow"><span style="font-weight:700"><span class="pin ${has?'':'off'}" ${m.pend?'style="background:#fff;border:1.5px dashed var(--red)"':''}></span>${esc(m.name||m.email)}${self?' <span class="note" style="font-weight:500">· tu</span>':''}${m.pend?` <span class="note" style="font-weight:700;color:var(--red)">· da confermare</span>${m.note?`<br><span class="note" style="font-weight:500;margin-left:16px">${esc(m.note)}</span>`:''}`:''}</span>
+      el.innerHTML=rows.length?rows.map(m=>{const k=esc(m.key),has=typeof m.lat==='number';
+        if(m.pend){const ck='pd:'+m.id;return `<div class="crow"><span style="font-weight:700"><span class="pin" style="background:#fff;border:1.5px dashed var(--red)"></span><span style="color:var(--red)">Da coprire</span>${m.role?' · '+esc(m.role):''}<br><span class="note" style="font-weight:500;margin-left:16px">${m.name?'Potrebbe coprirla: '+esc(m.name):'Nessuno indicato'}${m.note?' · '+esc(m.note):''}</span></span>
+          <span>${m.city?esc(m.city)+(has?'':' <small class="note">· non trovata sul globo</small>'):'<span class="note">Città non indicata</span>'}</span>
+          <span style="display:flex;gap:10px;justify-content:end">${S.canWrite?`<button class="linkish" data-act="gedit" data-col="pending" data-id="${esc(m.id)}" type="button">Modifica</button><button class="x ${S.confirmDel===ck?'confirm':''}" data-act="delpend" data-id="${esc(m.id)}" aria-label="Togli posizione">${S.confirmDel===ck?'Ok?':'×'}</button>`:''}</span></div>${gOpen('pending',m.id)?gEditor('pending',m):''}`}
+        const self=lc(m.email)===S.email,can=self||mg,ed=can&&S.editingCity===m.key;
+        return `<div class="crow"><span style="font-weight:700"><span class="pin ${has?'':'off'}"></span>${esc(m.name||m.email)}${self?' <span class="note" style="font-weight:500">· tu</span>':''}</span>
           <span>${ed?`<input data-city="${k}" value="${esc(m.city||'')}" maxlength="60" placeholder="Es. Milano" list="nk-cities" aria-label="Città di ${esc(m.name||m.email)}">`:m.city?esc(m.city)+(has?'':' <small class="note">· non trovata sul globo</small>'):'<span class="note">Città non indicata</span>'}</span>
-          <span style="display:flex;gap:10px;justify-content:end">${can?(ed?`<button class="linkish dark" data-act="savecity" data-id="${k}" type="button">Salva</button><button class="linkish" data-act="cancelcity" type="button">Annulla</button>`:`<button class="linkish" data-act="editcity" data-id="${k}" type="button">${m.city?'Cambia':'Scrivi la città'}</button>${m.pend?`<button class="x ${S.confirmDel===ck?'confirm':''}" data-act="delpend" data-id="${esc(m.id)}" aria-label="Togli ${esc(m.name)}">${S.confirmDel===ck?'Ok?':'×'}</button>`:''}`):''}</span></div>`}).join(''):'<div class="empty">Nessuno nel team ancora.</div>';
+          <span style="display:flex;gap:10px;justify-content:end">${can?(ed?`<button class="linkish dark" data-act="savecity" data-id="${k}" type="button">Salva</button><button class="linkish" data-act="cancelcity" type="button">Annulla</button>`:`<button class="linkish" data-act="editcity" data-id="${k}" type="button">${m.city?'Cambia':'Scrivi la città'}</button>`):''}</span></div>`}).join(''):'<div class="empty">Nessuno nel team ancora.</div>';
       const i=document.querySelector('[data-city]');if(i&&S.editingCity)i.focus({preventScroll:true})}}
   const set=(id,html)=>{const el=$(id);if(el)el.innerHTML=html};
   // brand
   const bb=$('brandbody');if(bb){const mode=S.editingBrand?'edit':'view';if(mode==='view'||bb.dataset.mode!=='edit'){bb.innerHTML=mode==='edit'?brandForm():brandHtml();bb.dataset.mode=mode}}
   // reference detail
   if(r.startsWith('ref-')){const id=r.slice(4),ref=S.refs.find(x=>x.id===id);
-    if(ref){const h1=$('rf-h');if(h1)h1.textContent=ref.title;const p=$('rf-p');if(p)p.textContent=ref.note||''}
+    if(ref){const h1=$('rf-h');if(h1)h1.textContent=ref.title;const p=$('rf-p');if(p)p.textContent=ref.note||'';const ed=$('rf-edit');if(ed){const want=gOpen('refs',ref.id);if(want&&!ed.firstChild)ed.innerHTML='<section style="padding-top:0">'+gEditor('refs',ref)+'</section>';else if(!want&&ed.firstChild)ed.innerHTML=''}}
     const items=S.refitems.filter(i=>i.refId===id).sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
     const photos=[...(ref&&okThumb(ref.thumb)?[{id:'_main',kind:'photo',thumb:ref.thumb,driveUrl:ref.driveUrl,note:'Immagine principale',main:true}]:[]),...items.filter(i=>i.kind==='photo')];
     const links=[...(ref&&safeUrl(ref.url)?[{id:'_mainl',url:ref.url,title:ref.url,note:'Link principale',main:true}]:[]),...items.filter(i=>i.kind==='link')];
     set('ri-count',photos.length?photos.length+' foto':'');
     set('ri-photos',!S.loaded.refitems?'<div class="empty">Carico…</div>':photos.length?photos.map(i=>{const ck='ri:'+i.id;return `<figure class="gph"><button class="pic" data-act="lb" data-thumb="${esc(i.id)}" type="button" aria-label="Apri foto">${okThumb(i.thumb)?`<img src="${i.thumb}" alt="${esc(i.note||'Foto')}" loading="lazy">`:'<span class="note">Foto su Drive</span>'}</button>
-      <figcaption><span>${esc(i.note||'')}${i.byName?' · '+esc(i.byName):''}</span><span style="display:flex;gap:8px">${safeUrl(i.driveUrl)?`<a class="linkish" href="${esc(safeUrl(i.driveUrl))}" target="_blank" rel="noopener">Drive</a>`:''}${!i.main&&S.canWrite?`<button class="x ${S.confirmDel===ck?'confirm':''}" data-act="delri" data-id="${esc(i.id)}" aria-label="Elimina foto">${S.confirmDel===ck?'Ok?':'×'}</button>`:''}</span></figcaption></figure>`}).join(''):'<div class="empty" style="grid-column:1/-1">Nessuna foto. Caricane una qui sopra.</div>');
-    set('ri-links',links.length?links.map(i=>{const u=safeUrl(i.url),ck='ri:'+i.id;return `<div class="lrow"><span style="font-weight:700;word-break:break-all">${u?`<a href="${esc(u)}" target="_blank" rel="noopener" style="text-decoration:underline;text-underline-offset:3px">${esc(i.title||u.replace(/^https?:\/\//,''))}</a>`:''}</span><span class="note">${esc(i.note||'')}</span><span class="note">${esc(i.byName||'')}</span><span>${!i.main&&S.canWrite?`<button class="x ${S.confirmDel===ck?'confirm':''}" data-act="delri" data-id="${esc(i.id)}" aria-label="Elimina link">${S.confirmDel===ck?'Ok?':'×'}</button>`:''}</span></div>`}).join(''):'<div class="empty">Nessun link.</div>');
+      <figcaption><span>${esc(i.note||'')}${i.byName?' · '+esc(i.byName):''}</span><span style="display:flex;gap:8px">${safeUrl(i.driveUrl)?`<a class="linkish" href="${esc(safeUrl(i.driveUrl))}" target="_blank" rel="noopener">Drive</a>`:''}${!i.main&&S.canWrite?gBtn('refitems',i.id)+`<button class="x ${S.confirmDel===ck?'confirm':''}" data-act="delri" data-id="${esc(i.id)}" aria-label="Elimina foto">${S.confirmDel===ck?'Ok?':'×'}</button>`:''}</span></figcaption>${!i.main&&gOpen('refitems',i.id)?gEditor('refitems',i):''}</figure>`}).join(''):'<div class="empty" style="grid-column:1/-1">Nessuna foto. Caricane una qui sopra.</div>');
+    set('ri-links',links.length?links.map(i=>{const u=safeUrl(i.url),ck='ri:'+i.id;return `<div class="lrow"><span style="font-weight:700;word-break:break-all">${u?`<a href="${esc(u)}" target="_blank" rel="noopener" style="text-decoration:underline;text-underline-offset:3px">${esc(i.title||u.replace(/^https?:\/\//,''))}</a>`:''}</span><span class="note">${esc(i.note||'')}</span><span class="note">${esc(i.byName||'')}</span><span style="display:flex;gap:8px;justify-content:end">${!i.main&&S.canWrite?gBtn('refitems',i.id)+`<button class="x ${S.confirmDel===ck?'confirm':''}" data-act="delri" data-id="${esc(i.id)}" aria-label="Elimina link">${S.confirmDel===ck?'Ok?':'×'}</button>`:''}</span></div>${!i.main&&gOpen('refitems',i.id)?gEditor('refitems',i):''}`}).join(''):'<div class="empty">Nessun link.</div>');
   }
   // suppliers
   if($('suplist')){
@@ -1018,14 +1075,16 @@ function fillExtra(r){
       <span><b>${esc(o.toName||'')}</b><br><span class="note" style="word-break:break-all">${esc(o.to||'')}</span></span>
       <span class="note">${esc(o.subject||'')}${o.draftTitle?'<br>da: '+esc(o.draftTitle):''}</span>
       <span class="st-${esc(o.status||'programmata')}" title="${esc(o.error||'')}">${o.status==='inviata'?'Inviata':o.status==='errore'?'Errore':'Programmata'}</span>
-      <span>${o.status==='programmata'&&canApprove()?`<button class="x ${S.confirmDel===ck?'confirm':''}" data-act="delout" data-id="${esc(o.id)}" aria-label="Annulla invio">${S.confirmDel===ck?'Ok?':'×'}</button>`:''}</span></div>`}).join(''));
+      <span style="display:flex;gap:8px;justify-content:end">${o.status!=='inviata'&&canApprove()?gBtn('outbox',o.id):''}${o.status==='programmata'&&canApprove()?`<button class="x ${S.confirmDel===ck?'confirm':''}" data-act="delout" data-id="${esc(o.id)}" aria-label="Annulla invio">${S.confirmDel===ck?'Ok?':'×'}</button>`:''}</span></div>${gOpen('outbox',o.id)?gEditor('outbox',o):''}`}).join(''));
   }
 }
 function openLb(thumb,cap,drive){let lb=$('lb');if(!lb){lb=document.createElement('div');lb.id='lb';lb.className='lbox';lb.hidden=true;lb.innerHTML='<img id="lb-img" alt=""><div class="cap" id="lb-cap"></div><a id="lb-drive" target="_blank" rel="noopener">Apri l\'originale su Drive</a>';document.body.appendChild(lb);lb.addEventListener('click',e=>{if(e.target.id!=='lb-drive')lb.hidden=true})}
   $('lb-img').src=thumb;$('lb-cap').textContent=cap||'';const a=$('lb-drive');const u=safeUrl(drive);a.hidden=!u;if(u)a.href=u;lb.hidden=false}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){const lb=$('lb');if(lb)lb.hidden=true}});
 /* ---------- fill ---------- */
-function fill(){
+function fill(){const fa=document.activeElement,fk=fa&&fa.dataset&&fa.dataset.gf,fs=fk&&'selectionStart' in fa?(()=>{try{return fa.selectionStart}catch(e){return null}})():null;
+  try{fillInner()}finally{if(fk){const n=document.querySelector(`.gedit [data-gf="${fk}"]`);if(n&&n!==document.activeElement){n.focus({preventScroll:true});try{if(fs!=null)n.setSelectionRange(fs,fs)}catch(e){}}}}}
+function fillInner(){
   const r=route(),T=S.tasks,open=T.filter(t=>t.status!=='done'),done=T.length-open.length,cd=countdown();
   const set=(id,html)=>{const el=$(id);if(el)el.innerHTML=html};
   const txt=(id,v)=>{const el=$(id);if(el)el.textContent=v};
@@ -1088,11 +1147,11 @@ function fill(){
   if($('alllinks')){
     if(!S.loaded.links)set('alllinks',`<div class="empty">Carico i link…</div>`);
     else set('alllinks',LGROUPS.map(g=>{const X=S.links.filter(l=>(l.group||'Altro')===g).sort((a,b)=>(a.order??999)-(b.order??999));if(!X.length)return '';
-      return `<div class="lgroup"><h3>${esc(g)}</h3>${X.map(l=>{const u=safeUrl(l.url),ed=S.editingLink===l.id;
+      return `<div class="lgroup"><h3>${esc(g)}</h3>${X.map(l=>{const u=safeUrl(l.url),ed=false,ged=gOpen('links',l.id);
         return `<div class="lk"><div style="min-width:0"><div class="nm">${u?`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(l.label)}</a>`:esc(l.label)}</div>
           ${ed?`<input id="le-${esc(l.id)}" type="url" value="${esc(l.url||'')}" placeholder="https://…" aria-label="Link per ${esc(l.label)}">`:`<div class="u ${u?'':'miss'}">${u?esc(u.replace(/^https?:\/\//,'')):'Link da inserire'}</div>`}
           ${l.note&&!ed?`<div class="u">${esc(l.note)}</div>`:''}</div>
-          <div>${S.canWrite?(ed?`<button class="linkish" data-act="savelink" data-id="${esc(l.id)}" type="button">Salva</button>`:`<button class="linkish" data-act="editlink" data-id="${esc(l.id)}" type="button">Modifica</button>`):''}</div></div>`}).join('')}</div>`}).join('')||`<div class="empty">Nessun link ancora.</div>`);}
+          <div style="display:flex;gap:8px;align-items:center">${S.canWrite&&!ged?`<button class="linkish" data-act="gedit" data-col="links" data-id="${esc(l.id)}" type="button">Modifica</button><button class="x ${S.confirmDel==='l:'+l.id?'confirm':''}" data-act="dellink2" data-id="${esc(l.id)}" aria-label="Elimina link">${S.confirmDel==='l:'+l.id?'Ok?':'×'}</button>`:''}</div>${ged?gEditor('links',l):''}</div>`}).join('')}</div>`}).join('')||`<div class="empty">Nessun link ancora.</div>`);}
   if($('allmembers')){const admins=(CFG.admins||[]).map(lc);const el=$('allmembers');const mg=canManageTeam();
     const sig=JSON.stringify(S.members.map(m=>[m.email,m.name,m.role]))+'|'+S.confirmDel+'|'+S.editingMember;
     if(el.dataset.sig!==sig&&!(el.contains(document.activeElement)&&/INPUT|SELECT/.test(document.activeElement.tagName))){el.dataset.sig=sig;
@@ -1123,7 +1182,7 @@ function render(){
   const r=route();let h;
   const V={dove:viewDove,fornitori:viewSuppliers,team:viewTeam,attivita:viewTasks,scadenze:viewDeadlines,testi:viewTexts,file:viewFiles,moodboard:viewMood,link:viewLinks,brand:viewBrand};
   h=V[r]?V[r]():r.startsWith('area-')?viewArea(r.slice(5)):r.startsWith('ref-')?viewRef(r.slice(4)):viewHome();
-  $('main').innerHTML=h;window.scrollTo(0,0);S.confirmDel=null;S.editingTask=null;S.editingCity=null;S.editingBrand=false;S.editingSupplier=null;S.editingTpl=null;S.scheduling=null;S.editingLink=null;S.editingDraft=null;S.reviewing=null;setMenu(false);fill();showNote();
+  $('main').innerHTML=h;window.scrollTo(0,0);S.confirmDel=null;S.editingTask=null;S.gedit=null;S.gdraft=null;S.editingCity=null;S.editingBrand=false;S.editingSupplier=null;S.editingTpl=null;S.scheduling=null;S.editingLink=null;S.editingDraft=null;S.reviewing=null;setMenu(false);fill();showNote();
 }
 let noteMsg='';
 function showNote(m){if(m!==undefined)noteMsg=m;const el=$('netnote');if(el){el.textContent=noteMsg;el.classList.toggle('show',!!noteMsg)}}
@@ -1268,7 +1327,9 @@ document.addEventListener('submit',async e=>{
       const ok=await guard(async()=>{await S.db.collection('refs').add(data)});if(ok){f.reset();showNote('')}}
     finally{S.busy=false;busy('rf-btn',false)}}
 });
-document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches&&e.target.matches('[data-city]')){e.preventDefault();const b=document.querySelector('[data-act=savecity]');if(b)b.click()}});
+document.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.gf;if(k&&S.gdraft)S.gdraft[k]=e.target.value});
+document.addEventListener('change',e=>{if(e.target.closest&&e.target.closest('.gedit details.multi')&&S.gdraft)S.gdraft.helpers=[...e.target.closest('details').querySelectorAll('input:checked')].map(i=>i.value);const k=e.target.dataset&&e.target.dataset.gf;if(k&&S.gdraft)S.gdraft[k]=e.target.value});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&S.gedit&&e.target.closest&&e.target.closest('.gedit')){S.gedit=null;S.gdraft=null;e.target.blur();fill();return}if(e.key==='Enter'&&e.target.matches&&e.target.matches('.gedit input')){e.preventDefault();const b=e.target.closest('.gedit').querySelector('[data-act=gsave]');if(b)b.click();return}if(e.key==='Enter'&&e.target.matches&&e.target.matches('[data-city]')){e.preventDefault();const b=document.querySelector('[data-act=savecity]');if(b)b.click()}});
 document.addEventListener('change',e=>{const s=e.target.closest('[data-act="reassign"]');if(!s)return;const p=pick(s.value);S.reassigning=null;
   guard(()=>S.db.collection('tasks').doc(s.dataset.id).update({...p,notifiedOwner:'',remindedFor:''}));});
 document.addEventListener('change',e=>{
@@ -1278,6 +1339,29 @@ document.addEventListener('change',e=>{
 document.addEventListener('click',e=>{
   const b=e.target.closest('[data-act]');if(!b)return;const act=b.dataset.act,id=b.dataset.id;
   const conf=(key,fn)=>{if(S.confirmDel!==key){S.confirmDel=key;fill();return}S.confirmDel=null;guard(fn)};
+  if(act==='gedit'){const col=b.dataset.col;if(col==='outbox'&&!canApprove())return;S.gedit=col+':'+id;S.gdraft={};S.editingTask=null;S.reviewing=null;fill();const f=document.querySelector('.gedit [data-gf]');if(f)f.focus({preventScroll:true});return}
+  if(act==='gcancel'){S.gedit=null;S.gdraft=null;if(document.activeElement)document.activeElement.blur();fill();return}
+  if(act==='dellink2'){conf('l:'+id,()=>S.db.collection('links').doc(id).delete());return}
+  if(act==='gsave'){const col=b.dataset.col,list={tasks:S.tasks,deadlines:S.deadlines,drafts:S.drafts,refs:S.refs,refitems:S.refitems,links:S.links,outbox:S.outbox,pending:S.pending,uploads:S.uploads}[col]||[];const doc=list.find(x=>x.id===id);if(!doc)return;
+    const box=b.closest('.gedit'),F=GSPEC[col](doc),upd={};let bad='';
+    for(const f of F){const el=box.querySelector('#ge-'+f.k);if(!el&&f.t!=='helpers')continue;const raw=el&&'value' in el?el.value:'';
+      if(f.t==='owner'){const p=pick(raw);Object.assign(upd,p);if(lc(p.ownerEmail)!==lc(doc.ownerEmail)){upd.notifiedOwner=''}}
+      else if(f.t==='author')upd.author=pick(raw).owner;
+      else if(f.t==='helpers')upd.helpers=readMulti('ge-helpers');
+      else if(f.t==='date'){if(f.req&&!isDate(raw)){bad='Serve una data.';break}upd[f.k]=isDate(raw)?raw:null}
+      else if(f.t==='datetime'){const ms=new Date(raw).getTime();if(!ms){bad='Serve data e ora.';break}upd[f.k]=ms}
+      else if(f.t==='url'){const v=raw.trim();if(v&&!safeUrl(v)){bad='Il link deve iniziare con https://';break}if(f.req&&!v){bad='Serve un link.';break}upd[f.k]=safeUrl(v)}
+      else if(f.t==='email'){const v=lc(raw.trim());if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)){bad='Email non valida.';break}upd[f.k]=v}
+      else if(f.t==='tags')upd[f.k]=raw.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean).slice(0,6);
+      else if(f.t==='textarea')upd[f.k]=raw;
+      else upd[f.k]=raw.trim().replace(/\s+/g,' ')}
+    if(bad){showNote(bad);return}
+    if(('title' in upd&&!upd.title)||('label' in upd&&!upd.label)){showNote('Il titolo non può essere vuoto.');return}
+    if(col==='tasks'){upd.due=isDate(upd.dueDate)?'':(doc.due&&!isDate(doc.dueDate)?doc.due:'Da definire')}
+    if(col==='outbox'){upd.status='programmata';upd.error=''}
+    upd.updatedAt=Date.now();b.textContent='Salvo…';
+    guard(async()=>{if(col==='pending'&&normCity(upd.city)!==normCity(doc.city)){const c=upd.city?await geocode(upd.city):null;upd.lat=c?c[0]:null;upd.lng=c?c[1]:null;if(upd.city&&!c)showNote('Non trovo "'+upd.city+'" sul globo. Prova a scriverla meglio.')}
+      await S.db.collection(col).doc(id).update(upd);S.gedit=null;S.gdraft=null;if(document.activeElement)document.activeElement.blur();fill()});return}
   if(act==='gmode'){S.globeMode=b.dataset.k;G.spin=S.globeMode==='mondo';const wrap=$('globe');if(wrap){globeTarget(wrap.clientWidth,wrap.clientHeight);if(S.globeMode==='mondo'){G.tLat=25}}document.querySelectorAll('[data-act=gmode]').forEach(x=>x.classList.toggle('on',x.dataset.k===S.globeMode));return}
   if(act==='delpend'){conf('pd:'+id,()=>S.db.collection('pending').doc(id).delete());return}
   if(act==='editcity'){S.editingCity=id;fill();return}
@@ -1332,9 +1416,9 @@ document.addEventListener('submit',async e=>{const f=e.target;
         try{up=await toDrive(file,ref&&ref.area,'Reference',(ref?ref.title+' ':'')+note,i===0?tokP:null)}catch(err){showNote(upErr(err));return}
         await guard(()=>S.db.collection('refitems').add({refId,kind:'photo',thumb:th||'',driveUrl:up.url,note,byName:whoName(),createdAt:Date.now()}))}
       f.reset();showNote('')}finally{S.busy=false;busy('ri-btn',false)}}
-  if(f.id==='pendform'){e.preventDefault();const name=$('pd-name').value.trim();if(!name)return;const city=$('pd-city').value.trim().replace(/\s+/g,' ');busy('pd-btn',true,'Cerco…');
-    try{const c=city?await geocode(city):null;await guard(()=>S.db.collection('pending').add({name,city,note:$('pd-note').value.trim(),status:'Da confermare',lat:c?c[0]:null,lng:c?c[1]:null,createdByName:whoName(),createdAt:Date.now()}));
-      f.reset();f.closest('details').open=false;if(city&&!c)showNote('Non trovo "'+city+'" sul globo. Prova a scriverla meglio con "Cambia".')}finally{busy('pd-btn',false)}}
+  if(f.id==='pendform'){e.preventDefault();const name=$('pd-name').value.trim(),role=$('pd-role').value.trim();if(!role)return;const city=$('pd-city').value.trim().replace(/\s+/g,' ');busy('pd-btn',true,'Cerco…');
+    try{const c=city?await geocode(city):null;await guard(()=>S.db.collection('pending').add({name,role,city,note:$('pd-note').value.trim(),status:'Da coprire',lat:c?c[0]:null,lng:c?c[1]:null,createdByName:whoName(),createdAt:Date.now()}));
+      f.reset();f.closest('details').open=false;if(city&&!c)showNote('Non trovo "'+city+'" sul globo. Prova a scriverla meglio con "Modifica".')}finally{busy('pd-btn',false)}}
   if(f.id==='supform'){e.preventDefault();const name=$('sp-name').value.trim();if(!name)return;const url=$('sp-url').value.trim();
     if(url&&!safeUrl(url)){$('sp-url').setCustomValidity('Serve un link che inizia con https://');$('sp-url').reportValidity();return}
     const data={name,category:$('sp-cat').value,region:$('sp-reg').value,city:$('sp-city').value.trim(),url:safeUrl(url),email:lc($('sp-email').value),phone:$('sp-phone').value.trim(),contact:$('sp-contact').value.trim(),status:$('sp-status').value,note:$('sp-note').value.trim(),updatedAt:Date.now()};
