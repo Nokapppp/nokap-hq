@@ -295,6 +295,60 @@ main{counter-reset:sec}
 .minput:focus{border-bottom-color:var(--ink);outline:none}
 .mrow{display:grid;grid-template-columns:minmax(200px,1.3fr) minmax(170px,1.2fr) 130px 90px;gap:14px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);min-width:600px}
 .mrow:last-child{border-bottom:0}
+/* ---- nuove sezioni ---- */
+a.refl{display:contents}
+.ref .cnt2{font-size:11px;font-weight:700;color:var(--mute)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:22px}
+.gph{margin:0;display:flex;flex-direction:column;gap:6px}
+.gph button.pic{border:0;padding:0;background:rgba(255,255,255,.35);cursor:zoom-in;aspect-ratio:1;display:grid;place-items:center;overflow:hidden}
+.gph img{width:100%;height:100%;object-fit:cover;display:block}
+.gph figcaption{font-size:12px;color:var(--mute);display:flex;justify-content:space-between;gap:8px;align-items:center}
+.lbox{position:fixed;inset:0;z-index:60;background:rgba(17,17,17,.86);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;cursor:zoom-out}
+.lbox[hidden]{display:none}
+.lbox img{max-width:min(1100px,92vw);max-height:78vh;object-fit:contain;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.lbox .cap{color:#EDECEA;font-size:13px;text-align:center;max-width:70ch}
+.lbox a{color:#fff;font-size:12.5px;font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.lrow{display:grid;grid-template-columns:minmax(200px,2fr) minmax(160px,1.4fr) 120px auto;gap:14px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
+.lrow:last-child{border-bottom:0}
+.multi{position:relative;min-width:0}
+.multi summary{list-style:none;cursor:pointer;border-bottom:1px solid var(--ink);padding:6px 0;font-size:14px;font-weight:500;color:var(--ink)}
+.multi summary::-webkit-details-marker{display:none}
+.multi summary::after{content:" ▾";color:var(--mute)}
+.multi[open] > div{position:absolute;z-index:12;left:0;top:100%;min-width:220px;max-height:260px;overflow:auto;background:#fff;border:1px solid var(--line);box-shadow:0 12px 30px rgba(0,0,0,.08);padding:8px 10px;display:flex;flex-direction:column;gap:6px}
+.multi label{display:flex;gap:8px;align-items:center;font-size:13px;font-weight:500;color:var(--ink);flex:none}
+.tedit{padding:14px 16px 18px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.55);display:flex;flex-wrap:wrap;gap:14px 18px;align-items:end;min-width:720px}
+.tedit label{display:flex;flex-direction:column;gap:6px;font-size:11.5px;font-weight:700;color:var(--mute);flex:1 1 160px}
+.tedit select,.tedit input{border:0;border-bottom:1px solid var(--ink);background:transparent;padding:6px 0;font-size:14px;font-weight:500;color:var(--ink)}
+.loc{display:inline-block;font-size:10.5px;font-weight:700;color:var(--mute);border:1px solid var(--line);padding:1px 6px;margin-left:6px;vertical-align:1px}
+.addbox{margin-bottom:22px}
+.addbox > summary{list-style:none;cursor:pointer;display:inline-block}
+.addbox > summary::-webkit-details-marker{display:none}
+.addbox[open] > summary{margin-bottom:14px}
+.sup{display:grid;grid-template-columns:minmax(200px,1.8fr) minmax(120px,1fr) minmax(170px,1.3fr) 110px 110px;gap:14px;align-items:center;padding:13px 16px;border-bottom:1px solid var(--line);min-width:760px}
+.sup:last-child{border-bottom:0}
+.sup .nm{font-weight:700}
+.sup .nm small{display:block;font-weight:500;color:var(--mute);font-size:12px}
+.sup a{text-decoration:underline;text-underline-offset:3px}
+.spill{font-size:11px;font-weight:700;border:1px solid var(--line);padding:3px 8px;justify-self:start}
+.spill.s-attivo{color:var(--ok);border-color:var(--ok)}
+.spill.s-trattativa{color:var(--red);border-color:var(--red)}
+.spill.s-scartato{color:var(--mute);text-decoration:line-through}
+.sched{border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column;gap:10px}
+.sched select,.sched input{border:0;border-bottom:1px solid var(--ink);background:transparent;padding:5px 0;font-size:13.5px}
+.supchk{display:flex;flex-direction:column;gap:5px;max-height:170px;overflow:auto;border:1px solid var(--line);padding:8px;background:rgba(255,255,255,.5)}
+.supchk label{display:flex;gap:8px;font-size:13px;align-items:center}
+.supchk small{color:var(--mute)}
+.ob{display:grid;grid-template-columns:130px minmax(180px,1.4fr) minmax(200px,2fr) 100px 28px;gap:14px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);min-width:720px}
+.ob:last-child{border-bottom:0}
+.ob .st-programmata{color:var(--red);font-weight:700;font-size:12px}
+.ob .st-inviata{color:var(--ok);font-weight:700;font-size:12px}
+.ob .st-errore{color:var(--red);font-weight:700;font-size:12px;text-decoration:underline}
+.prow{display:grid;grid-template-columns:1.4fr 70px 80px 28px;gap:10px;align-items:center;margin-bottom:8px}
+.prow input{border:0;border-bottom:1px solid var(--ink);background:transparent;padding:5px 0;font-size:14px;min-width:0}
+.prow input[type=color]{height:30px;padding:0;border:1px solid var(--line)}
+.bform textarea{width:100%;min-height:110px;border:1px solid var(--line);background:rgba(255,255,255,.5);padding:10px;font-size:14px;line-height:1.5}
+.bform label{display:flex;flex-direction:column;gap:6px;font-size:11.5px;font-weight:700;color:var(--mute);margin-bottom:14px}
+.bform input[type=text]{border:0;border-bottom:1px solid var(--ink);background:transparent;padding:6px 0;font-size:14px}
 @media (max-width:760px){
   .top{padding:10px 14px}
   .logo img{height:40px}
@@ -362,8 +416,8 @@ const KIND_USE=k=>['Post','Carosello','Reel','Story','Caption'].includes(k)?'Soc
 const APPROVER='Gabriele Caponnetto';
 
 const S={tasks:[],links:[],refs:[],drafts:[],deadlines:[],uploads:[],drop:{},drive:{},
-  loaded:{tasks:false,links:false,refs:false,drafts:false,deadlines:false,uploads:false},
-  db:null,user:null,me:null,editingMember:null,reassigning:null,email:'',myName:'',isAdmin:false,members:[],token:null,tokenAt:0,names:{},canWrite:true,
+  loaded:{tasks:false,links:false,refs:false,drafts:false,deadlines:false,uploads:false,suppliers:false,mailtpl:false,outbox:false,refitems:false},
+  db:null,user:null,me:null,editingMember:null,reassigning:null,editingTask:null,editingBrand:false,editingSupplier:null,editingTpl:null,scheduling:null,supCat:'all',supReg:'',suppliers:[],mailtpl:[],outbox:[],refitems:[],brandkit:null,myCanBrand:false,email:'',myName:'',isAdmin:false,members:[],token:null,tokenAt:0,names:{},canWrite:true,
   taskFilter:'all',refFilter:'all',draftFilter:'attivi',editingLink:null,editingDraft:null,reviewing:null,openBody:{},confirmDel:null,busy:false};
 
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -391,7 +445,27 @@ function people(){const seen=new Set(),L=[];
 const teamOpts=(sel)=>`<option value="Da assegnare">Da assegnare</option>`+people().map(p=>`<option value="${esc(p.v)}" ${sel&&sel===p.v?'selected':''}>${esc(p.label)}</option>`).join('');
 const pick=v=>{if(!v||v==='Da assegnare')return {owner:'Da assegnare',ownerEmail:''};const p=people().find(x=>x.v===v);return p?{owner:p.name,ownerEmail:p.email}:{owner:v,ownerEmail:''}};
 const ownerVal=t=>{if(t.ownerEmail)return '@'+t.ownerEmail;const m=S.members.find(m=>m.email&&lc(m.name)===lc(t.owner));return m?'@'+m.email:(t.owner||'Da assegnare')};
-const mine=t=>S.email&&lc(t.ownerEmail)===S.email;
+const mine=t=>S.email&&(lc(t.ownerEmail)===S.email||(t.helpers||[]).some(h=>lc(h.email)===S.email));
+const LOCS=['Online','Firenze','Milano','Roma','Altro'];
+const REGIONS=['Online','Toscana','Lombardia','Lazio','Piemonte','Veneto','Emilia-Romagna','Liguria','Campania','Puglia','Sicilia','Sardegna','Marche','Umbria','Abruzzo','Calabria','Trentino-Alto Adige','Friuli-Venezia Giulia','Basilicata','Molise',"Valle d'Aosta",'Estero'];
+const SCATS=['Stampa e serigrafia','Ricamo','Capi base e tessuti','Produzione capi','Etichette e packaging','Foto e video','Grafica','Location ed eventi','Spedizioni','Altro'];
+const SSTATUS=['Da contattare','Contattato','In trattativa','Attivo','Scartato'];
+const SCLASS={'In trattativa':'s-trattativa','Attivo':'s-attivo','Scartato':'s-scartato'};
+const DEFAULT_BRAND={status:'Bozza',palette:[{name:'Bianco',hex:'#FFFFFF',pct:60},{name:'Rosso',hex:'#B91E1A',pct:30},{name:'Nero',hex:'#111111',pct:10}],hashtags:'',
+  tone:['Parliamo come la community: cultura, scena, strada, "noi".','Niente linguaggio da azienda, niente promesse vuote, niente polemiche.','Frasi brevi. Slang solo dove suona naturale.','Nelle collab NoKap viene sempre per primo: NoKap × Artista – Titolo.'],
+  templates:['Annuncio drop, countdown, artista, citazione, behind the scenes','Base: 2 post o caroselli + 2 reel a settimana','Si taggano sempre artista, fotografo o videomaker e luogo','Commenti e DM: risposta entro 24 ore']};
+const locOpts=sel=>`<option value="">—</option>`+LOCS.map(l=>`<option ${l===sel?'selected':''}>${l}</option>`).join('');
+const optsOf=(L,sel,empty)=>(empty!==undefined?`<option value="">${esc(empty)}</option>`:'')+L.map(l=>`<option ${l===sel?'selected':''}>${esc(l)}</option>`).join('');
+const locTag=l=>l?`<span class="loc">${esc(l)}</span>`:'';
+const helpersTxt=t=>(t.helpers||[]).length?' + '+(t.helpers||[]).map(h=>esc(h.name||h.email)).join(', '):'';
+function multiBox(id,selEmails){const P=people().filter(p=>p.email);
+  if(!P.length)return `<span class="note">Aggiungi prima le persone in Team e accessi</span>`;
+  const sel=new Set((selEmails||[]).map(lc));
+  return `<details class="multi" id="${id}"><summary>${sel.size?sel.size+' persone':'Nessuno'}</summary><div>${P.map(p=>`<label><input type="checkbox" value="${esc(p.email)}" ${sel.has(lc(p.email))?'checked':''}> ${esc(p.name)}</label>`).join('')}</div></details>`}
+function readMulti(id){const el=$(id);if(!el)return [];return [...el.querySelectorAll('input[type=checkbox]:checked')].map(i=>{const p=people().find(x=>lc(x.email)===lc(i.value));return {name:p?p.name:i.value,email:lc(i.value)}})}
+const canBrand=()=>S.isAdmin||!!S.myCanBrand;
+const brandData=()=>({...DEFAULT_BRAND,...(S.brandkit||{})});
+const fillTpl=(s,sup,d)=>String(s||'').replace(/\{fornitore\}/g,sup.name||'').replace(/\{contatto\}/g,sup.contact||sup.name||'').replace(/\{titolo\}/g,d?d.title||'':'').replace(/\{link\}/g,d&&safeUrl(d.fileUrl)?safeUrl(d.fileUrl):'').replace(/\{testo\}/g,d?d.body||'':'').replace(/\{firma\}/g,'Il team NoKap');
 
 /* ---------- background ---------- */
 function rng(seed){return()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646}}
@@ -430,6 +504,7 @@ function buildMenu(){
     ${it('file','Carica file')}
     ${it('moodboard','Moodboard')}
     ${it('link','Link utili')}
+    ${it('fornitori','Fornitori',S.outbox.filter(o=>o.status==='programmata').length?S.outbox.filter(o=>o.status==='programmata').length+' email programmate':'')}
     ${it('brand','Brand kit')}
     ${S.isAdmin?it('team','Team e accessi'):''}
     <li><a href="#home" data-act="logout">Esci<small style="color:var(--mute)">${esc(S.email)}</small></a></li>
@@ -490,8 +565,10 @@ function taskForm(prefArea){
   return `<form class="form" id="taskform">
     <label class="wide" for="tf-title">Cosa<input id="tf-title" required maxlength="140" placeholder="Es. Chiudere il preventivo con il fornitore"></label>
     <label for="tf-area">Area<select id="tf-area">${areaOpts(prefArea)}</select></label>
-    <label for="tf-owner">Chi (una persona)<select id="tf-owner">${teamOpts()}</select></label>
+    <label for="tf-owner">Responsabile<select id="tf-owner">${teamOpts()}</select></label>
+    <label>Con (facoltativo)${multiBox('tf-helpers')}</label>
     <label for="tf-date">Entro il<input id="tf-date" type="date"></label>
+    <label for="tf-loc">Dove<select id="tf-loc">${locOpts('')}</select></label>
     <button class="btn" type="submit">Aggiungi attività</button>
   </form>`;
 }
@@ -507,7 +584,9 @@ function viewDeadlines(){
       <label class="wide" for="df-title">Scadenza<input id="df-title" required maxlength="120" placeholder="Es. Consegna campionature"></label>
       <label for="df-date">Data<input id="df-date" type="date" required></label>
       <label for="df-area">Area<select id="df-area">${areaOpts('dir')}</select></label>
-      <label for="df-owner">Chi<select id="df-owner">${teamOpts()}</select></label>
+      <label for="df-owner">Responsabile<select id="df-owner">${teamOpts()}</select></label>
+      <label>Con (facoltativo)${multiBox('df-helpers')}</label>
+      <label for="df-loc">Dove<select id="df-loc">${locOpts('')}</select></label>
       <button class="btn" type="submit">Aggiungi scadenza</button>
     </form>
     <div class="panel" id="alldl" style="margin-top:30px"></div></section>`;
@@ -521,6 +600,7 @@ function viewTexts(){
       <label for="dr-area">Area<select id="dr-area">${areaOpts('cont')}</select></label>
       <label for="dr-author">Chi l'ha scritta<select id="dr-author">${teamOpts()}</select></label>
       <label for="dr-date">Uscita prevista<input id="dr-date" type="date"></label>
+      <label for="dr-loc">Dove<select id="dr-loc">${locOpts('')}</select></label>
       <label class="full" for="dr-body">Testo<textarea id="dr-body" maxlength="8000" placeholder="Scrivi qui la caption, il copy o la descrizione del progetto."></textarea></label>
       <label class="wide" for="dr-file">Allegato, va su Drive (grafica, video, PDF)<input id="dr-file" type="file"></label>
       <label class="wide" for="dr-link">Oppure link a un file<input id="dr-link" type="url" placeholder="https://…"></label>
@@ -571,16 +651,16 @@ function viewLinks(){
     <div class="lgroups" id="alllinks" style="margin-top:40px"></div></section>`;
 }
 function viewBrand(){
-  return `${head('Bozza · da approvare: '+APPROVER,'Brand kit','Palette, font e hashtag diventano ufficiali solo con l\'ok di Gabriele.')}
-    <section>
-      <div class="sec-head"><h2>Palette, proporzioni indicative</h2><span class="note">Rosso del logo: #B91E1A · codici ufficiali <span class="tbd">da definire</span></span></div>
-      <div class="ratio">
-        <div style="flex:60;background:#fff"><b>60%</b>Bianco</div>
-        <div style="flex:30;background:var(--red);color:#fff"><b>30%</b>Rosso</div>
-        <div style="flex:10;background:var(--ink);color:#fff"><b>10%</b>Nero</div>
-      </div>
+  return `${head('Brand kit','Brand kit','Palette, font, hashtag e tono di NoKap. Lo modificano solo le persone abilitate da Gabriele.')}
+    <div id="brandbody"></div>`;
+}
+function brandHtml(){const b=brandData(),tot=(b.palette||[]).reduce((s,p)=>s+(+p.pct||0),0)||1;
+  const okHex=x=>/^#[0-9a-fA-F]{6}$/.test(x||'')?x:'#cccccc';
+  const lum=x=>{const n=parseInt(okHex(x).slice(1),16);return ((n>>16)*.299+((n>>8)&255)*.587+(n&255)*.114)/255};
+  return `<section><div class="sec-head"><h2>Palette, proporzioni indicative</h2><span class="note">${esc(b.status||'Bozza')}${b.updatedByName?' · ultima modifica: '+esc(b.updatedByName):''}${canBrand()?` · <button class="linkish dark" data-act="bedit" type="button">Modifica brand kit</button>`:''}</span></div>
+      <div class="ratio">${(b.palette||[]).map(p=>`<div style="flex:${Math.max(1,+p.pct||0)};background:${okHex(p.hex)};color:${lum(p.hex)>.6?'#111':'#fff'};${lum(p.hex)>.9?'box-shadow:inset 0 0 0 1px var(--line)':''}"><b>${Math.round((+p.pct||0)/tot*100)}%</b>${esc(p.name||'')}<small style="font-weight:500;opacity:.8">${esc(okHex(p.hex).toUpperCase())}</small></div>`).join('')}</div>
     </section>
-    <section class="grid2">
+    <section class="grid2" style="margin-top:28px">
       <div class="box spec"><h3>Logo e font del logo · Cloister Black</h3>
         <img src="assets/logo_nokap.png" alt="Logo NoKap" style="display:block;width:min(320px,100%);height:auto;margin:6px 0 10px">
         <div class="a">NoKap</div>
@@ -591,19 +671,63 @@ function viewBrand(){
         <div class="c" style="font-weight:500;color:var(--ink)">Medium · interfaccia ed etichette</div>
         <div class="c" style="font-weight:700;color:var(--ink)">Bold · titoli e nomi</div>
         <p class="note">Licenza SIL Open Font: si può usare anche per prodotti e grafiche commerciali.</p></div>
-      <div class="box"><h3>Tono di voce</h3><ul>
-        <li>Parliamo come la community: cultura, scena, strada, "noi".</li>
-        <li>Niente linguaggio da azienda, niente promesse vuote, niente polemiche.</li>
-        <li>Frasi brevi. Slang solo dove suona naturale.</li>
-        <li>Nelle collab NoKap viene sempre per primo: NoKap × Artista – Titolo.</li></ul></div>
-      <div class="box"><h3>Template e social</h3><ul>
-        <li>Annuncio drop, countdown, artista, citazione, behind the scenes</li>
-        <li>Base: 2 post o caroselli + 2 reel a settimana</li>
-        <li>Si taggano sempre artista, fotografo o videomaker e luogo</li>
-        <li>Commenti e DM: risposta entro 24 ore</li></ul>
-        <p class="note">Hashtag ufficiali <span class="tbd">da definire</span></p></div>
-    </section>`;
-}
+      <div class="box"><h3>Tono di voce</h3><ul>${(b.tone||[]).map(t=>`<li>${esc(t)}</li>`).join('')}</ul></div>
+      <div class="box"><h3>Template e social</h3><ul>${(b.templates||[]).map(t=>`<li>${esc(t)}</li>`).join('')}</ul>
+        <p class="note">Hashtag ufficiali: ${b.hashtags?esc(b.hashtags):'<span class="tbd">da definire</span>'}</p></div>
+    </section>`}
+function brandForm(){const b=brandData();
+  return `<section class="box bform"><div class="sec-head"><h2>Modifica brand kit</h2><span class="note">Le modifiche le vede subito tutto il team</span></div>
+    <label>Palette (nome · colore · percentuale)<div id="bf-pal">${(b.palette||[]).map(p=>palRow(p)).join('')}</div>
+      <button class="linkish dark" data-act="baddcol" type="button" style="align-self:start">+ Aggiungi colore</button></label>
+    <label for="bf-status">Stato<select id="bf-status">${optsOf(['Bozza','Approvato da Gabriele'],b.status)}</select></label>
+    <label for="bf-hash">Hashtag ufficiali<input type="text" id="bf-hash" value="${esc(b.hashtags||'')}" placeholder="#nokap #aspettandolatrapmusicale"></label>
+    <label for="bf-tone">Tono di voce (una regola per riga)<textarea id="bf-tone">${esc((b.tone||[]).join('\n'))}</textarea></label>
+    <label for="bf-tpl">Template e social (una voce per riga)<textarea id="bf-tpl">${esc((b.templates||[]).join('\n'))}</textarea></label>
+    <div style="display:flex;gap:14px;align-items:center"><button class="btn" data-act="bsave" type="button">Salva brand kit</button><button class="linkish" data-act="bcancel" type="button">Annulla</button></div>
+  </section>`}
+const palRow=p=>`<div class="prow"><input type="text" class="pname" value="${esc(p.name||'')}" placeholder="Nome colore" aria-label="Nome colore"><input type="color" class="phex" value="${/^#[0-9a-fA-F]{6}$/.test(p.hex||'')?p.hex:'#cccccc'}" aria-label="Colore"><input type="number" class="ppct" min="0" max="100" value="${+p.pct||0}" aria-label="Percentuale"><button class="x" data-act="bdelcol" type="button" aria-label="Togli colore">×</button></div>`;
+function viewRef(id){const r=S.refs.find(x=>x.id===id);
+  return `<div class="pagehead"><div class="lab">Reference</div><h1 id="rf-h">${esc(r?r.title:'Reference')}</h1><p id="rf-p">${r&&r.note?esc(r.note):''}</p><p><a class="linkish" href="#moodboard">← Torna alla moodboard</a></p></div>
+    <div id="netnote" class="status-note"></div>
+    <section><form class="form" id="riform" data-ref="${esc(id)}">
+      <label class="wide" for="ri-file">Foto, vanno su Drive<input id="ri-file" type="file" accept="image/*" multiple></label>
+      <label class="wide" for="ri-url">Oppure un link<input id="ri-url" type="url" placeholder="https://…"></label>
+      <label class="wide" for="ri-note">Nota<input id="ri-note" maxlength="200" placeholder="Cosa guardare"></label>
+      <button class="btn" type="submit" id="ri-btn">Aggiungi</button></form>
+      <div class="sec-head" style="margin-top:44px"><h2>Foto</h2><span class="note" id="ri-count"></span></div>
+      <div class="gallery" id="ri-photos"></div>
+      <div class="sec-head" style="margin-top:44px"><h2>Link</h2></div>
+      <div class="panel" id="ri-links"></div></section>`}
+function viewSuppliers(){
+  return `${head('Chi ci produce, stampa, spedisce','Fornitori','Divisi per regione e oggetto. Da una bozza approvata puoi programmare email preimpostate ai fornitori.')}
+    <section><details class="addbox" id="sup-add"><summary class="btn ghost">Aggiungi fornitore</summary>
+      <form class="form" id="supform">
+        <label class="wide" for="sp-name">Nome<input id="sp-name" required maxlength="100" placeholder="Es. Serigrafia Rossi"></label>
+        <label for="sp-cat">Oggetto<select id="sp-cat">${optsOf(SCATS,'Stampa e serigrafia')}</select></label>
+        <label for="sp-reg">Regione<select id="sp-reg">${optsOf(REGIONS,'Toscana')}</select></label>
+        <label for="sp-city">Città<input id="sp-city" maxlength="60" placeholder="Es. Prato (vuoto se online)"></label>
+        <label class="wide" for="sp-url">Sito o link<input id="sp-url" type="url" placeholder="https://…"></label>
+        <label for="sp-email">Email<input id="sp-email" type="email" placeholder="info@…"></label>
+        <label for="sp-phone">Telefono<input id="sp-phone" maxlength="30"></label>
+        <label for="sp-contact">Referente<input id="sp-contact" maxlength="60"></label>
+        <label for="sp-status">Stato<select id="sp-status">${optsOf(SSTATUS,'Da contattare')}</select></label>
+        <label class="full" for="sp-note">Note<input id="sp-note" maxlength="300" placeholder="Minimi d'ordine, tempi, cosa fanno bene"></label>
+        <button class="btn" type="submit" id="sp-btn">Salva fornitore</button><button class="linkish" data-act="spcancel" type="button">Annulla</button>
+      </form></details>
+      <div class="filters" id="supfilters"></div>
+      <div id="suplist"></div></section>
+    <section><div class="sec-head"><h2>Modelli email</h2><span class="note">Segnaposto: {fornitore} {contatto} {titolo} {link} {testo} {firma}</span></div>
+      <div id="tplwrap"></div></section>
+    <section><div class="sec-head"><h2>Email programmate</h2><span class="note">Partono da nokapmerch@gmail.com · controllo ogni 15 minuti</span></div>
+      <div class="panel" id="outlist"></div></section>`}
+function schedPanel(d){const sups=S.suppliers.filter(s=>s.email&&s.status!=='Scartato');
+  const dt=new Date(Date.now()+3600e3);dt.setMinutes(0,0,0);const def=new Date(dt.getTime()-dt.getTimezoneOffset()*6e4).toISOString().slice(0,16);
+  if(!S.mailtpl.length)return `<div class="sched"><span class="note">Crea prima un modello email nella pagina <a href="#fornitori" class="linkish dark">Fornitori</a>.</span></div>`;
+  if(!sups.length)return `<div class="sched"><span class="note">Nessun fornitore con email. Aggiungili nella pagina <a href="#fornitori" class="linkish dark">Fornitori</a>.</span></div>`;
+  return `<div class="sched"><label class="note" for="sc-tpl">Modello<select id="sc-tpl">${S.mailtpl.map(t=>`<option value="${esc(t.id)}">${esc(t.name)}</option>`).join('')}</select></label>
+    <div class="supchk">${sups.map(s=>`<label><input type="checkbox" value="${esc(s.id)}"> ${esc(s.name)} <small>${esc(s.category||'')} · ${esc(s.city||s.region||'')}</small></label>`).join('')}</div>
+    <label class="note" for="sc-when">Invio il<input id="sc-when" type="datetime-local" value="${def}"></label>
+    <div class="acts"><button class="btn sm" data-act="dschedgo" data-id="${esc(d.id)}" type="button">Programma invio</button><button class="linkish" data-act="dschedx" type="button">Annulla</button></div></div>`}
 function viewTeam(){
   if(!S.isAdmin)return viewHome();
   const mg=canManageTeam();
@@ -643,17 +767,22 @@ function trackRows(list,empty){
   list.map((t,i)=>{const st=STATUS[t.status]?t.status:'todo',a=AREA[t.area],ck='t:'+t.id;
     return `<div class="tr ${st==='done'?'done':''}">
       <span class="n">${String(i+1).padStart(2,'0')}</span>
-      <span class="tt">${esc(t.title)}<small>${esc(a?a.name:'Senza area')}</small></span>
-      <span class="who ${noOwner(t)?'warn':''}">${S.canWrite&&st!=='done'&&S.reassigning===t.id?`<select class="osel" data-act="reassign" data-id="${esc(t.id)}" aria-label="Responsabile di ${esc(t.title)}">${teamOpts(ownerVal(t))}</select>`:`${noOwner(t)?'Senza responsabile':esc(t.owner)}${S.canWrite&&st!=='done'?` <button class="chg" data-act="startreassign" data-id="${esc(t.id)}" type="button" aria-label="Cambia responsabile">cambia</button>`:''}`}${t.ownerEmail&&t.notifiedOwner===lc(t.ownerEmail)?'<small class="ntf">avvisato</small>':''}</span>
+      <span class="tt">${esc(t.title)}<small>${esc(a?a.name:'Senza area')}${locTag(t.location)}</small></span>
+      <span class="who ${noOwner(t)?'warn':''}">${false?`<select class="osel" data-act="reassign" data-id="${esc(t.id)}" aria-label="Responsabile di ${esc(t.title)}">${teamOpts(ownerVal(t))}</select>`:`${noOwner(t)?'Senza responsabile':esc(t.owner)}${helpersTxt(t)}${S.canWrite?` <button class="chg" data-act="tedit" data-id="${esc(t.id)}" type="button" aria-label="Modifica attività">modifica</button>`:''}`}${t.ownerEmail&&(t.notifiedOwner===lc(t.ownerEmail)||String(t.notified||'').split(',').includes(lc(t.ownerEmail)))?'<small class="ntf">avvisato</small>':''}</span>
       <span class="note">${dueHtml(t)}</span>
       <span><button class="st ${st}" data-act="cycle" data-id="${esc(t.id)}" ${S.canWrite?'':'disabled'} aria-label="Stato ${STATUS[st]}: clicca per cambiare">${STATUS[st]}</button></span>
       <span>${S.canWrite?`<button class="x ${S.confirmDel===ck?'confirm':''}" data-act="deltask" data-id="${esc(t.id)}" aria-label="Elimina attività">${S.confirmDel===ck?'Ok?':'×'}</button>`:''}</span>
-    </div>`}).join('');
+    </div>${S.editingTask===t.id?`<div class="tedit">
+      <label for="te-owner">Responsabile<select id="te-owner">${teamOpts(ownerVal(t))}</select></label>
+      <label>Con${multiBox('te-helpers',(t.helpers||[]).map(h=>h.email))}</label>
+      <label for="te-date">Entro il<input id="te-date" type="date" value="${isDate(t.dueDate)?t.dueDate:''}"></label>
+      <label for="te-loc">Dove<select id="te-loc">${locOpts(t.location||'')}</select></label>
+      <div style="display:flex;gap:12px;align-items:center"><button class="btn sm" data-act="tsave" data-id="${esc(t.id)}" type="button">Salva</button><button class="linkish" data-act="tcancel" type="button">Annulla</button></div></div>`:''}`}).join('');
 }
 function allDeadlines(){
   const L=[];
-  S.deadlines.forEach(d=>{if(isDate(d.date))L.push({key:'d:'+d.id,id:d.id,date:d.date,title:d.title,src:'Scadenza',area:d.area,owner:d.owner,del:true})});
-  S.tasks.forEach(t=>{if(isDate(t.dueDate)&&t.status!=='done')L.push({key:'t:'+t.id,date:t.dueDate,title:t.title,src:'Attività',area:t.area,owner:t.owner})});
+  S.deadlines.forEach(d=>{if(isDate(d.date))L.push({key:'d:'+d.id,id:d.id,date:d.date,title:d.title,src:'Scadenza',area:d.area,owner:d.owner,helpers:d.helpers,location:d.location,del:true})});
+  S.tasks.forEach(t=>{if(isDate(t.dueDate)&&t.status!=='done')L.push({key:'t:'+t.id,date:t.dueDate,title:t.title,src:'Attività',area:t.area,owner:t.owner,helpers:t.helpers,location:t.location})});
   S.drafts.forEach(d=>{if(isDate(d.date)&&d.status!=='pubblicato')L.push({key:'x:'+d.id,date:d.date,title:d.title,src:'Uscita '+(d.kind||'contenuto').toLowerCase(),area:d.area,owner:d.author})});
   if(isDate(S.drop.date))L.push({key:'drop',date:S.drop.date,title:'Giorno T: uscita del drop 01',src:'Drop',area:'dir',owner:''});
   return L.sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0);
@@ -665,7 +794,7 @@ function dlRows(list,grouped){
   const row=x=>{const n=daysTo(x.date),a=AREA[x.area],ck='d:'+x.id;
     return `<div class="dl"><span class="d ${n<0?'late':''}">${fmtDate(x.date)}<small>${n<0?'scaduta':n===0?'oggi':n===1?'domani':'tra '+n+' giorni'}</small></span>
       <span class="tt" style="font-weight:700">${esc(x.title)}</span><span class="src">${esc(x.src)}</span>
-      <span class="note">${esc(a?a.name:'')}</span><span class="who ${x.owner==='Da assegnare'?'warn':''}">${x.owner==='Da assegnare'?'Senza responsabile':esc(x.owner||'')}</span>
+      <span class="note">${esc(a?a.name:'')}${locTag(x.location)}</span><span class="who ${x.owner==='Da assegnare'?'warn':''}">${x.owner==='Da assegnare'?'Senza responsabile':esc(x.owner||'')}${helpersTxt(x)}</span>
       <span>${x.del&&S.canWrite?`<button class="x ${S.confirmDel===ck?'confirm':''}" data-act="deldl" data-id="${esc(x.id)}" aria-label="Elimina scadenza">${S.confirmDel===ck?'Ok?':'×'}</button>`:''}</span></div>`};
   if(!grouped) return list.map(row).join('');
   const g={late:[],week:[],later:[]};list.forEach(x=>{const n=daysTo(x.date);(n<0?g.late:n<=7?g.week:g.later).push(x)});
@@ -679,6 +808,7 @@ function draftCard(d){
     if(st==='bozza'||st==='modifiche')acts+=`<button class="btn sm" data-act="dsubmit" data-id="${esc(d.id)}" type="button">${st==='modifiche'?'Rimanda in approvazione':'Invia in approvazione'}</button>`;
     if(st==='revisione'&&canApprove())acts+=`<button class="btn sm" data-act="dapprove" data-id="${esc(d.id)}" type="button">Approva</button><button class="btn sm ghost" data-act="dreview" data-id="${esc(d.id)}" type="button">Chiedi modifiche</button>`;
     if(st==='approvato')acts+=`<button class="btn sm ghost" data-act="dpublish" data-id="${esc(d.id)}" type="button">Segna pubblicato</button>`;
+    if((st==='approvato'||st==='pubblicato')&&canApprove())acts+=`<button class="linkish dark" data-act="dsched" data-id="${esc(d.id)}" type="button">Email ai fornitori</button>`;
     if(st!=='pubblicato')acts+=`<button class="linkish dark" data-act="dedit" data-id="${esc(d.id)}" type="button">Modifica</button>`;
     acts+=`<button class="x ${S.confirmDel===ck?'confirm':''}" data-act="ddel" data-id="${esc(d.id)}" aria-label="Elimina bozza">${S.confirmDel===ck?'Ok?':'×'}</button>`;
   }
@@ -686,7 +816,7 @@ function draftCard(d){
       <div class="acts"><button class="btn sm" data-act="dsave" data-id="${esc(d.id)}" type="button">Salva modifiche</button><button class="linkish" data-act="dcancel" type="button">Annulla</button></div>`
     :(d.body?`<div class="body ${S.openBody[d.id]?'open':''}">${esc(d.body)}</div>${(d.body||'').length>320?`<button class="linkish" data-act="dtoggle" data-id="${esc(d.id)}" type="button" style="align-self:start">${S.openBody[d.id]?'Riduci':'Leggi tutto'}</button>`:''}`:'');
   return `<article class="dcard s-${st}">
-    <div class="meta"><span>${esc(d.kind||'Bozza')}</span><span>·</span><span>${esc(d.channel||'')}</span>${isDate(d.date)?`<span>·</span><span>Uscita ${fmtDate(d.date)}</span>`:''}</div>
+    <div class="meta"><span>${esc(d.kind||'Bozza')}</span><span>·</span><span>${esc(d.channel||'')}</span>${isDate(d.date)?`<span>·</span><span>Uscita ${fmtDate(d.date)}</span>`:''}${d.location?`<span>·</span><span>${esc(d.location)}</span>`:''}</div>
     ${ed?'':`<div class="tt">${esc(d.title)}</div>`}
     ${body}
     ${file?`<a class="linkish dark" href="${esc(file)}" target="_blank" rel="noopener">Allegato: ${esc(d.fileName||'apri file')}</a>`:''}
@@ -694,6 +824,7 @@ function draftCard(d){
     ${(st==='approvato'||st==='pubblicato')&&d.approvedBy?`<div class="appr">Approvato da ${esc(d.approvedByName||nameOf(d.approvedBy))}${d.approvedAt?' il '+new Date(d.approvedAt).toLocaleDateString('it-IT',{day:'numeric',month:'short'}):''}</div>`:''}
     ${st==='revisione'?`<div class="note">Da approvare: ${APPROVER}${canApprove()?'':' · solo chi ha il ruolo di approvatore può approvare'}</div>`:''}
     ${rv?`<textarea id="dr-note-${esc(d.id)}" maxlength="1000" placeholder="Cosa va cambiato?" aria-label="Note per le modifiche"></textarea><div class="acts"><button class="btn sm red" data-act="dreviewsend" data-id="${esc(d.id)}" type="button">Invia richiesta di modifiche</button><button class="linkish" data-act="dcancel" type="button">Annulla</button></div>`:''}
+    ${S.scheduling===d.id?schedPanel(d):''}${(()=>{const n=S.outbox.filter(o=>o.draftId===d.id);return n.length?`<div class="note">${n.filter(o=>o.status==='inviata').length} email inviate · ${n.filter(o=>o.status==='programmata').length} programmate</div>`:''})()}
     <div class="foot2"><span class="badge b-${st}">${DSTATUS[st]}</span><span class="note">${esc(d.author&&d.author!=='Da assegnare'?d.author:'Autore non indicato')}${a?' · '+esc(a.name):''}</span><div class="acts">${acts}</div></div>
   </article>`;
 }
@@ -706,8 +837,9 @@ function sortDrafts(L){const o={revisione:0,modifiche:1,bozza:2,approvato:3,pubb
 function refCard(r){
   const media=okThumb(r.thumb)?`<img src="${r.thumb}" alt="${esc(r.title)}" loading="lazy">`:`<div class="ph">${esc(r.title)}</div>`;
   const url=safeUrl(r.driveUrl)||safeUrl(r.url),ck='r:'+r.id;
-  return `<figure class="obj ref" style="margin:0"><div class="art">${media}</div>
-    <div class="nm">${esc(r.title)}</div>${r.note?`<p>${esc(r.note)}</p>`:''}
+  const n=S.refitems.filter(i=>i.refId===r.id).length;
+  return `<figure class="obj ref" style="margin:0"><a class="refl" href="#ref-${esc(r.id)}"><div class="art" style="cursor:pointer">${media}</div>
+    <div class="nm">${esc(r.title)}</div></a>${r.note?`<p>${esc(r.note)}</p>`:''}${n?`<span class="cnt2">${n} tra foto e link</span>`:''}
     <div class="tags">${(r.tags||[]).map(t=>`<span>${esc(t)}</span>`).join('')}</div>
     <div class="refacts">${safeUrl(r.driveUrl)?`<a class="linkish" href="${esc(safeUrl(r.driveUrl))}" target="_blank" rel="noopener">Originale su Drive</a>`:''}${safeUrl(r.url)?`<a class="linkish" href="${esc(safeUrl(r.url))}" target="_blank" rel="noopener">Link</a>`:''}
       ${S.canWrite?`<button class="x ${S.confirmDel===ck?'confirm':''}" data-act="delref" data-id="${esc(r.id)}" aria-label="Elimina reference">${S.confirmDel===ck?'Ok?':'×'}</button>`:''}</div>
@@ -731,6 +863,57 @@ function countdown(){
   return {big:'Giorno T',hud:'T da definire',txt:'data da definire'};
 }
 
+/* ---------- fill sezioni nuove ---------- */
+function fillExtra(r){
+  const set=(id,html)=>{const el=$(id);if(el)el.innerHTML=html};
+  // brand
+  const bb=$('brandbody');if(bb){const mode=S.editingBrand?'edit':'view';if(mode==='view'||bb.dataset.mode!=='edit'){bb.innerHTML=mode==='edit'?brandForm():brandHtml();bb.dataset.mode=mode}}
+  // reference detail
+  if(r.startsWith('ref-')){const id=r.slice(4),ref=S.refs.find(x=>x.id===id);
+    if(ref){const h1=$('rf-h');if(h1)h1.textContent=ref.title;const p=$('rf-p');if(p)p.textContent=ref.note||''}
+    const items=S.refitems.filter(i=>i.refId===id).sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
+    const photos=[...(ref&&okThumb(ref.thumb)?[{id:'_main',kind:'photo',thumb:ref.thumb,driveUrl:ref.driveUrl,note:'Immagine principale',main:true}]:[]),...items.filter(i=>i.kind==='photo')];
+    const links=[...(ref&&safeUrl(ref.url)?[{id:'_mainl',url:ref.url,title:ref.url,note:'Link principale',main:true}]:[]),...items.filter(i=>i.kind==='link')];
+    set('ri-count',photos.length?photos.length+' foto':'');
+    set('ri-photos',!S.loaded.refitems?'<div class="empty">Carico…</div>':photos.length?photos.map(i=>{const ck='ri:'+i.id;return `<figure class="gph"><button class="pic" data-act="lb" data-thumb="${esc(i.id)}" type="button" aria-label="Apri foto">${okThumb(i.thumb)?`<img src="${i.thumb}" alt="${esc(i.note||'Foto')}" loading="lazy">`:'<span class="note">Foto su Drive</span>'}</button>
+      <figcaption><span>${esc(i.note||'')}${i.byName?' · '+esc(i.byName):''}</span><span style="display:flex;gap:8px">${safeUrl(i.driveUrl)?`<a class="linkish" href="${esc(safeUrl(i.driveUrl))}" target="_blank" rel="noopener">Drive</a>`:''}${!i.main&&S.canWrite?`<button class="x ${S.confirmDel===ck?'confirm':''}" data-act="delri" data-id="${esc(i.id)}" aria-label="Elimina foto">${S.confirmDel===ck?'Ok?':'×'}</button>`:''}</span></figcaption></figure>`}).join(''):'<div class="empty" style="grid-column:1/-1">Nessuna foto. Caricane una qui sopra.</div>');
+    set('ri-links',links.length?links.map(i=>{const u=safeUrl(i.url),ck='ri:'+i.id;return `<div class="lrow"><span style="font-weight:700;word-break:break-all">${u?`<a href="${esc(u)}" target="_blank" rel="noopener" style="text-decoration:underline;text-underline-offset:3px">${esc(i.title||u.replace(/^https?:\/\//,''))}</a>`:''}</span><span class="note">${esc(i.note||'')}</span><span class="note">${esc(i.byName||'')}</span><span>${!i.main&&S.canWrite?`<button class="x ${S.confirmDel===ck?'confirm':''}" data-act="delri" data-id="${esc(i.id)}" aria-label="Elimina link">${S.confirmDel===ck?'Ok?':'×'}</button>`:''}</span></div>`}).join(''):'<div class="empty">Nessun link.</div>');
+  }
+  // suppliers
+  if($('suplist')){
+    const cats=[...new Set(S.suppliers.map(s=>s.category).filter(Boolean))];
+    set('supfilters',[['all','Tutti'],...SCATS.filter(c=>cats.includes(c)).map(c=>[c,c])].map(([k,l])=>`<button class="chip ${S.supCat===k?'on':''}" data-act="supcat" data-k="${esc(k)}" type="button">${esc(l)}</button>`).join('')+
+      `<select class="osel" id="supreg" aria-label="Filtra per regione" style="margin-left:8px">${optsOf(REGIONS.filter(x=>S.suppliers.some(s=>s.region===x)),S.supReg,'Tutte le regioni')}</select>`);
+    let L=S.suppliers.filter(s=>(S.supCat==='all'||s.category===S.supCat)&&(!S.supReg||s.region===S.supReg));
+    const byReg={};L.forEach(s=>{(byReg[s.region||'Altro']=byReg[s.region||'Altro']||[]).push(s)});
+    const regs=REGIONS.filter(x=>byReg[x]).concat(Object.keys(byReg).filter(x=>!REGIONS.includes(x)));
+    set('suplist',!S.loaded.suppliers?'<div class="empty">Carico i fornitori…</div>':!L.length?'<div class="empty">Nessun fornitore. Aggiungine uno con il tasto qui sopra.</div>':regs.map(rg=>`<div class="sec-head" style="margin:26px 0 10px"><h2 style="font-size:13px">${esc(rg)}</h2><span class="note">${byReg[rg].length}</span></div><div class="panel">${byReg[rg].sort((a,b)=>(a.category||'').localeCompare(b.category||'')||(a.name||'').localeCompare(b.name||'')).map(s=>{const u=safeUrl(s.url),ck='sp:'+s.id;
+      return `<div class="sup"><span class="nm">${u?`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(s.name)}</a>`:esc(s.name)}<small>${esc(s.category||'')}${s.note?' · '+esc(s.note):''}</small></span>
+        <span class="note">${esc(s.city||(s.region==='Online'?'Online':''))}</span>
+        <span class="note" style="word-break:break-all">${s.contact?esc(s.contact)+'<br>':''}${s.email?esc(s.email):''}${s.phone?'<br>'+esc(s.phone):''}</span>
+        <span class="spill ${SCLASS[s.status]||''}">${esc(s.status||'Da contattare')}</span>
+        <span style="display:flex;gap:10px;justify-content:end">${S.canWrite?`<button class="linkish" data-act="spedit" data-id="${esc(s.id)}" type="button">Modifica</button><button class="x ${S.confirmDel===ck?'confirm':''}" data-act="delsup" data-id="${esc(s.id)}" aria-label="Elimina fornitore">${S.confirmDel===ck?'Ok?':'×'}</button>`:''}</span></div>`}).join('')}</div>`).join(''));
+    // templates
+    const tw=$('tplwrap');if(tw&&!(tw.contains(document.activeElement)&&/INPUT|TEXTAREA/.test(document.activeElement.tagName))){
+      const ed=S.editingTpl,t=ed&&ed!=='new'?S.mailtpl.find(x=>x.id===ed):null;
+      tw.innerHTML=`<div class="panel">${S.mailtpl.length?S.mailtpl.map(t=>{const ck='tp:'+t.id;return `<div class="lrow"><span style="font-weight:700">${esc(t.name)}</span><span class="note">${esc(t.subject||'')}</span><span class="note">${esc((t.body||'').split('\n')[0].slice(0,40))}</span><span style="display:flex;gap:8px">${canApprove()?`<button class="linkish" data-act="tpedit" data-id="${esc(t.id)}" type="button">Modifica</button><button class="x ${S.confirmDel===ck?'confirm':''}" data-act="deltpl" data-id="${esc(t.id)}" aria-label="Elimina modello">${S.confirmDel===ck?'Ok?':'×'}</button>`:''}</span></div>`}).join(''):'<div class="empty">Nessun modello.</div>'}</div>
+      ${canApprove()?(ed?`<form class="form bform" id="tplform" style="margin-top:16px;display:block">
+        <label for="tp-name">Nome del modello<input type="text" id="tp-name" required maxlength="60" value="${esc(t?t.name:'')}"></label>
+        <label for="tp-subj">Oggetto<input type="text" id="tp-subj" required maxlength="140" value="${esc(t?t.subject:'')}"></label>
+        <label for="tp-body">Testo<textarea id="tp-body" required style="min-height:180px">${esc(t?t.body:'')}</textarea></label>
+        <div style="display:flex;gap:14px;align-items:center"><button class="btn" type="submit">Salva modello</button><button class="linkish" data-act="tpcancel" type="button">Annulla</button></div></form>`:`<p style="margin-top:12px"><button class="linkish dark" data-act="tpnew" type="button">+ Nuovo modello</button></p>`):'<p class="note">Solo gli approvatori creano e modificano i modelli.</p>'}`}
+    // outbox
+    const O=[...S.outbox].sort((a,b)=>(b.sendAt||0)-(a.sendAt||0));
+    set('outlist',!S.loaded.outbox?'<div class="empty">Carico…</div>':!O.length?'<div class="empty">Nessuna email programmata. Si programmano da una bozza approvata in Testi & editoria.</div>':O.map(o=>{const ck='ob:'+o.id;return `<div class="ob"><span class="note" style="font-variant-numeric:tabular-nums">${o.sendAt?new Date(o.sendAt).toLocaleString('it-IT',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):''}</span>
+      <span><b>${esc(o.toName||'')}</b><br><span class="note" style="word-break:break-all">${esc(o.to||'')}</span></span>
+      <span class="note">${esc(o.subject||'')}${o.draftTitle?'<br>da: '+esc(o.draftTitle):''}</span>
+      <span class="st-${esc(o.status||'programmata')}" title="${esc(o.error||'')}">${o.status==='inviata'?'Inviata':o.status==='errore'?'Errore':'Programmata'}</span>
+      <span>${o.status==='programmata'&&canApprove()?`<button class="x ${S.confirmDel===ck?'confirm':''}" data-act="delout" data-id="${esc(o.id)}" aria-label="Annulla invio">${S.confirmDel===ck?'Ok?':'×'}</button>`:''}</span></div>`}).join(''));
+  }
+}
+function openLb(thumb,cap,drive){let lb=$('lb');if(!lb){lb=document.createElement('div');lb.id='lb';lb.className='lbox';lb.hidden=true;lb.innerHTML='<img id="lb-img" alt=""><div class="cap" id="lb-cap"></div><a id="lb-drive" target="_blank" rel="noopener">Apri l\'originale su Drive</a>';document.body.appendChild(lb);lb.addEventListener('click',e=>{if(e.target.id!=='lb-drive')lb.hidden=true})}
+  $('lb-img').src=thumb;$('lb-cap').textContent=cap||'';const a=$('lb-drive');const u=safeUrl(drive);a.hidden=!u;if(u)a.href=u;lb.hidden=false}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){const lb=$('lb');if(lb)lb.hidden=true}});
 /* ---------- fill ---------- */
 function fill(){
   const r=route(),T=S.tasks,open=T.filter(t=>t.status!=='done'),done=T.length-open.length,cd=countdown();
@@ -807,14 +990,15 @@ function fill(){
     el.innerHTML=rows.length?`<div class="mrow tr head" style="display:grid"><span>Nome</span><span>Email</span><span>Ruolo</span><span></span></div>`+rows.map(m=>{const ck='m:'+m.email,k=esc(m.email),adm=admins.includes(lc(m.email)),ed=mg&&S.editingMember===m.email;
       if(ed)return `<div class="mrow"><span><input class="minput" data-mname="${k}" value="${esc(m.name||'')}" maxlength="60" placeholder="Nome e cognome" aria-label="Nome per ${k}"></span>
         <span class="note" style="word-break:break-all">${k}</span>
-        <span><select class="osel" data-mrole="${k}" aria-label="Ruolo di ${k}"><option ${m.role!=='Approvatore'?'selected':''}>Membro</option><option ${m.role==='Approvatore'?'selected':''}>Approvatore</option></select></span>
+        <span style="display:flex;flex-direction:column;gap:6px"><select class="osel" data-mrole="${k}" aria-label="Ruolo di ${k}"><option ${m.role!=='Approvatore'?'selected':''}>Membro</option><option ${m.role==='Approvatore'?'selected':''}>Approvatore</option></select><label class="note" style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-mbrand="${k}" ${m.canBrand?'checked':''}> Brand kit</label></span>
         <span style="display:flex;gap:10px;align-items:center"><button class="linkish dark" data-act="savemember" data-id="${k}" type="button">Salva</button><button class="linkish" data-act="cancelmember" type="button">Annulla</button></span></div>`;
       return `<div class="mrow"><span style="font-weight:700">${esc(m.name||'—')}${adm?'<small class="ntf" style="color:var(--mute)">amministratore</small>':''}</span>
-        <span class="note" style="word-break:break-all">${k}</span><span class="note">${esc(m.role||'Membro')}</span>
+        <span class="note" style="word-break:break-all">${k}</span><span class="note">${esc(m.role||'Membro')}${m.canBrand?' · brand kit':''}</span>
         <span style="display:flex;gap:10px;align-items:center;justify-content:end">${mg?`<button class="linkish" data-act="editmember" data-id="${k}" type="button">Modifica</button>${adm||m.virtual?'':`<button class="x ${S.confirmDel===ck?'confirm':''}" data-act="delmember" data-id="${k}" aria-label="Rimuovi dal team">${S.confirmDel===ck?'Ok?':'×'}</button>`}`:''}</span></div>`}).join(''):`<div class="empty">Nessun membro.</div>`}}
   ['tf-owner','df-owner','dr-author'].forEach(id=>{const el=$(id);if(el&&document.activeElement!==el&&el.dataset.n!==String(S.members.length)){const v=el.value;el.innerHTML=teamOpts(v);el.dataset.n=String(S.members.length)}});
   const myT=open.filter(mine);
   set('mytasks',myT.length?trackRows(sortTasks(myT)):'');const ms=$('mysec');if(ms)ms.hidden=!myT.length;
+  fillExtra(r);
   document.body.classList.toggle('ro',!S.canWrite||!S.db);
   resolveNames();
 }
@@ -827,9 +1011,9 @@ async function resolveNames(){return;
 }
 function render(){
   const r=route();let h;
-  const V={team:viewTeam,attivita:viewTasks,scadenze:viewDeadlines,testi:viewTexts,file:viewFiles,moodboard:viewMood,link:viewLinks,brand:viewBrand};
-  h=V[r]?V[r]():r.startsWith('area-')?viewArea(r.slice(5)):viewHome();
-  $('main').innerHTML=h;window.scrollTo(0,0);S.confirmDel=null;S.editingLink=null;S.editingDraft=null;S.reviewing=null;setMenu(false);fill();showNote();
+  const V={fornitori:viewSuppliers,team:viewTeam,attivita:viewTasks,scadenze:viewDeadlines,testi:viewTexts,file:viewFiles,moodboard:viewMood,link:viewLinks,brand:viewBrand};
+  h=V[r]?V[r]():r.startsWith('area-')?viewArea(r.slice(5)):r.startsWith('ref-')?viewRef(r.slice(4)):viewHome();
+  $('main').innerHTML=h;window.scrollTo(0,0);S.confirmDel=null;S.editingTask=null;S.editingBrand=false;S.editingSupplier=null;S.editingTpl=null;S.scheduling=null;S.editingLink=null;S.editingDraft=null;S.reviewing=null;setMenu(false);fill();showNote();
 }
 let noteMsg='';
 function showNote(m){if(m!==undefined)noteMsg=m;const el=$('netnote');if(el){el.textContent=noteMsg;el.classList.toggle('show',!!noteMsg)}}
@@ -878,8 +1062,8 @@ function upErr(e){
   if(c==='forbidden')return 'Drive ha rifiutato il file: non hai accesso in modifica alla cartella. Chiedi a Lorenzo di condividerla con '+(S.email||'il tuo account')+'.';
   if(c==='network')return 'Connessione interrotta: non so se il file è arrivato. Controlla la cartella prima di riprovare.'+open;
   return 'Caricamento non riuscito'+(e&&e.msg?': '+e.msg:'.')+open}
-function thumbOf(f){return new Promise(res=>{if(!f||!f.type.startsWith('image/'))return res(null);const u=URL.createObjectURL(f),img=new Image();
-  img.onload=()=>{let w=img.naturalWidth,h=img.naturalHeight,m=480;if(w>h&&w>m){h=Math.round(h*m/w);w=m}else if(h>m){w=Math.round(w*m/h);h=m}
+function thumbOf(f,max){return new Promise(res=>{if(!f||!f.type.startsWith('image/'))return res(null);const u=URL.createObjectURL(f),img=new Image();
+  img.onload=()=>{let w=img.naturalWidth,h=img.naturalHeight,m=max||480;if(w>h&&w>m){h=Math.round(h*m/w);w=m}else if(h>m){w=Math.round(w*m/h);h=m}
     const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);URL.revokeObjectURL(u);
     let q=.72,d=c.toDataURL('image/jpeg',q);while(d.length>240000&&q>.3){q-=.15;d=c.toDataURL('image/jpeg',q)}res(d.length<250000?d:null)};
   img.onerror=()=>{URL.revokeObjectURL(u);res(null)};img.src=u})}
@@ -899,9 +1083,9 @@ document.addEventListener('click',e=>{
   const em2=e.target.closest('[data-act="editmember"]');if(em2&&canManageTeam()){S.editingMember=em2.dataset.id;fill();const i=document.querySelector(`[data-mname="${CSS.escape(S.editingMember)}"]`);if(i)i.focus();return}
   if(e.target.closest('[data-act="cancelmember"]')){S.editingMember=null;fill();return}
   const sm=e.target.closest('[data-act="savemember"]');if(sm&&canManageTeam()){S.editingMember=null;const em=sm.dataset.id,ni=document.querySelector(`[data-mname="${CSS.escape(em)}"]`),ro=document.querySelector(`[data-mrole="${CSS.escape(em)}"]`);
-    const name=(ni&&ni.value.trim())||'',role=(ro&&ro.value)||'Membro';
+    const name=(ni&&ni.value.trim())||'',role=(ro&&ro.value)||'Membro',bk=document.querySelector(`[data-mbrand="${CSS.escape(em)}"]`),canBrand=!!(bk&&bk.checked);
     guard(async()=>{const ref=S.db.collection('members').doc(lc(em));const old=S.members.find(m=>lc(m.email)===lc(em));
-      await ref.set({...(old||{}),email:lc(em),name,role,updatedAt:Date.now()});
+      await ref.set({...(old||{}),email:lc(em),name,role,canBrand,updatedAt:Date.now()});
       if(name){const b=S.db.batch();let n=0;
         S.tasks.filter(t=>lc(t.ownerEmail)===lc(em)&&t.owner!==name).forEach(t=>{b.update(S.db.collection('tasks').doc(t.id),{owner:name});n++});
         S.deadlines.filter(t=>lc(t.ownerEmail)===lc(em)&&t.owner!==name).forEach(t=>{b.update(S.db.collection('deadlines').doc(t.id),{owner:name});n++});
@@ -943,16 +1127,16 @@ document.addEventListener('submit',async e=>{
       if(name){const b=S.db.batch();let n=0;[['tasks',S.tasks],['deadlines',S.deadlines]].forEach(([c,L])=>L.filter(t=>!t.ownerEmail&&lc(t.owner)===lc(name)).forEach(t=>{b.update(S.db.collection(c).doc(t.id),{ownerEmail:em});n++}));if(n){await b.commit();showNote(n+' attività già assegnate a '+name+' ora sono collegate alla sua email.')}}
       f.reset()});}
   if(f.id==='taskform'){const title=$('tf-title').value.trim();if(!title)return;
-    const dd=$('tf-date').value;const data={title,area:$('tf-area').value,...pick($('tf-owner').value),dueDate:isDate(dd)?dd:null,due:isDate(dd)?'':'Da definire',status:'todo',createdAt:Date.now()};
+    const dd=$('tf-date').value;const data={title,area:$('tf-area').value,...pick($('tf-owner').value),helpers:readMulti('tf-helpers'),location:$('tf-loc').value||'',dueDate:isDate(dd)?dd:null,due:isDate(dd)?'':'Da definire',status:'todo',createdAt:Date.now()};
     await guard(async()=>{await S.db.collection('tasks').add(data);const keep=$('tf-area').value;f.reset();$('tf-area').value=keep});}
   if(f.id==='dlform'){const title=$('df-title').value.trim(),date=$('df-date').value;if(!title||!isDate(date))return;
-    await guard(async()=>{await S.db.collection('deadlines').add({title,date,area:$('df-area').value,...pick($('df-owner').value),createdAt:Date.now()});f.reset()});}
+    await guard(async()=>{await S.db.collection('deadlines').add({title,date,area:$('df-area').value,...pick($('df-owner').value),helpers:readMulti('df-helpers'),location:$('df-loc').value||'',createdAt:Date.now()});f.reset()});}
   if(f.id==='linkform'){const label=$('lf-label').value.trim(),url=safeUrl($('lf-url').value.trim());if(!label||!url)return;
     await guard(async()=>{await S.db.collection('links').add({label,url,group:$('lf-group').value,order:Date.now()});f.reset()});}
   if(f.id==='draftform'){if(S.busy)return;const title=$('dr-title').value.trim();if(!title)return;const tokP=$('dr-file').files[0]?driveToken():null;if(tokP)tokP.catch(()=>{});
     const link=$('dr-link').value.trim();if(link&&!safeUrl(link)){$('dr-link').setCustomValidity('Serve un link che inizia con https://');$('dr-link').reportValidity();return}
     const dd=$('dr-date').value,file=$('dr-file').files[0],area=$('dr-area').value;
-    const data={title,kind:$('dr-kind').value,channel:$('dr-channel').value,area,author:pick($('dr-author').value).owner,date:isDate(dd)?dd:null,body:$('dr-body').value,fileUrl:safeUrl(link),fileName:'',status:'bozza',createdBy:S.me||null,createdByName:whoName(),createdAt:Date.now(),updatedAt:Date.now()};
+    const data={title,kind:$('dr-kind').value,channel:$('dr-channel').value,area,location:$('dr-loc').value||'',author:pick($('dr-author').value).owner,date:isDate(dd)?dd:null,body:$('dr-body').value,fileUrl:safeUrl(link),fileName:'',status:'bozza',createdBy:S.me||null,createdByName:whoName(),createdAt:Date.now(),updatedAt:Date.now()};
     S.busy=true;busy('dr-btn',true,'Salvo…');
     try{if(file){try{const up=await toDrive(file,area,KIND_USE(data.kind),title,tokP);data.fileUrl=up.url;data.fileName=file.name.slice(0,120)}catch(err){showNote('Bozza non salvata. '+upErr(err));return}}
       const ok=await guard(async()=>{await S.db.collection('drafts').add(data)});if(ok){f.reset();showNote('')}}
@@ -976,6 +1160,66 @@ document.addEventListener('submit',async e=>{
 });
 document.addEventListener('change',e=>{const s=e.target.closest('[data-act="reassign"]');if(!s)return;const p=pick(s.value);S.reassigning=null;
   guard(()=>S.db.collection('tasks').doc(s.dataset.id).update({...p,notifiedOwner:'',remindedFor:''}));});
+document.addEventListener('change',e=>{
+  const m=e.target.closest('details.multi');if(m){const n=m.querySelectorAll('input:checked').length;m.querySelector('summary').textContent=n?n+' persone':'Nessuno'}
+  if(e.target.id==='supreg'){S.supReg=e.target.value;fill()}
+});
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');if(!b)return;const act=b.dataset.act,id=b.dataset.id;
+  const conf=(key,fn)=>{if(S.confirmDel!==key){S.confirmDel=key;fill();return}S.confirmDel=null;guard(fn)};
+  if(act==='tedit'){S.editingTask=S.editingTask===id?null:id;fill();return}
+  if(act==='tcancel'){S.editingTask=null;fill();return}
+  if(act==='tsave'){const t=S.tasks.find(x=>x.id===id);if(!t)return;const p=pick($('te-owner').value),dd=$('te-date').value;
+    const upd={...p,helpers:readMulti('te-helpers'),dueDate:isDate(dd)?dd:null,due:isDate(dd)?'':(t.due||'Da definire'),location:$('te-loc').value||''};
+    if(lc(p.ownerEmail)!==lc(t.ownerEmail))upd.notifiedOwner='';
+    S.editingTask=null;guard(()=>S.db.collection('tasks').doc(id).update(upd));fill();return}
+  if(act==='lb'){const i=[...S.refitems,...S.refs.map(r=>({id:'_main',thumb:r.thumb,driveUrl:r.driveUrl,note:r.title,refId:r.id}))].find(x=>x.id===b.dataset.thumb&&(x.id!=='_main'||x.refId===route().slice(4)));if(i&&okThumb(i.thumb))openLb(i.thumb,i.note,i.driveUrl);return}
+  if(act==='delri'){conf('ri:'+id,()=>S.db.collection('refitems').doc(id).delete());return}
+  if(act==='bedit'&&canBrand()){S.editingBrand=true;const bb=$('brandbody');if(bb)bb.dataset.mode='';fill();return}
+  if(act==='bcancel'){S.editingBrand=false;fill();return}
+  if(act==='baddcol'){$('bf-pal').insertAdjacentHTML('beforeend',palRow({name:'',hex:'#cccccc',pct:0}));return}
+  if(act==='bdelcol'){b.closest('.prow').remove();return}
+  if(act==='bsave'&&canBrand()){const pal=[...document.querySelectorAll('#bf-pal .prow')].map(r=>({name:r.querySelector('.pname').value.trim(),hex:r.querySelector('.phex').value,pct:Math.max(0,Math.min(100,+r.querySelector('.ppct').value||0))})).filter(p=>p.name||p.pct);
+    const lines=id=>($(id).value||'').split('\n').map(s=>s.trim()).filter(Boolean).slice(0,20);
+    const data={palette:pal,status:$('bf-status').value,hashtags:$('bf-hash').value.trim(),tone:lines('bf-tone'),templates:lines('bf-tpl'),updatedByName:whoName(),updatedAt:Date.now()};
+    guard(async()=>{await S.db.collection('config').doc('brandkit').set(data);S.editingBrand=false;fill();showNote('Brand kit salvato.')});return}
+  if(act==='supcat'){S.supCat=b.dataset.k;fill();return}
+  if(act==='spedit'){const s=S.suppliers.find(x=>x.id===id);if(!s)return;S.editingSupplier=id;const d=$('sup-add');d.open=true;
+    $('sp-name').value=s.name||'';$('sp-cat').value=s.category||SCATS[0];$('sp-reg').value=s.region||'Toscana';$('sp-city').value=s.city||'';$('sp-url').value=s.url||'';$('sp-email').value=s.email||'';$('sp-phone').value=s.phone||'';$('sp-contact').value=s.contact||'';$('sp-status').value=s.status||'Da contattare';$('sp-note').value=s.note||'';
+    $('sp-btn').textContent='Salva modifiche';d.scrollIntoView({behavior:'smooth',block:'start'});return}
+  if(act==='spcancel'){S.editingSupplier=null;$('supform').reset();$('sp-btn').textContent='Salva fornitore';$('sup-add').open=false;return}
+  if(act==='delsup'){conf('sp:'+id,()=>S.db.collection('suppliers').doc(id).delete());return}
+  if(act==='tpnew'){S.editingTpl='new';fill();return}
+  if(act==='tpedit'){S.editingTpl=id;fill();return}
+  if(act==='tpcancel'){S.editingTpl=null;fill();return}
+  if(act==='deltpl'){conf('tp:'+id,()=>S.db.collection('mailtpl').doc(id).delete());return}
+  if(act==='delout'){conf('ob:'+id,()=>S.db.collection('outbox').doc(id).delete());return}
+  if(act==='dsched'){S.scheduling=S.scheduling===id?null:id;fill();return}
+  if(act==='dschedx'){S.scheduling=null;fill();return}
+  if(act==='dschedgo'&&canApprove()){const d=S.drafts.find(x=>x.id===id),t=S.mailtpl.find(x=>x.id===$('sc-tpl').value);
+    const ids=[...document.querySelectorAll('.supchk input:checked')].map(i=>i.value),when=new Date($('sc-when').value).getTime();
+    if(!d||!t)return;if(!ids.length){showNote('Scegli almeno un fornitore.');return}if(!when||isNaN(when)){showNote('Scegli data e ora di invio.');return}
+    guard(async()=>{const bt=S.db.batch();ids.forEach(sid=>{const s=S.suppliers.find(x=>x.id===sid);if(!s||!s.email)return;
+      bt.set(S.db.collection('outbox').doc(),{to:lc(s.email),toName:s.name,supplierId:s.id,subject:fillTpl(t.subject,s,d),body:fillTpl(t.body,s,d),sendAt:when,status:'programmata',draftId:d.id,draftTitle:d.title,templateName:t.name,createdByName:whoName(),createdAt:Date.now()})});
+      await bt.commit();S.scheduling=null;fill();showNote(ids.length+' email programmate per il '+new Date(when).toLocaleString('it-IT',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'})+'.')});return}
+});
+document.addEventListener('submit',async e=>{const f=e.target;
+  if(f.id==='riform'){e.preventDefault();if(S.busy)return;const refId=f.dataset.ref,ref=S.refs.find(x=>x.id===refId);const files=[...$('ri-file').files],url=$('ri-url').value.trim(),note=$('ri-note').value.trim();
+    if(!files.length&&!url)return;if(url&&!safeUrl(url)){$('ri-url').setCustomValidity('Serve un link che inizia con https://');$('ri-url').reportValidity();return}
+    const tokP=files.length?driveToken():null;if(tokP)tokP.catch(()=>{});S.busy=true;busy('ri-btn',true,'Carico…');
+    try{if(url)await guard(()=>S.db.collection('refitems').add({refId,kind:'link',url:safeUrl(url),title:'',note,byName:whoName(),createdAt:Date.now()}));
+      for(const [i,file] of files.entries()){showNote(`Carico ${i+1} di ${files.length}…`);const th=await thumbOf(file,1000);let up=null;
+        try{up=await toDrive(file,ref&&ref.area,'Reference',(ref?ref.title+' ':'')+note,i===0?tokP:null)}catch(err){showNote(upErr(err));return}
+        await guard(()=>S.db.collection('refitems').add({refId,kind:'photo',thumb:th||'',driveUrl:up.url,note,byName:whoName(),createdAt:Date.now()}))}
+      f.reset();showNote('')}finally{S.busy=false;busy('ri-btn',false)}}
+  if(f.id==='supform'){e.preventDefault();const name=$('sp-name').value.trim();if(!name)return;const url=$('sp-url').value.trim();
+    if(url&&!safeUrl(url)){$('sp-url').setCustomValidity('Serve un link che inizia con https://');$('sp-url').reportValidity();return}
+    const data={name,category:$('sp-cat').value,region:$('sp-reg').value,city:$('sp-city').value.trim(),url:safeUrl(url),email:lc($('sp-email').value),phone:$('sp-phone').value.trim(),contact:$('sp-contact').value.trim(),status:$('sp-status').value,note:$('sp-note').value.trim(),updatedAt:Date.now()};
+    await guard(async()=>{if(S.editingSupplier)await S.db.collection('suppliers').doc(S.editingSupplier).update(data);else await S.db.collection('suppliers').add({...data,createdAt:Date.now(),createdByName:whoName()});
+      S.editingSupplier=null;f.reset();$('sp-btn').textContent='Salva fornitore';$('sup-add').open=false})}
+  if(f.id==='tplform'){e.preventDefault();if(!canApprove())return;const data={name:$('tp-name').value.trim(),subject:$('tp-subj').value.trim(),body:$('tp-body').value,updatedAt:Date.now(),updatedByName:whoName()};if(!data.name||!data.subject)return;
+    await guard(async()=>{if(S.editingTpl&&S.editingTpl!=='new')await S.db.collection('mailtpl').doc(S.editingTpl).update(data);else await S.db.collection('mailtpl').add({...data,createdAt:Date.now()});S.editingTpl=null;fill()})}
+});
 document.addEventListener('input',e=>{if(e.target.setCustomValidity)e.target.setCustomValidity('')});
 window.addEventListener('hashchange',render);
 
@@ -1006,7 +1250,12 @@ function startData(){
   sub('uploads',S.db.collection('uploads').orderBy('createdAt','desc').limit(60));
   unsubs.push(S.db.collection('config').doc('drop').onSnapshot(s=>{S.drop=s.exists?s.data():{};fill()},()=>{}));
   unsubs.push(S.db.collection('config').doc('drive').onSnapshot(s=>{S.drive=s.exists?s.data():{};fill()},()=>{}));
-  unsubs.push(S.db.collection('members').onSnapshot(s=>{S.members=toList(s);fill()},()=>{}));
+  unsubs.push(S.db.collection('config').doc('brandkit').onSnapshot(s=>{S.brandkit=s.exists?s.data():null;fill()},()=>{}));
+  sub('suppliers',S.db.collection('suppliers'));
+  sub('mailtpl',S.db.collection('mailtpl'));
+  sub('outbox',S.db.collection('outbox').orderBy('sendAt','desc').limit(150));
+  sub('refitems',S.db.collection('refitems'));
+  unsubs.push(S.db.collection('members').onSnapshot(s=>{S.members=toList(s);const me=S.members.find(m=>lc(m.email)===S.email);S.myCanBrand=!!(me&&me.canBrand);if(me&&me.role)S.myRole=me.role;fill()},()=>{}));
 }
 drawBg();makeGrain();render();
 (function boot(){

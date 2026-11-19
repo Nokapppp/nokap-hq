@@ -9,6 +9,7 @@ service cloud.firestore {
     function memberDoc() { return /databases/$(database)/documents/members/$(email()); }
     function isMember() { return isAdmin() || (signedIn() && exists(memberDoc())); }
     function canApprove() { return isAdmin() || (isMember() && get(memberDoc()).data.role == 'Approvatore'); }
+    function canBrand() { return isAdmin() || (isMember() && get(memberDoc()).data.get('canBrand', false) == true); }
 
     // Elenco del team: lo leggono tutti i membri (serve per assegnare le attività), lo modifica solo Gabriele (nokapmerch).
     match /members/{mail} {
@@ -25,9 +26,27 @@ service cloud.firestore {
         canApprove());
     }
 
-    // Tutto il resto (attività, scadenze, link, reference, caricamenti, config).
+    // Brand kit: lo leggono tutti, lo modificano solo le persone abilitate da Gabriele.
+    match /config/brandkit {
+      allow read: if isMember();
+      allow write: if canBrand();
+    }
+
+    // Modelli email ed email programmate ai fornitori: le gestiscono solo gli approvatori.
+    match /mailtpl/{id} {
+      allow read: if isMember();
+      allow write: if canApprove();
+    }
+    match /outbox/{id} {
+      allow read: if isMember();
+      allow write: if canApprove();
+    }
+
+    // Tutto il resto (attività, scadenze, link, reference e foto, fornitori, caricamenti, config).
     match /{col}/{id} {
-      allow read, write: if isMember() && !(col in ['members', 'drafts']);
+      allow read, write: if isMember()
+        && !(col in ['members', 'drafts', 'mailtpl', 'outbox'])
+        && !(col == 'config' && id == 'brandkit');
     }
   }
 }
