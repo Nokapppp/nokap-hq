@@ -1431,7 +1431,8 @@ document.addEventListener('input',e=>{if(e.target.setCustomValidity)e.target.set
 window.addEventListener('hashchange',render);
 
 /* ---------- start ---------- */
-function gate(show,title,text,btn,out){const g=$('gate');g.hidden=!show;if(!show)return;$('gate-t').textContent=title;$('gate-p').textContent=text;$('gate-btn').hidden=!btn;$('gate-out').hidden=!out}
+const INAPP=/Instagram|FBAN|FBAV|FB_IAB|Messenger|Line\/|TikTok|musical_ly|Bytedance|Snapchat|Twitter|LinkedInApp|GSA\/|; wv\)/i.test(navigator.userAgent||'');
+function gate(show,title,text,btn,out){const g=$('gate');g.hidden=!show;if(!show)return;$('gate-t').textContent=title;if(INAPP&&btn)text='Stai aprendo il sito dentro un\'app (Instagram, TikTok, Messenger…): lì Google blocca l\'accesso. Tocca i tre puntini e scegli "Apri nel browser" (Safari o Chrome), poi entra da lì.';$('gate-p').textContent=text;$('gate-btn').hidden=!btn;$('gate-out').hidden=!out}
 function signIn(){firebase.auth().signInWithPopup(provider()).then(()=>{S.token=null})
   .catch(e=>{const c=e&&e.code||'';gate(true,'Accesso non riuscito',c==='auth/popup-blocked'?'Il browser ha bloccato la finestra di Google: consenti i popup per questo sito e riprova.':c==='auth/unauthorized-domain'?'Questo indirizzo non è autorizzato in Firebase: aggiungilo nei domini autorizzati (vedi la guida).':'Riprova. Se il problema continua, scrivi a Lorenzo.',true,false)})}
 async function importSeed(){
