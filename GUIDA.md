@@ -80,3 +80,11 @@ Quando modifichiamo l'interfaccia ti mando la cartella nuova: Netlify → **Depl
 | "Accesso bloccato: app non verificata" | l'email non è tra gli utenti di test (passo 5) |
 
 Amministratori (gestiscono il team e approvano): nokapmerch@gmail.com e lorenzociampana@gmail.com. Per cambiarli si modificano sia `firebase-config.js` sia `firestore.rules`.
+
+## Novità (novembre 2026)
+- **Reference**: clicca una reference nella moodboard per aprirla. Dentro puoi caricare foto (vanno su Drive) e aggiungere link.
+- **Più persone**: ogni attività e scadenza ha un responsabile più chi collabora. Tutti ricevono avviso e promemoria via email. Con "modifica" cambi persone, data e luogo.
+- **Dove**: attività, scadenze e bozze hanno il luogo (Online, Firenze, Milano, Roma, Altro).
+- **Brand kit**: palette, hashtag, tono e template li modifica chi ha la spunta "Brand kit" in Team e accessi (la mette Gabriele).
+- **Fornitori**: elenco per regione e oggetto, con link, contatti e stato.
+- **Email ai fornitori**: gli approvatori creano modelli email nella pagina Fornitori. Da una bozza approvata, "Email ai fornitori" programma l'invio a data e ora scelte. Partono da nokapmerch@gmail.com entro 15 minuti dall'orario.
