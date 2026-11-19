@@ -1195,7 +1195,7 @@ function formatOf(f){const e=(f.name.includes('.')?f.name.split('.').pop():'').t
 function driveName(f,area,use){const d=today().replace(/-/g,''),ext=(f.name.includes('.')?'.'+f.name.split('.').pop().toLowerCase().replace(/[^a-z0-9]/g,''):'');
   return `${d}_${area||'gen'}_${slug(use)}_${slug(f.name.replace(/\.[^.]+$/,''))}${ext}`}
 const GSCOPE='https://www.googleapis.com/auth/drive';
-function provider(){const p=new firebase.auth.GoogleAuthProvider();p.addScope(GSCOPE);p.setCustomParameters({prompt:'select_account'});return p}
+function provider(){const p=new firebase.auth.GoogleAuthProvider();p.setCustomParameters({prompt:'select_account'});return p}  // solo nome ed email: nessuna verifica Google richiesta
 function driveToken(){
   if(S.token&&Date.now()-S.tokenAt<50*60000)return Promise.resolve(S.token);
   const u=firebase.auth().currentUser;if(!u)return Promise.reject({code:'no_auth'});
@@ -1432,7 +1432,7 @@ window.addEventListener('hashchange',render);
 
 /* ---------- start ---------- */
 function gate(show,title,text,btn,out){const g=$('gate');g.hidden=!show;if(!show)return;$('gate-t').textContent=title;$('gate-p').textContent=text;$('gate-btn').hidden=!btn;$('gate-out').hidden=!out}
-function signIn(){firebase.auth().signInWithPopup(provider()).then(r=>{const t=r.credential&&r.credential.accessToken;if(t){S.token=t;S.tokenAt=Date.now()}})
+function signIn(){firebase.auth().signInWithPopup(provider()).then(()=>{S.token=null})
   .catch(e=>{const c=e&&e.code||'';gate(true,'Accesso non riuscito',c==='auth/popup-blocked'?'Il browser ha bloccato la finestra di Google: consenti i popup per questo sito e riprova.':c==='auth/unauthorized-domain'?'Questo indirizzo non è autorizzato in Firebase: aggiungilo nei domini autorizzati (vedi la guida).':'Riprova. Se il problema continua, scrivi a Lorenzo.',true,false)})}
 async function importSeed(){
   if(!S.isAdmin)return;const b=$('seedbtn');b.disabled=true;b.textContent='Importo…';
