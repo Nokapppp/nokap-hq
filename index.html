@@ -1197,6 +1197,7 @@ function driveName(f,area,use){const d=today().replace(/-/g,''),ext=(f.name.incl
 const GSCOPE='https://www.googleapis.com/auth/drive';
 function provider(){const p=new firebase.auth.GoogleAuthProvider();p.setCustomParameters({prompt:'select_account'});return p}  // solo nome ed email: nessuna verifica Google richiesta
 function driveToken(){
+  if(S.drive&&S.drive.uploadUrl)return Promise.resolve(null);  // caricamento tramite lo script NoKap: nessun permesso Drive
   if(S.token&&Date.now()-S.tokenAt<50*60000)return Promise.resolve(S.token);
   const u=firebase.auth().currentUser;if(!u)return Promise.reject({code:'no_auth'});
   const p=new firebase.auth.GoogleAuthProvider();p.addScope(GSCOPE);p.setCustomParameters({login_hint:u.email});
@@ -1206,8 +1207,18 @@ function driveToken(){
 async function toDrive(f,area,use,note,tokenP){
   if(!S.drive.folderId)throw {code:'no_folder'};
   if(f.size>100*1024*1024)throw {code:'too_big'};
-  const token=await (tokenP||driveToken());
   const name=driveName(f,area,use),type=f.type||'application/octet-stream';
+  if(S.drive.uploadUrl){
+    if(f.size>35*1024*1024)throw {code:'too_big_script'};
+    const u=firebase.auth().currentUser;if(!u)throw {code:'no_auth'};const idToken=await u.getIdToken();
+    const data=await new Promise((ok,ko)=>{const r=new FileReader();r.onload=()=>ok(String(r.result).split(',')[1]||'');r.onerror=()=>ko({code:'read'});r.readAsDataURL(f)});
+    let res;try{res=await fetch(S.drive.uploadUrl,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({idToken,name,mimeType:type,data,description:(note||'').slice(0,200)})})}catch(_){throw {code:'network'}}
+    let p={};try{p=await res.json()}catch(_){throw {code:'http',status:res.status}}
+    if(!p.ok)throw {code:p.error==='not_member'?'forbidden':'http',msg:p.error||''};
+    const rec={name,original:f.name.slice(0,120),driveId:String(p.id||'').slice(0,100),url:safeUrl(p.url)||'',mime:type.slice(0,80),format:formatOf(f),area:area||null,use:use||'',note:(note||'').slice(0,200),by:S.me||null,byName:whoName(),createdAt:Date.now()};
+    try{await S.db.collection('uploads').add(rec)}catch(_){}
+    return rec}
+  const token=await (tokenP||driveToken());
   const meta={name,parents:[S.drive.folderId]};
   const bd='nokap'+Math.random().toString(36).slice(2);
   const body=new Blob([`--${bd}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(meta)}\r\n--${bd}\r\nContent-Type: ${type}\r\n\r\n`,f,`\r\n--${bd}--`]);
@@ -1225,6 +1236,8 @@ function upErr(e){
   const u=safeUrl(S.drive.url),open=u?' Puoi anche caricarlo a mano nella cartella Drive.':'';
   const c=e&&e.code;
   if(c==='no_folder')return 'La cartella Drive di destinazione non è ancora impostata. Chiedi a Lorenzo.';
+  if(c==='too_big_script')return 'Il file supera 35 MB: caricalo direttamente nella cartella Drive.'+open;
+  if(c==='read')return 'Non riesco a leggere il file dal tuo dispositivo. Riprova.';
   if(c==='too_big')return 'File oltre 100 MB: caricalo direttamente nella cartella Drive.';
   if(c==='popup')return 'Serve il tuo ok a Google Drive: riprova e consenti nella finestra di Google (controlla che il browser non blocchi i popup).';
   if(c==='expired')return 'Il permesso di Google Drive è scaduto: riprova, ti verrà richiesto di nuovo.';
