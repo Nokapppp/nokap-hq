@@ -1,0 +1,235 @@
+{
+ "tasks": {
+  "t01": {
+   "title": "Accordo tra soci: quote, contributi, proprietà del marchio",
+   "area": "dir",
+   "owner": "Gabriele Caponnetto",
+   "due": "Da definire",
+   "status": "todo",
+   "order": 1,
+   "createdAt": 1
+  },
+  "t02": {
+   "title": "Registrazione del marchio NoKap",
+   "area": "dir",
+   "owner": "Da assegnare",
+   "due": "Da definire",
+   "status": "todo",
+   "order": 2,
+   "createdAt": 2
+  },
+  "t03": {
+   "title": "Budget del primo drop: costo per capo, margine, punto di pareggio",
+   "area": "ops",
+   "owner": "Lorenzo Ciampana",
+   "due": "Da definire",
+   "status": "todo",
+   "order": 3,
+   "createdAt": 3
+  },
+  "t04": {
+   "title": "Scelta del fornitore e prime campionature",
+   "area": "prod",
+   "owner": "Greta (da confermare)",
+   "due": "Da definire",
+   "status": "todo",
+   "order": 4,
+   "createdAt": 4
+  },
+  "t05": {
+   "title": "Accordo scritto con Gabriel Tonelli",
+   "area": "comm",
+   "owner": "Da assegnare",
+   "due": "Da definire",
+   "status": "todo",
+   "order": 5,
+   "createdAt": 5
+  },
+  "t06": {
+   "title": "Brand kit: palette, font, logo",
+   "area": "dir",
+   "owner": "Da assegnare",
+   "due": "Da definire",
+   "status": "todo",
+   "order": 6,
+   "createdAt": 6
+  },
+  "t07": {
+   "title": "Template social: annuncio drop, countdown, artista, citazione, BTS",
+   "area": "cont",
+   "owner": "Tommaso Carlini",
+   "due": "Dopo il brand kit",
+   "status": "todo",
+   "order": 7,
+   "createdAt": 7
+  },
+  "t08": {
+   "title": "Setup strumenti: Drive, Notion, Slack, Shopify + collegamenti",
+   "area": "ops",
+   "owner": "Lorenzo Ciampana",
+   "due": "Da definire",
+   "status": "todo",
+   "order": 8,
+   "createdAt": 8
+  },
+  "t09": {
+   "title": "Shop con pre-order per il drop 01",
+   "area": "ops",
+   "owner": "Lorenzo Ciampana",
+   "due": "Da definire",
+   "status": "todo",
+   "order": 9,
+   "createdAt": 9
+  },
+  "t10": {
+   "title": "Shooting e video del drop a Firenze",
+   "area": "cont",
+   "owner": "Da assegnare",
+   "due": "Da definire",
+   "status": "todo",
+   "order": 10,
+   "createdAt": 10
+  },
+  "t11": {
+   "title": "Location ed evento pop-up a Firenze",
+   "area": "comm",
+   "owner": "Da assegnare",
+   "due": "Da definire",
+   "status": "todo",
+   "order": 11,
+   "createdAt": 11
+  }
+ },
+ "links": {
+  "slack": {
+   "label": "Slack",
+   "url": "",
+   "group": "Team",
+   "order": 1,
+   "note": "Canali per area + #drop-01"
+  },
+  "drive": {
+   "label": "Google Drive",
+   "url": "",
+   "group": "Team",
+   "order": 2,
+   "note": "Cartella NoKap: reference, media, grafiche"
+  },
+  "caricamenti": {
+   "label": "Cartella caricamenti HQ",
+   "url": "https://drive.google.com/drive/folders/1XDuV-vHB_eNA2_OjI2ESyg9gqB5QAoFR",
+   "group": "Team",
+   "order": 2.5,
+   "note": "Drive di nokapmerch@gmail.com: qui arrivano i file caricati dalla pagina"
+  },
+  "notion": {
+   "label": "Notion",
+   "url": "",
+   "group": "Team",
+   "order": 3,
+   "note": "Attività e calendario del drop"
+  },
+  "calendar": {
+   "label": "Calendario NoKap",
+   "url": "",
+   "group": "Team",
+   "order": 4
+  },
+  "canva": {
+   "label": "Canva",
+   "url": "",
+   "group": "Team",
+   "order": 5,
+   "note": "Grafiche e template social"
+  },
+  "instagram": {
+   "label": "Instagram",
+   "url": "",
+   "group": "Social",
+   "order": 1
+  },
+  "tiktok": {
+   "label": "TikTok",
+   "url": "",
+   "group": "Social",
+   "order": 2
+  },
+  "youtube": {
+   "label": "YouTube",
+   "url": "",
+   "group": "Social",
+   "order": 3
+  },
+  "shopify": {
+   "label": "Shopify (admin)",
+   "url": "",
+   "group": "Shop & dati",
+   "order": 1
+  },
+  "report": {
+   "label": "Report mensile",
+   "url": "",
+   "group": "Shop & dati",
+   "order": 2
+  }
+ },
+ "refs": {
+  "r01": {
+   "title": "Chrome Hearts",
+   "note": "Lettering gotico, croci, argento: il lato lusso e scuro.",
+   "tags": [
+    "mood",
+    "lettering"
+   ],
+   "url": "",
+   "createdAt": 105
+  },
+  "r02": {
+   "title": "Supreme",
+   "note": "Drop limitati, collab con artisti, rosso e bianco netti.",
+   "tags": [
+    "drop",
+    "colore"
+   ],
+   "url": "",
+   "createdAt": 104
+  },
+  "r03": {
+   "title": "Thrasher",
+   "note": "Skate, strada, grafica da zine: crudo e riconoscibile.",
+   "tags": [
+    "mood",
+    "grafica"
+   ],
+   "url": "",
+   "createdAt": 103
+  },
+  "r04": {
+   "title": "Palace",
+   "note": "Ironia e lookbook video fuori dagli schemi.",
+   "tags": [
+    "contenuti",
+    "video"
+   ],
+   "url": "",
+   "createdAt": 102
+  },
+  "r05": {
+   "title": "Tyler, the Creator",
+   "note": "Artista che diventa universo: musica, capi, eventi, estetica.",
+   "tags": [
+    "mood",
+    "esperienza"
+   ],
+   "url": "",
+   "createdAt": 101
+  }
+ },
+ "config": {
+  "drive": {
+   "folderId": "1XDuV-vHB_eNA2_OjI2ESyg9gqB5QAoFR",
+   "url": "https://drive.google.com/drive/folders/1XDuV-vHB_eNA2_OjI2ESyg9gqB5QAoFR",
+   "name": "NoKap HQ – Caricamenti (nokapmerch)"
+  }
+ }
+}

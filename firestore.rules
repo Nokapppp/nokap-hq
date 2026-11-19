@@ -1,0 +1,33 @@
+rules_version = '2';
+// NoKap HQ – chi può leggere e scrivere.
+// Gli amministratori devono essere gli stessi di firebase-config.js.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function email() { return request.auth.token.email.lower(); }
+    function signedIn() { return request.auth != null && request.auth.token.email_verified == true; }
+    function isAdmin() { return signedIn() && email() in ['nokapmerch@gmail.com', 'lorenzociampana@gmail.com']; }
+    function memberDoc() { return /databases/$(database)/documents/members/$(email()); }
+    function isMember() { return isAdmin() || (signedIn() && exists(memberDoc())); }
+    function canApprove() { return isAdmin() || (isMember() && get(memberDoc()).data.role == 'Approvatore'); }
+
+    // Elenco del team: lo leggono tutti i membri (serve per assegnare le attività), lo modifica solo Gabriele (nokapmerch).
+    match /members/{mail} {
+      allow read: if isMember() || (signedIn() && email() == mail);
+      allow write: if signedIn() && email() == 'nokapmerch@gmail.com';
+    }
+
+    // Bozze: tutti i membri le creano e modificano, ma solo gli approvatori le approvano.
+    match /drafts/{id} {
+      allow read, create, delete: if isMember();
+      allow update: if isMember() && (
+        request.resource.data.status != 'approvato' ||
+        resource.data.status == 'approvato' ||
+        canApprove());
+    }
+
+    // Tutto il resto (attività, scadenze, link, reference, caricamenti, config).
+    match /{col}/{id} {
+      allow read, write: if isMember() && !(col in ['members', 'drafts']);
+    }
+  }
+}

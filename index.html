@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NoKap HQ</title>
+<link rel="preload" href="fonts/CreatoDisplay-Medium.otf" as="font" type="font/otf" crossorigin>
+<style>
+@font-face{font-family:"Creato Display";src:url("fonts/CreatoDisplay-Regular.otf") format("opentype");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"Creato Display";src:url("fonts/CreatoDisplay-Medium.otf") format("opentype");font-weight:500 600;font-style:normal;font-display:swap}
+@font-face{font-family:"Creato Display";src:url("fonts/CreatoDisplay-Bold.otf") format("opentype");font-weight:700 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Cloister Black";src:url("fonts/CloisterBlack.ttf") format("truetype");font-display:swap}
+:root{
+  --bg:#EBEAE8;
+  --ink:#111111;
+  --mute:#6C6967;
+  --line:rgba(17,17,17,.16);
+  --glass:rgba(255,255,255,.58);
+  --red:#B91E1A;
+  --ok:#2F6B3F;
+  --f-logo:"Cloister Black",Georgia,serif;
+  --f-body:"Creato Display","Helvetica Neue",Arial,sans-serif;
+  color-scheme: light;
+  /* layout: sfondo grigio sgranato a tutta pagina, logo al centro, menu nascosto, oggetti che galleggiano senza riquadri, testo piccolo in grassetto */
+}
+*{box-sizing:border-box}
+html{height:100%}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.5;font-weight:500}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:1px solid var(--ink);outline-offset:3px}
+.lab{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+
+#bg{position:fixed;inset:0;width:100%;height:100%;z-index:-2;display:block}
+.grain{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.055;mix-blend-mode:multiply}
+
+/* header */
+.top{position:sticky;top:0;z-index:20;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:14px 22px;background:var(--bg)}
+.top::after{content:"";position:absolute;left:0;right:0;top:100%;height:36px;pointer-events:none;background:linear-gradient(var(--bg),rgba(235,234,232,0))}
+.menu-btn{justify-self:start;background:none;border:0;padding:6px 0;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700}
+.menu-btn i{display:block;width:18px;height:9px;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);transition:transform .2s}
+.menu-btn[aria-expanded="true"] i{transform:scaleX(.6)}
+.logo{display:block;padding:0 10px}
+.logo img{display:block;height:52px;width:auto}
+.hud{justify-self:end;font-size:12.5px;font-weight:700;display:flex;gap:6px;align-items:center;white-space:nowrap}
+.hud .cd{color:var(--red)}
+
+/* overlay menu */
+.overlay{position:fixed;inset:0;z-index:15;padding:84px 22px 40px;display:none;background:rgba(235,234,232,.74);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);overflow:auto}
+.overlay.open{display:block}
+.overlay ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.overlay > ul > li > a{font-size:24px;font-weight:700;display:inline-flex;gap:10px;align-items:baseline;padding:2px 0}
+.overlay > ul > li > a small{font-size:12px;font-weight:700;color:var(--red)}
+.overlay a:hover{color:var(--mute)}
+.overlay a.on{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:5px}
+.overlay .sub{padding:4px 0 8px 4px;gap:2px}
+.overlay .sub a{font-size:14px;font-weight:600}
+.overlay .sub small{color:var(--mute);font-weight:500;margin-left:8px}
+.overlay .grp{margin-top:14px;font-size:11px;font-weight:700;color:var(--mute);text-transform:uppercase;letter-spacing:.04em}
+
+/* main */
+main{max-width:1160px;margin:0 auto;padding:10px 24px 40px;display:flex;flex-direction:column;gap:88px;min-height:calc(100vh - 160px)}
+.pagehead{text-align:center;padding-top:7vh;display:flex;flex-direction:column;align-items:center;gap:10px}
+.pagehead h1{margin:0;font-size:30px;font-weight:700;line-height:1.15;text-wrap:balance}
+.pagehead p{margin:0;color:var(--mute);max-width:58ch}
+h2{margin:0;font-size:15px;font-weight:700}
+.sec-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.sec-head a,.linkish{font-size:12.5px;font-weight:700;color:var(--mute);background:none;border:0;padding:0}
+.sec-head a:hover,.linkish:hover{color:var(--ink)}
+.linkish.dark{color:var(--ink)}
+.note{font-size:12.5px;color:var(--mute)}
+.status-note{display:none;text-align:center;font-size:12.5px;color:var(--ink);background:var(--glass);padding:10px 14px;max-width:620px;margin:0 auto}
+.status-note.show{display:block}
+
+/* hero drop */
+.drop{display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;padding-top:3vh}
+.drop .t{font-size:30px;font-weight:700;line-height:1.1;text-wrap:balance}
+.drop .s{color:var(--mute)}
+.drop .big{font-size:13px;font-weight:700;color:var(--red);font-variant-numeric:tabular-nums}
+.prog{width:min(420px,100%);display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.prog .row{display:flex;justify-content:space-between;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
+.bar{height:2px;background:var(--line)}
+.bar i{display:block;height:2px;background:var(--ink);width:0;transition:width .5s}
+.datebox{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;font-size:12.5px;color:var(--mute)}
+.datebox input{border:0;border-bottom:1px solid var(--ink);background:transparent;padding:4px 0;color:var(--ink)}
+.quick{display:flex;gap:26px;justify-content:center;flex-wrap:wrap;margin-top:18px;font-size:13px;font-weight:700}
+.quick a{display:flex;flex-direction:column;align-items:center;gap:2px}
+.quick a small{font-weight:500;color:var(--mute);font-size:12px}
+.quick a:hover{color:var(--mute)}
+
+/* object grid */
+.objs{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:56px 28px}
+.obj{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px}
+.obj .art{width:100%;display:grid;place-items:center;transition:transform .3s;background:rgba(255,255,255,.35);aspect-ratio:1}
+.obj:hover .art{transform:translateY(-4px)}
+.obj .mk{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:clamp(54px,6vw,76px);font-weight:700;line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.obj .mk small{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--mute)}
+.obj .nm{font-weight:700;font-size:13.5px;margin-top:4px}
+.obj .ow{font-size:12.5px;color:var(--mute)}
+.obj .ct{font-size:11.5px;font-weight:700}
+.obj .ct.warn{color:var(--red)}
+
+/* lists */
+.panel{background:var(--glass);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);overflow-x:auto}
+.tr{display:grid;grid-template-columns:28px minmax(220px,2.2fr) minmax(150px,1.1fr) minmax(110px,.8fr) 96px 28px;gap:14px;align-items:center;padding:13px 16px;border-bottom:1px solid var(--line);min-width:720px}
+.tr:last-child{border-bottom:0}
+.tr.head{font-size:11px;font-weight:700;color:var(--mute);padding-top:10px;padding-bottom:10px}
+.tr:not(.head):hover{background:rgba(255,255,255,.5)}
+.tr .n{color:var(--mute);font-variant-numeric:tabular-nums;font-size:12px}
+.tr .tt{font-weight:700}
+.tr .tt small{display:block;font-weight:500;color:var(--mute);font-size:12px}
+.tr.done .tt{text-decoration:line-through;color:var(--mute)}
+.who{font-size:13px}
+.who.warn{color:var(--red);font-weight:700;font-size:12px}
+.late{color:var(--red);font-weight:700}
+.osel{border:0;border-bottom:1px solid var(--line);background:transparent;font-size:13px;font-weight:500;color:var(--ink);max-width:100%;padding:2px 0}
+.osel.warn{color:var(--red);font-weight:700}
+.chg{border:0;background:none;padding:0 0 0 6px;font-size:11px;font-weight:600;color:var(--mute);opacity:0;transition:opacity .15s}
+.tr:hover .chg,.chg:focus{opacity:1}
+.chg:hover{color:var(--ink);text-decoration:underline}
+@media (hover:none){.chg{opacity:1}}
+.ntf{display:block;font-size:10.5px;color:var(--ok);font-weight:700}
+button.st{border:1px solid var(--line);background:transparent;padding:5px 10px;font-size:11.5px;font-weight:700}
+.st.todo{color:var(--mute)}
+.st.doing{color:var(--red);border-color:var(--red)}
+.st.done{color:#fff;background:var(--ink);border-color:var(--ink)}
+.x{border:0;background:none;color:var(--mute);font-size:16px;line-height:1;padding:4px}
+.x:hover{color:var(--ink)}
+.x.confirm{color:var(--red);font-size:11px;font-weight:700}
+.empty{padding:26px 16px;color:var(--mute);text-align:center}
+
+/* deadlines */
+.dl{display:grid;grid-template-columns:86px minmax(200px,2fr) 110px minmax(140px,1fr) minmax(130px,1fr) 28px;gap:14px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);min-width:700px}
+.dl:last-child{border-bottom:0}
+.dl .d{font-weight:700;font-variant-numeric:tabular-nums}
+.dl .d small{display:block;font-weight:500;color:var(--mute);font-size:11.5px}
+.dl .src{font-size:11px;font-weight:700;color:var(--mute);text-transform:uppercase;letter-spacing:.04em}
+.dlgroup{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--mute);padding:14px 16px 6px}
+
+/* forms */
+.form{display:flex;flex-wrap:wrap;gap:14px 18px;align-items:end;background:var(--glass);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);padding:16px}
+.form label{display:flex;flex-direction:column;gap:6px;font-size:11.5px;font-weight:700;color:var(--mute);flex:1 1 160px}
+.form label.wide{flex:3 1 260px}
+.form label.full{flex:1 1 100%}
+.form input,.form select,.form textarea{border:0;border-bottom:1px solid var(--ink);border-radius:0;padding:6px 0;background:transparent;font-size:14px;font-weight:500;color:var(--ink);min-width:0}
+.form textarea{border:1px solid var(--line);padding:10px;min-height:120px;resize:vertical;background:rgba(255,255,255,.5);line-height:1.5}
+.form input::placeholder,.form textarea::placeholder{color:#9C9896}
+.btn{border:1px solid var(--ink);background:var(--ink);color:#fff;font-size:12.5px;font-weight:700;padding:10px 18px;white-space:nowrap;transition:background .2s,color .2s}
+.btn:hover{background:transparent;color:var(--ink)}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.ghost:hover{background:var(--ink);color:#fff}
+.btn.sm{padding:6px 12px;font-size:11.5px}
+.btn.red{background:var(--red);border-color:var(--red)}
+.btn.red:hover{background:transparent;color:var(--red)}
+.btn:disabled{opacity:.4;cursor:default}
+.filters{display:flex;gap:4px 18px;flex-wrap:wrap;justify-content:center;margin:0 0 22px}
+.chip{border:0;background:none;padding:4px 0;font-size:13px;font-weight:700;color:var(--mute);border-bottom:2px solid transparent}
+.chip:hover{color:var(--ink)}
+.chip.on{color:var(--ink);border-bottom-color:var(--ink)}
+.chip small{font-weight:500;margin-left:4px}
+.ro .form,.ro .editonly{display:none}
+
+/* drafts */
+.drafts{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
+.dcard{background:var(--glass);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);padding:16px 18px;display:flex;flex-direction:column;gap:10px;border-top:3px solid var(--line)}
+.dcard.s-revisione{border-top-color:var(--ink)}
+.dcard.s-modifiche{border-top-color:var(--red)}
+.dcard.s-approvato{border-top-color:var(--ok)}
+.dcard.s-pubblicato{opacity:.7}
+.dcard .meta{display:flex;gap:8px;flex-wrap:wrap;font-size:11px;font-weight:700;color:var(--mute);text-transform:uppercase;letter-spacing:.04em}
+.dcard .tt{font-size:16px;font-weight:700;line-height:1.25}
+.dcard .body{white-space:pre-wrap;font-weight:400;font-size:14px;line-height:1.55;max-height:9.5em;overflow:hidden;position:relative}
+.dcard .body.open{max-height:none}
+.dcard .rev{font-size:12.5px;color:var(--red);font-weight:600;white-space:pre-wrap}
+.dcard .appr{font-size:12.5px;color:var(--ok);font-weight:700}
+.dcard .foot2{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:10px}
+.dcard .acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.dcard textarea,.dcard input{width:100%;border:1px solid var(--line);background:rgba(255,255,255,.6);padding:8px;font-size:13.5px}
+.dcard textarea{min-height:110px;resize:vertical}
+.badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 8px;border:1px solid currentColor}
+.b-bozza{color:var(--mute)}
+.b-revisione{color:var(--ink)}
+.b-modifiche{color:var(--red)}
+.b-approvato{color:var(--ok)}
+.b-pubblicato{color:var(--mute)}
+
+/* reference */
+.ref .art{aspect-ratio:auto;display:block;background:none}
+.ref img{display:block;width:100%;height:auto;max-height:420px;object-fit:contain;filter:drop-shadow(0 20px 26px rgba(0,0,0,.14))}
+.ref .ph{width:100%;aspect-ratio:4/5;display:grid;place-items:center;background:rgba(255,255,255,.35);font-size:15px;font-weight:700;padding:16px;text-align:center}
+.ref p{margin:0;font-size:12.5px;color:var(--mute);max-width:32ch}
+.tags{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;font-size:11px;font-weight:700;color:var(--mute)}
+.refacts{display:flex;gap:10px;align-items:center;justify-content:center}
+
+/* uploads */
+.up{display:grid;grid-template-columns:minmax(220px,2fr) 100px minmax(120px,1fr) minmax(120px,1fr) 110px 90px;gap:14px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);min-width:760px}
+.up:last-child{border-bottom:0}
+.up .nm{font-weight:700;word-break:break-all}
+.up .nm small{display:block;font-weight:500;color:var(--mute);font-size:11.5px}
+.progress{font-size:12.5px;font-weight:700}
+
+/* links */
+.lgroups{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:40px}
+.lgroup h3{margin:0 0 6px;font-size:13px;font-weight:700}
+.lk{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.lk .nm{font-weight:700}
+.lk .nm a:hover{text-decoration:underline;text-underline-offset:3px}
+.lk .u{font-size:12px;color:var(--mute);word-break:break-all}
+.lk .u.miss{color:var(--red);font-weight:700}
+.lk input{border:0;border-bottom:1px solid var(--ink);padding:4px 0;width:100%;background:transparent}
+
+/* brand */
+.ratio{display:flex;height:150px}
+.ratio div{display:flex;flex-direction:column;justify-content:end;padding:14px;font-size:12px;font-weight:700}
+.ratio b{font-size:28px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px}
+.box{background:var(--glass);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);padding:18px}
+.box h3{margin:0 0 10px;font-size:14px;font-weight:700}
+.box ul{margin:0;padding-left:16px;display:flex;flex-direction:column;gap:5px}
+.tbd{color:var(--red);font-weight:700}
+.spec .a{font-family:var(--f-logo);font-size:56px;line-height:1}
+.spec .b{font-size:22px;font-weight:700;margin-top:6px}
+.spec .c{font-size:14px;margin-top:4px;color:var(--mute)}
+
+.decs{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.decs span{font-weight:700}
+.decs span::after{content:" — da definire";font-weight:500;color:var(--mute)}
+
+/* footer */
+.foot{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;padding:16px 22px 18px;font-size:11px;font-weight:700}
+.foot nav{display:flex;gap:16px;flex-wrap:wrap}
+.foot nav:last-child{justify-content:end}
+.foot a:hover{color:var(--mute)}
+.foot .off{color:var(--mute);font-weight:500}
+.ig{width:18px;height:18px;border:2px solid var(--ink);border-radius:5px;position:relative;display:block}
+.ig::after{content:"";position:absolute;inset:3px;border:2px solid var(--ink);border-radius:50%}
+
+/* ---- dettagli grafici ---- */
+main{counter-reset:sec}
+.sec-head h2{display:flex;align-items:baseline;gap:10px}
+.sec-head h2::before{counter-increment:sec;content:counter(sec,decimal-leading-zero);font-size:11px;font-weight:700;color:var(--red);font-variant-numeric:tabular-nums}
+.sec-head{border-bottom:1px solid var(--line);padding-bottom:10px;position:relative}
+.sec-head::after{content:"";position:absolute;left:0;bottom:-1px;width:28px;height:1px;background:var(--ink)}
+.panel,.form,.box,.dcard,.tree{position:relative}
+.panel::before,.form::before,.box::before,.tree::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.55;
+  background:
+   linear-gradient(var(--ink),var(--ink)) left top/10px 1px no-repeat,linear-gradient(var(--ink),var(--ink)) left top/1px 10px no-repeat,
+   linear-gradient(var(--ink),var(--ink)) right top/10px 1px no-repeat,linear-gradient(var(--ink),var(--ink)) right top/1px 10px no-repeat,
+   linear-gradient(var(--ink),var(--ink)) left bottom/10px 1px no-repeat,linear-gradient(var(--ink),var(--ink)) left bottom/1px 10px no-repeat,
+   linear-gradient(var(--ink),var(--ink)) right bottom/10px 1px no-repeat,linear-gradient(var(--ink),var(--ink)) right bottom/1px 10px no-repeat}
+.ticker{overflow:hidden;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);background:var(--ink);color:#fff;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.ticker .run{display:inline-flex;gap:28px;padding:6px 0;animation:tick 60s linear infinite;will-change:transform}
+.ticker .run span{display:inline-flex;align-items:center;gap:28px}
+.ticker .run span::after{content:"";width:5px;height:5px;border-radius:50%;background:var(--red)}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.drop{position:relative}
+.seal{position:absolute;right:0;top:0;width:132px;height:132px}
+.seal svg{width:100%;height:100%;animation:spin 40s linear infinite}
+.seal text{font-family:var(--f-body);font-size:8.6px;font-weight:700;fill:var(--ink);text-transform:uppercase}
+.seal{position:absolute}.seal .seal-art{position:absolute;left:50%;top:50%;height:56%;width:auto;transform:translate(-50%,-50%)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.drop .t{position:relative;padding:0 6px}
+.rule{display:flex;align-items:center;gap:12px;width:min(420px,100%);color:var(--mute);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.rule::before,.rule::after{content:"";flex:1;height:1px;background:var(--line)}
+.obj .art{position:relative}
+.obj .idx{position:absolute;left:10px;top:10px;font-size:11px;font-weight:700;color:var(--mute);font-variant-numeric:tabular-nums}
+.obj .art::after{content:"";position:absolute;right:10px;top:10px;width:6px;height:6px;border-radius:50%;background:var(--line)}
+.obj.hot .art::after{background:var(--red)}
+.obj .nm{position:relative}
+.obj:hover .nm{text-decoration:underline;text-decoration-color:var(--red);text-decoration-thickness:2px;text-underline-offset:4px}
+.badge::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;margin-right:6px;vertical-align:1px}
+.tree{background:var(--glass);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);padding:18px;margin-top:28px}
+.tree-h{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.tree-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.leaf{background:rgba(255,255,255,.35);padding:12px;display:flex;flex-direction:column;gap:2px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.leaf b{font-size:11px;color:var(--red)}
+.leaf span{font-weight:700}
+.leaf small{font-size:11.5px;color:var(--mute)}
+.wordmark{display:flex;justify-content:center;padding:20px 22px 0;opacity:.13;filter:grayscale(1) contrast(1.4)}
+.wordmark img{width:min(760px,90%);height:auto}
+.pagehead::before{content:"";width:1px;height:34px;background:var(--ink);margin-bottom:6px}
+@media (max-width:1240px){.seal{position:relative;right:auto;top:auto;margin:0 auto 2px;width:112px;height:112px}}
+@media (prefers-reduced-motion:reduce){.ticker .run,.seal svg{animation:none}}
+/* ---- accesso ---- */
+.gate{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:24px;background:rgba(235,234,232,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.gate[hidden]{display:none}
+.gate img{width:min(300px,70vw);height:auto}
+.gate h1{margin:0;font-size:24px;font-weight:700}
+.gate p{margin:0;color:var(--mute);max-width:44ch}
+.gbtn{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--ink);background:var(--ink);color:#fff;font-weight:700;font-size:13.5px;padding:12px 20px}
+.gbtn:hover{background:transparent;color:var(--ink)}
+.gbtn svg{width:18px;height:18px}
+.minput{width:100%;border:0;border-bottom:1px solid var(--line);background:transparent;padding:4px 0;font-weight:600}
+.minput:focus{border-bottom-color:var(--ink);outline:none}
+.mrow{display:grid;grid-template-columns:minmax(200px,1.3fr) minmax(170px,1.2fr) 130px 90px;gap:14px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);min-width:600px}
+.mrow:last-child{border-bottom:0}
+@media (max-width:760px){
+  .top{padding:10px 14px}
+  .logo img{height:40px}
+  .hud .lb{display:none}
+  main{padding:0 16px 32px;gap:72px}
+  .drafts{grid-template-columns:1fr}
+  .foot{grid-template-columns:1fr;justify-items:center;text-align:center}
+  .foot nav,.foot nav:last-child{justify-content:center}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<canvas id="bg" aria-hidden="true"></canvas>
+<div class="gate" id="gate" hidden>
+  <img src="assets/logo_nokap.png" alt="NoKap">
+  <h1 id="gate-t">NoKap HQ</h1>
+  <p id="gate-p">La home del team. Entra con il tuo account Google.</p>
+  <button class="gbtn" id="gate-btn" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.3zM12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3.1v2.6A10 10 0 0 0 12 22zM6.4 14a6 6 0 0 1 0-3.9V7.5H3.1a10 10 0 0 0 0 9zM12 5.9c1.5 0 2.8.5 3.8 1.5l2.9-2.9A10 10 0 0 0 3.1 7.5L6.4 10C7.2 7.7 9.4 5.9 12 5.9z"/></svg><span>Accedi con Google</span></button>
+  <button class="linkish" id="gate-out" type="button" hidden>Esci e cambia account</button>
+</div>
+<div class="grain" id="grain" aria-hidden="true"></div>
+
+<header class="top">
+  <button class="menu-btn" id="menubtn" aria-expanded="false" aria-controls="overlay" type="button"><i></i>Menu</button>
+  <a class="logo" href="#home" aria-label="NoKap HQ, home"><img src="assets/logo_nokap.png" alt="NoKap" width="160" height="52"></a>
+  <a class="hud" href="#scadenze"><span class="lb">Drop 01</span><span class="lb">/</span><span class="cd" id="hudcd">T da definire</span></a>
+</header>
+
+<nav class="overlay" id="overlay" aria-label="Menu"></nav>
+
+<main id="main" tabindex="-1"></main>
+
+<div class="wordmark" aria-hidden="true"><img src="assets/logo_nokap.png" alt=""></div>
+<footer class="foot">
+  <nav id="footleft" aria-label="Strumenti"></nav>
+  <a id="footig" aria-label="Instagram NoKap"><span class="ig"></span></a>
+  <nav><a href="#file">Carica file</a><a href="#brand">Brand kit</a><a href="#link">Link utili</a><span class="off">NoKap HQ · IT</span></nav>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script>
+const AREAS=[
+  {id:'dir',name:'Direzione & Brand',owner:'Gabriele Caponnetto',scope:'Visione del brand e approvazione finale di annunci e campagne.'},
+  {id:'prod',name:'Prodotto',owner:'Greta (da confermare) + [DA DEFINIRE]',scope:'Design, campionature, produzione, logistica.'},
+  {id:'cont',name:'Contenuti',owner:'Tommaso Carlini · Roby e Fra',scope:'Copy, caption, tono di voce. Foto e video a Firenze.'},
+  {id:'comm',name:'Community & Partnership',owner:'Miche e Ludo',scope:'Collab con artisti e collettivi, PR, eventi.'},
+  {id:'ops',name:'Dati, Shop & Ops',owner:'Lorenzo Ciampana',scope:'E-commerce, ordini, report mensile, strumenti.'}
+];
+const AREA=Object.fromEntries(AREAS.map(a=>[a.id,a]));
+const TEAM=['Da assegnare','Gabriele Caponnetto','Greta (da confermare)','Tommaso Carlini','Roby','Fra','Miche','Ludo','Lorenzo Ciampana'];
+const STATUS={todo:'Da fare',doing:'In corso',done:'Fatto'};
+const NEXT={todo:'doing',doing:'done',done:'todo'};
+const OPEN=['Data di uscita di album e drop','Pezzi, quantità e prezzi','Budget per ads ed evento','Location del pop-up','Palette, font e hashtag','Chi copre social, grafica e video a Milano/Roma'];
+const LGROUPS=['Team','Archivio Drive','Social','Shop & dati','Altro'];
+const DKINDS=['Post','Carosello','Reel','Story','Caption','Comunicato','DM artista o brand','Flyer','Progetto','Altro'];
+const DCHANNELS=['Instagram','TikTok','YouTube','Sito / shop','Stampa','Interno'];
+const DSTATUS={bozza:'Bozza',revisione:'In approvazione',modifiche:'Da rivedere',approvato:'Approvato',pubblicato:'Pubblicato'};
+const USES=['Social','Grafiche','Loghi','Shop','Stampa e merch','Eventi','Reference','Interno','Altro'];
+const USE_NUM={'Social':'01','Grafiche':'02','Loghi':'03','Shop':'04','Stampa e merch':'05','Eventi':'06','Reference':'07','Interno':'08','Altro':'09'};
+const KIND_USE=k=>['Post','Carosello','Reel','Story','Caption'].includes(k)?'Social':k==='Flyer'?'Grafiche':['Comunicato','DM artista o brand'].includes(k)?'Interno':'Altro';
+const APPROVER='Gabriele Caponnetto';
+
+const S={tasks:[],links:[],refs:[],drafts:[],deadlines:[],uploads:[],drop:{},drive:{},
+  loaded:{tasks:false,links:false,refs:false,drafts:false,deadlines:false,uploads:false},
+  db:null,user:null,me:null,editingMember:null,reassigning:null,email:'',myName:'',isAdmin:false,members:[],token:null,tokenAt:0,names:{},canWrite:true,
+  taskFilter:'all',refFilter:'all',draftFilter:'attivi',editingLink:null,editingDraft:null,reviewing:null,openBody:{},confirmDel:null,busy:false};
+
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const safeUrl=u=>{try{const x=new URL(String(u||''));return /^https?:$/.test(x.protocol)?x.href:''}catch(e){return ''}};
+const okThumb=t=>typeof t==='string'&&/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(t)&&t.length<260000;
+const isDate=d=>typeof d==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(d);
+const $=id=>document.getElementById(id);
+const route=()=>(location.hash||'#home').slice(1)||'home';
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const daysTo=d=>Math.round((new Date(d+'T00:00:00')-new Date(today()+'T00:00:00'))/864e5);
+const fmtDate=d=>isDate(d)?new Date(d+'T00:00:00').toLocaleDateString('it-IT',{day:'numeric',month:'short'}):'';
+const fmtLong=d=>isDate(d)?new Date(d+'T00:00:00').toLocaleDateString('it-IT',{weekday:'short',day:'numeric',month:'long'}):'';
+const nameOf=id=>id?(S.names[id]||'Qualcuno del team'):'';
+const CFG=window.NOKAP_CONFIG||{};
+const lc=s=>String(s||'').trim().toLowerCase();
+const canApprove=()=>S.isAdmin||S.myRole==='Approvatore';
+const canManageTeam=()=>(CFG.teamManagers||['nokapmerch@gmail.com']).map(lc).includes(S.email);
+const whoName=()=>S.myName||S.email||'Qualcuno del team';
+const areaOpts=(sel,empty)=>(empty?`<option value="">${empty}</option>`:'')+AREAS.map(a=>`<option value="${a.id}" ${a.id===sel?'selected':''}>${esc(a.name)}</option>`).join('');
+function people(){const seen=new Set(),L=[];
+  S.members.filter(m=>m.email).sort((a,b)=>(a.name||a.email).localeCompare(b.name||b.email)).forEach(m=>{L.push({v:'@'+m.email,label:(m.name||m.email),name:m.name||m.email,email:m.email});seen.add(lc(m.name))});
+  const used=new Set([...S.tasks,...S.deadlines].filter(x=>!x.ownerEmail&&x.owner&&x.owner!=='Da assegnare').map(x=>x.owner));
+  [...used].filter(t=>!seen.has(lc(t))).forEach(t=>L.push({v:t,label:t+' (senza email)',name:t,email:''}));
+  return L}
+const teamOpts=(sel)=>`<option value="Da assegnare">Da assegnare</option>`+people().map(p=>`<option value="${esc(p.v)}" ${sel&&sel===p.v?'selected':''}>${esc(p.label)}</option>`).join('');
+const pick=v=>{if(!v||v==='Da assegnare')return {owner:'Da assegnare',ownerEmail:''};const p=people().find(x=>x.v===v);return p?{owner:p.name,ownerEmail:p.email}:{owner:v,ownerEmail:''}};
+const ownerVal=t=>{if(t.ownerEmail)return '@'+t.ownerEmail;const m=S.members.find(m=>m.email&&lc(m.name)===lc(t.owner));return m?'@'+m.email:(t.owner||'Da assegnare')};
+const mine=t=>S.email&&lc(t.ownerEmail)===S.email;
+
+/* ---------- background ---------- */
+function rng(seed){return()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646}}
+function drawBg(){
+  const c=$('bg'),dpr=Math.min(window.devicePixelRatio||1,1.5),w=innerWidth,h=innerHeight,k=.5;
+  c.width=Math.round(w*dpr*k);c.height=Math.round(h*dpr*k);
+  const x=c.getContext('2d'),W=c.width,H=c.height,r=rng(7);
+  const g=x.createLinearGradient(0,0,W,H);g.addColorStop(0,'#EAE9E7');g.addColorStop(.55,'#EDECEA');g.addColorStop(1,'#E8E7E5');
+  x.fillStyle=g;x.fillRect(0,0,W,H);
+  x.filter='blur('+Math.round(Math.max(W,H)/40)+'px)';
+  for(let i=0;i<3;i++){
+    const sx=W*(.1+r()*.5),sy=H*1.05,ex=W*(.5+r()*.6),ey=-H*.1;
+    x.beginPath();x.moveTo(sx,sy);
+    x.bezierCurveTo(W*(r()*.4),H*(.2+r()*.4),W*(.5+r()*.5),H*(.6+r()*.3),ex,ey);
+    x.lineWidth=Math.max(W,H)*(.06+r()*.08);
+    x.strokeStyle='rgba(255,255,255,'+(.14+r()*.1)+')';x.lineCap='round';x.stroke();
+  }
+  x.filter='none';
+}
+function makeGrain(){
+  const c=document.createElement('canvas');c.width=c.height=160;const x=c.getContext('2d'),d=x.createImageData(160,160);
+  for(let i=0;i<d.data.length;i+=4){const v=Math.random()*255;d.data[i]=d.data[i+1]=d.data[i+2]=v;d.data[i+3]=255}
+  x.putImageData(d,0,0);$('grain').style.backgroundImage='url('+c.toDataURL()+')';
+}
+let rz;window.addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(drawBg,200)});
+
+/* ---------- menu ---------- */
+function buildMenu(){
+  const r=route(),T=S.tasks,inRev=S.drafts.filter(d=>d.status==='revisione').length;
+  const it=(h,l,extra)=>`<li><a href="#${h}" class="${r===h?'on':''}">${l}${extra?`<small>${extra}</small>`:''}</a></li>`;
+  $('overlay').innerHTML=`<ul>
+    ${it('home','Home')}
+    ${it('attivita','Attività',S.tasks.filter(t=>t.status!=='done'&&mine(t)).length?S.tasks.filter(t=>t.status!=='done'&&mine(t)).length+' tue':'')}
+    ${it('scadenze','Scadenze')}
+    ${it('testi','Testi & editoria',inRev?inRev+' da approvare':'')}
+    ${it('file','Carica file')}
+    ${it('moodboard','Moodboard')}
+    ${it('link','Link utili')}
+    ${it('brand','Brand kit')}
+    ${S.isAdmin?it('team','Team e accessi'):''}
+    <li><a href="#home" data-act="logout">Esci<small style="color:var(--mute)">${esc(S.email)}</small></a></li>
+    <li class="grp">Aree</li>
+    <li><ul class="sub">${AREAS.map(a=>{const n=T.filter(t=>t.area===a.id&&t.status!=='done').length;return `<li><a href="#area-${a.id}" class="${r==='area-'+a.id?'on':''}">${esc(a.name)}<small>${esc(a.owner)}${S.loaded.tasks?' · '+n+' aperte':''}</small></a></li>`}).join('')}</ul></li>
+  </ul>`;
+}
+function setMenu(open){$('overlay').classList.toggle('open',open);$('menubtn').setAttribute('aria-expanded',String(open));$('menubtn').lastChild.textContent=open?'Chiudi':'Menu';if(open)buildMenu()}
+$('menubtn').addEventListener('click',()=>setMenu(!$('overlay').classList.contains('open')));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')setMenu(false)});
+$('overlay').addEventListener('click',e=>{if(e.target.closest('a'))setMenu(false)});
+
+/* ---------- views ---------- */
+function head(lab,title,sub){return `<div class="pagehead"><div class="lab">${lab}</div><h1>${title}</h1>${sub?`<p>${sub}</p>`:''}</div><div id="netnote" class="status-note"></div>`}
+function viewHome(){
+  return `<section class="drop">
+      <div class="seal" aria-hidden="true"><svg viewBox="0 0 132 132"><defs><path id="sealpath" d="M66,66 m-52,0 a52,52 0 1,1 104,0 a52,52 0 1,1 -104,0"/></defs><circle cx="66" cy="66" r="63" fill="none" stroke="currentColor" stroke-width="1" opacity=".35"/><text><textPath href="#sealpath" textLength="322" lengthAdjust="spacing">NoKap · Drop 01 · Aspettando la Trap Musicale · </textPath></text></svg><img class="seal-art" src="assets/grafica_tee.png" alt=""></div>
+      <div class="lab">Drop 01 · in riproduzione</div>
+      <div class="t">Aspettando la Trap Musicale</div>
+      <div class="s">Con l'album di Gabriel Tonelli · partenza da Firenze</div>
+      <div class="rule">Stato del drop</div>
+      <div class="prog"><div class="row"><span><span class="big" id="bigcd">Giorno T</span> · <span id="cdtxt">data da definire</span></span><span id="pct">—</span></div><div class="bar"><i id="barfill"></i></div></div>
+      <div class="datebox editonly"><label for="dropdate">Data del drop</label><input type="date" id="dropdate"><button class="linkish" id="savedate" type="button">Salva</button></div>
+      <div class="quick">
+        <a href="#attivita">Attività<small id="tl-att">—</small></a>
+        <a href="#scadenze">Scadenze<small id="tl-dl">—</small></a>
+        <a href="#testi">Testi & editoria<small id="tl-txt">—</small></a>
+        <a href="#file">Carica file<small>Vanno su Drive</small></a>
+      </div>
+    </section>
+    <div id="netnote" class="status-note"></div>
+    <section id="mysec" hidden>
+      <div class="sec-head"><h2>Assegnate a te</h2><span class="note">Ti arriva anche un'email con il promemoria</span></div>
+      <div class="panel" id="mytasks"></div>
+    </section>
+    <section>
+      <div class="sec-head"><h2>Le aree</h2><span class="note">Apri un'area per vedere chi segue cosa</span></div>
+      <div class="objs" id="areacards"></div>
+    </section>
+    <section>
+      <div class="sec-head"><h2>Prossime scadenze</h2><a href="#scadenze">Tutte le scadenze</a></div>
+      <div class="panel" id="homedl"></div>
+    </section>
+    <section>
+      <div class="sec-head"><h2>In attesa di approvazione</h2><a href="#testi">Apri Testi & editoria</a></div>
+      <div class="drafts" id="homedrafts"></div>
+    </section>
+    <section>
+      <div class="sec-head"><h2>Attività aperte</h2><a href="#attivita">Vedi tutte</a></div>
+      <div class="panel" id="hometasks"></div>
+    </section>
+    <section>
+      <div class="sec-head" style="justify-content:center"><h2>Decisioni aperte</h2></div>
+      <div class="decs">${OPEN.map(d=>`<span>${esc(d)}</span>`).join('')}</div>
+    </section>`;
+}
+function taskForm(prefArea){
+  return `<form class="form" id="taskform">
+    <label class="wide" for="tf-title">Cosa<input id="tf-title" required maxlength="140" placeholder="Es. Chiudere il preventivo con il fornitore"></label>
+    <label for="tf-area">Area<select id="tf-area">${areaOpts(prefArea)}</select></label>
+    <label for="tf-owner">Chi (una persona)<select id="tf-owner">${teamOpts()}</select></label>
+    <label for="tf-date">Entro il<input id="tf-date" type="date"></label>
+    <button class="btn" type="submit">Aggiungi attività</button>
+  </form>`;
+}
+function viewTasks(){
+  return `${head('Cosa · chi · entro quando','Attività','Chiunque nel team può aggiungere attività. Clicca lo stato per farlo avanzare. Le attività senza responsabile restano in rosso.')}
+    <section>${taskForm('dir')}
+    <div class="filters" id="taskfilters" style="margin-top:30px"></div>
+    <div class="panel" id="alltasks"></div></section>`;
+}
+function viewDeadlines(){
+  return `${head('Calendario a ritroso','Scadenze','Scadenze fisse, attività con una data e contenuti da pubblicare, tutti in ordine di data.')}
+    <section><form class="form" id="dlform">
+      <label class="wide" for="df-title">Scadenza<input id="df-title" required maxlength="120" placeholder="Es. Consegna campionature"></label>
+      <label for="df-date">Data<input id="df-date" type="date" required></label>
+      <label for="df-area">Area<select id="df-area">${areaOpts('dir')}</select></label>
+      <label for="df-owner">Chi<select id="df-owner">${teamOpts()}</select></label>
+      <button class="btn" type="submit">Aggiungi scadenza</button>
+    </form>
+    <div class="panel" id="alldl" style="margin-top:30px"></div></section>`;
+}
+function viewTexts(){
+  return `${head('Bozze · approvazione · pubblicazione','Testi & editoria',`Carica qui bozze di post, caption, comunicati e progetti. Quando una bozza è pronta, inviala in approvazione: annunci e campagne li approva ${APPROVER}.`)}
+    <section><form class="form" id="draftform">
+      <label class="wide" for="dr-title">Titolo<input id="dr-title" required maxlength="120" placeholder="Es. Annuncio drop – carosello 1"></label>
+      <label for="dr-kind">Tipo<select id="dr-kind">${DKINDS.map(k=>`<option>${k}</option>`).join('')}</select></label>
+      <label for="dr-channel">Canale<select id="dr-channel">${DCHANNELS.map(k=>`<option>${k}</option>`).join('')}</select></label>
+      <label for="dr-area">Area<select id="dr-area">${areaOpts('cont')}</select></label>
+      <label for="dr-author">Chi l'ha scritta<select id="dr-author">${teamOpts()}</select></label>
+      <label for="dr-date">Uscita prevista<input id="dr-date" type="date"></label>
+      <label class="full" for="dr-body">Testo<textarea id="dr-body" maxlength="8000" placeholder="Scrivi qui la caption, il copy o la descrizione del progetto."></textarea></label>
+      <label class="wide" for="dr-file">Allegato, va su Drive (grafica, video, PDF)<input id="dr-file" type="file"></label>
+      <label class="wide" for="dr-link">Oppure link a un file<input id="dr-link" type="url" placeholder="https://…"></label>
+      <button class="btn" type="submit" id="dr-btn">Salva bozza</button>
+    </form>
+    <div class="filters" id="draftfilters" style="margin-top:30px"></div>
+    <div class="drafts" id="alldrafts"></div></section>`;
+}
+function viewFiles(){
+  return `${head('I file non restano qui: vanno su Drive','Carica file','Scegli il file, indica a cosa serve e caricalo. Arriva nella cartella Drive del team con un nome ordinato, pronto per essere smistato.')}
+    <section><form class="form" id="upform">
+      <label class="wide" for="uf-file">File (fino a 100 MB per file)<input id="uf-file" type="file" multiple required></label>
+      <label for="uf-area">Area<select id="uf-area">${areaOpts('cont')}</select></label>
+      <label for="uf-use">Destinazione d'uso<select id="uf-use">${USES.map(u=>`<option>${u}</option>`).join('')}</select></label>
+      <label class="wide" for="uf-note">Nota<input id="uf-note" maxlength="200" placeholder="Es. Scatti backstage Firenze, selezione per carosello"></label>
+      <button class="btn" type="submit" id="uf-btn">Carica su Drive</button>
+    </form>
+    <p class="note" id="drivehint" style="text-align:center;margin-top:14px"></p>
+    <div class="tree" aria-label="Come vengono smistati i file">
+      <div class="tree-h"><span class="lab">Smistamento automatico</span><span class="note">Ogni 15 minuti i file passano da Caricamenti all'archivio: prima la destinazione, poi il formato.</span></div>
+      <div class="tree-grid">${USES.map(u=>`<div class="leaf"><b>${USE_NUM[u]}</b><span>${u}</span><small>${u==='Loghi'?'Vettoriali · Immagini · PDF':u==='Grafiche'?'Immagini · Vettoriali · Sorgenti · PDF':u==='Social'?'Immagini · Video · Documenti':'Divisi per formato'}</small></div>`).join('')}</div>
+    </div>
+    <div class="sec-head" style="margin-top:56px"><h2>Ultimi caricamenti</h2><span class="note">Nome: data_area_destinazione_nome · il link resta valido anche dopo lo spostamento</span></div>
+    <div class="panel" id="alluploads"></div></section>`;
+}
+function viewMood(){
+  return `${head('Immaginario · reference','Moodboard','Aggiungi una reference: le immagini vanno su Drive e qui resta solo un\'anteprima leggera. Scrivi due parole su cosa ti prende.')}
+    <section><form class="form" id="refform">
+      <label class="wide" for="rf-title">Titolo<input id="rf-title" required maxlength="80" placeholder="Es. Croci e argento, vibe gotica"></label>
+      <label for="rf-area">Area<select id="rf-area">${areaOpts('','Nessuna')}</select></label>
+      <label for="rf-tags">Tag, separati da virgola<input id="rf-tags" maxlength="80" placeholder="mood, logo, foto"></label>
+      <label class="wide" for="rf-note">Cosa ti prende<input id="rf-note" maxlength="240" placeholder="Il contrasto, il lettering, la luce"></label>
+      <label class="wide" for="rf-url">Link, facoltativo<input id="rf-url" type="url" placeholder="https://…"></label>
+      <label for="rf-file">Immagine, va su Drive<input id="rf-file" type="file" accept="image/*"></label>
+      <button class="btn" type="submit" id="rf-btn">Aggiungi</button>
+    </form>
+    <div class="filters" id="reffilters" style="margin-top:30px"></div>
+    <div class="objs" id="allrefs"></div></section>`;
+}
+function viewLinks(){
+  return `${head('Un software per attività','Link utili','I posti dove lavoriamo. Quelli in rosso sono ancora da inserire.')}
+    <section><form class="form" id="linkform">
+      <label for="lf-label">Nome<input id="lf-label" required maxlength="60" placeholder="Es. Cartella shooting Firenze"></label>
+      <label class="wide" for="lf-url">Link<input id="lf-url" type="url" required placeholder="https://…"></label>
+      <label for="lf-group">Gruppo<select id="lf-group">${LGROUPS.map(g=>`<option>${g}</option>`).join('')}</select></label>
+      <button class="btn" type="submit">Aggiungi link</button>
+    </form>
+    <div class="lgroups" id="alllinks" style="margin-top:40px"></div></section>`;
+}
+function viewBrand(){
+  return `${head('Bozza · da approvare: '+APPROVER,'Brand kit','Palette, font e hashtag diventano ufficiali solo con l\'ok di Gabriele.')}
+    <section>
+      <div class="sec-head"><h2>Palette, proporzioni indicative</h2><span class="note">Rosso del logo: #B91E1A · codici ufficiali <span class="tbd">da definire</span></span></div>
+      <div class="ratio">
+        <div style="flex:60;background:#fff"><b>60%</b>Bianco</div>
+        <div style="flex:30;background:var(--red);color:#fff"><b>30%</b>Rosso</div>
+        <div style="flex:10;background:var(--ink);color:#fff"><b>10%</b>Nero</div>
+      </div>
+    </section>
+    <section class="grid2">
+      <div class="box spec"><h3>Logo e font del logo · Cloister Black</h3>
+        <img src="assets/logo_nokap.png" alt="Logo NoKap" style="display:block;width:min(320px,100%);height:auto;margin:6px 0 10px">
+        <div class="a">NoKap</div>
+        <p class="note">Cloister Black si usa solo per il logo e il segno NoKap, mai per i testi.</p></div>
+      <div class="box spec"><h3>Testi · Creato Display</h3>
+        <div class="b">Aspettando la Trap Musicale</div>
+        <div class="c" style="font-weight:400">Regular · testo corrente</div>
+        <div class="c" style="font-weight:500;color:var(--ink)">Medium · interfaccia ed etichette</div>
+        <div class="c" style="font-weight:700;color:var(--ink)">Bold · titoli e nomi</div>
+        <p class="note">Licenza SIL Open Font: si può usare anche per prodotti e grafiche commerciali.</p></div>
+      <div class="box"><h3>Tono di voce</h3><ul>
+        <li>Parliamo come la community: cultura, scena, strada, "noi".</li>
+        <li>Niente linguaggio da azienda, niente promesse vuote, niente polemiche.</li>
+        <li>Frasi brevi. Slang solo dove suona naturale.</li>
+        <li>Nelle collab NoKap viene sempre per primo: NoKap × Artista – Titolo.</li></ul></div>
+      <div class="box"><h3>Template e social</h3><ul>
+        <li>Annuncio drop, countdown, artista, citazione, behind the scenes</li>
+        <li>Base: 2 post o caroselli + 2 reel a settimana</li>
+        <li>Si taggano sempre artista, fotografo o videomaker e luogo</li>
+        <li>Commenti e DM: risposta entro 24 ore</li></ul>
+        <p class="note">Hashtag ufficiali <span class="tbd">da definire</span></p></div>
+    </section>`;
+}
+function viewTeam(){
+  if(!S.isAdmin)return viewHome();
+  const mg=canManageTeam();
+  return `${head('Team e accessi','Chi entra in NoKap HQ',mg?'Aggiungi l\'email Google di chi deve entrare. Ricordati di condividere anche la cartella Drive dei caricamenti con la stessa email.':'Solo Gabriele può aggiungere, rinominare o togliere persone dal team.')}
+    <section>${mg?'':'<!--'}<form class="form" id="memberform">
+      <label class="wide" for="mf-email">Email Google<input id="mf-email" type="email" required placeholder="nome@gmail.com"></label>
+      <label for="mf-name">Nome<input id="mf-name" maxlength="60" placeholder="Es. Tommaso Carlini"></label>
+      <label for="mf-role">Ruolo<select id="mf-role"><option>Membro</option><option>Approvatore</option></select></label>
+      <button class="btn" type="submit">Aggiungi al team</button>
+    </form>${mg?'':'-->'}
+    <div class="panel" id="allmembers" style="margin-top:24px"></div></section>
+    <section><div class="sec-head"><h2>Dati iniziali</h2></div>
+      <div class="box"><p class="note" style="margin:0 0 12px">Importa attività, link, reference e cartella Drive da NoKap HQ. Da fare una volta sola, a database vuoto.</p>
+      <button class="btn ghost" id="seedbtn" type="button">Importa dati iniziali</button></div></section>`;
+}
+function viewArea(id){
+  const a=AREA[id]; if(!a) return viewHome();
+  return `<div class="pagehead"><div class="lab">Area</div><h1>${esc(a.name)}</h1><p>${esc(a.scope)}</p>
+      <p><b>Responsabile</b> · ${esc(a.owner)} · <span id="area-count">—</span></p></div>
+    <div id="netnote" class="status-note"></div>
+    <section><div class="sec-head"><h2>Attività dell'area</h2></div>
+      ${taskForm(id)}<div class="panel" id="areatasks" style="margin-top:16px"></div></section>
+    <section><div class="sec-head"><h2>Testi e bozze dell'area</h2><a href="#testi">Apri Testi & editoria</a></div>
+      <div class="drafts" id="areadrafts"></div></section>
+    <section><div class="sec-head"><h2>Reference dell'area</h2><a href="#moodboard">Aggiungi dalla moodboard</a></div>
+      <div class="objs" id="arearefs"></div></section>`;
+}
+
+/* ---------- renderers ---------- */
+const noOwner=t=>!t.owner||t.owner==='Da assegnare';
+function dueHtml(t){if(isDate(t.dueDate)){const n=daysTo(t.dueDate);return `<span class="${n<0&&t.status!=='done'?'late':''}">${fmtDate(t.dueDate)}${n<0&&t.status!=='done'?' · in ritardo':''}</span>`}return esc(t.due||'Da definire')}
+function sortTasks(list){const ord={doing:0,todo:1,done:2};return [...list].sort((a,b)=>(ord[a.status]??1)-(ord[b.status]??1)||((isDate(a.dueDate)?a.dueDate:'9999')<(isDate(b.dueDate)?b.dueDate:'9999')?-1:(isDate(a.dueDate)?a.dueDate:'9999')>(isDate(b.dueDate)?b.dueDate:'9999')?1:0)||(a.order??999)-(b.order??999)||(a.createdAt??0)-(b.createdAt??0))}
+function trackRows(list,empty){
+  if(!S.loaded.tasks) return `<div class="empty">Carico le attività…</div>`;
+  if(!list.length) return `<div class="empty">${empty||'Nessuna attività qui.'}</div>`;
+  return `<div class="tr head"><span class="n">#</span><span>Attività</span><span>Chi</span><span>Entro</span><span>Stato</span><span></span></div>`+
+  list.map((t,i)=>{const st=STATUS[t.status]?t.status:'todo',a=AREA[t.area],ck='t:'+t.id;
+    return `<div class="tr ${st==='done'?'done':''}">
+      <span class="n">${String(i+1).padStart(2,'0')}</span>
+      <span class="tt">${esc(t.title)}<small>${esc(a?a.name:'Senza area')}</small></span>
+      <span class="who ${noOwner(t)?'warn':''}">${S.canWrite&&st!=='done'&&S.reassigning===t.id?`<select class="osel" data-act="reassign" data-id="${esc(t.id)}" aria-label="Responsabile di ${esc(t.title)}">${teamOpts(ownerVal(t))}</select>`:`${noOwner(t)?'Senza responsabile':esc(t.owner)}${S.canWrite&&st!=='done'?` <button class="chg" data-act="startreassign" data-id="${esc(t.id)}" type="button" aria-label="Cambia responsabile">cambia</button>`:''}`}${t.ownerEmail&&t.notifiedOwner===lc(t.ownerEmail)?'<small class="ntf">avvisato</small>':''}</span>
+      <span class="note">${dueHtml(t)}</span>
+      <span><button class="st ${st}" data-act="cycle" data-id="${esc(t.id)}" ${S.canWrite?'':'disabled'} aria-label="Stato ${STATUS[st]}: clicca per cambiare">${STATUS[st]}</button></span>
+      <span>${S.canWrite?`<button class="x ${S.confirmDel===ck?'confirm':''}" data-act="deltask" data-id="${esc(t.id)}" aria-label="Elimina attività">${S.confirmDel===ck?'Ok?':'×'}</button>`:''}</span>
+    </div>`}).join('');
+}
+function allDeadlines(){
+  const L=[];
+  S.deadlines.forEach(d=>{if(isDate(d.date))L.push({key:'d:'+d.id,id:d.id,date:d.date,title:d.title,src:'Scadenza',area:d.area,owner:d.owner,del:true})});
+  S.tasks.forEach(t=>{if(isDate(t.dueDate)&&t.status!=='done')L.push({key:'t:'+t.id,date:t.dueDate,title:t.title,src:'Attività',area:t.area,owner:t.owner})});
+  S.drafts.forEach(d=>{if(isDate(d.date)&&d.status!=='pubblicato')L.push({key:'x:'+d.id,date:d.date,title:d.title,src:'Uscita '+(d.kind||'contenuto').toLowerCase(),area:d.area,owner:d.author})});
+  if(isDate(S.drop.date))L.push({key:'drop',date:S.drop.date,title:'Giorno T: uscita del drop 01',src:'Drop',area:'dir',owner:''});
+  return L.sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0);
+}
+function dlRows(list,grouped){
+  const ready=S.loaded.tasks&&S.loaded.deadlines;
+  if(!ready) return `<div class="empty">Carico le scadenze…</div>`;
+  if(!list.length) return `<div class="empty">Nessuna scadenza con una data. Aggiungine una dalla pagina Scadenze o dai una data alle attività.</div>`;
+  const row=x=>{const n=daysTo(x.date),a=AREA[x.area],ck='d:'+x.id;
+    return `<div class="dl"><span class="d ${n<0?'late':''}">${fmtDate(x.date)}<small>${n<0?'scaduta':n===0?'oggi':n===1?'domani':'tra '+n+' giorni'}</small></span>
+      <span class="tt" style="font-weight:700">${esc(x.title)}</span><span class="src">${esc(x.src)}</span>
+      <span class="note">${esc(a?a.name:'')}</span><span class="who ${x.owner==='Da assegnare'?'warn':''}">${x.owner==='Da assegnare'?'Senza responsabile':esc(x.owner||'')}</span>
+      <span>${x.del&&S.canWrite?`<button class="x ${S.confirmDel===ck?'confirm':''}" data-act="deldl" data-id="${esc(x.id)}" aria-label="Elimina scadenza">${S.confirmDel===ck?'Ok?':'×'}</button>`:''}</span></div>`};
+  if(!grouped) return list.map(row).join('');
+  const g={late:[],week:[],later:[]};list.forEach(x=>{const n=daysTo(x.date);(n<0?g.late:n<=7?g.week:g.later).push(x)});
+  return [['late','Scadute'],['week','Entro 7 giorni'],['later','Più avanti']].map(([k,l])=>g[k].length?`<div class="dlgroup">${l}</div>`+g[k].map(row).join(''):'').join('');
+}
+function draftCard(d){
+  const st=DSTATUS[d.status]?d.status:'bozza',a=AREA[d.area],ck='x:'+d.id,ed=S.editingDraft===d.id,rv=S.reviewing===d.id;
+  const file=safeUrl(d.fileUrl);
+  let acts='';
+  if(S.canWrite&&!ed&&!rv){
+    if(st==='bozza'||st==='modifiche')acts+=`<button class="btn sm" data-act="dsubmit" data-id="${esc(d.id)}" type="button">${st==='modifiche'?'Rimanda in approvazione':'Invia in approvazione'}</button>`;
+    if(st==='revisione'&&canApprove())acts+=`<button class="btn sm" data-act="dapprove" data-id="${esc(d.id)}" type="button">Approva</button><button class="btn sm ghost" data-act="dreview" data-id="${esc(d.id)}" type="button">Chiedi modifiche</button>`;
+    if(st==='approvato')acts+=`<button class="btn sm ghost" data-act="dpublish" data-id="${esc(d.id)}" type="button">Segna pubblicato</button>`;
+    if(st!=='pubblicato')acts+=`<button class="linkish dark" data-act="dedit" data-id="${esc(d.id)}" type="button">Modifica</button>`;
+    acts+=`<button class="x ${S.confirmDel===ck?'confirm':''}" data-act="ddel" data-id="${esc(d.id)}" aria-label="Elimina bozza">${S.confirmDel===ck?'Ok?':'×'}</button>`;
+  }
+  const body=ed?`<input id="de-title-${esc(d.id)}" value="${esc(d.title)}" maxlength="120" aria-label="Titolo"><textarea id="de-body-${esc(d.id)}" maxlength="8000" aria-label="Testo">${esc(d.body||'')}</textarea>
+      <div class="acts"><button class="btn sm" data-act="dsave" data-id="${esc(d.id)}" type="button">Salva modifiche</button><button class="linkish" data-act="dcancel" type="button">Annulla</button></div>`
+    :(d.body?`<div class="body ${S.openBody[d.id]?'open':''}">${esc(d.body)}</div>${(d.body||'').length>320?`<button class="linkish" data-act="dtoggle" data-id="${esc(d.id)}" type="button" style="align-self:start">${S.openBody[d.id]?'Riduci':'Leggi tutto'}</button>`:''}`:'');
+  return `<article class="dcard s-${st}">
+    <div class="meta"><span>${esc(d.kind||'Bozza')}</span><span>·</span><span>${esc(d.channel||'')}</span>${isDate(d.date)?`<span>·</span><span>Uscita ${fmtDate(d.date)}</span>`:''}</div>
+    ${ed?'':`<div class="tt">${esc(d.title)}</div>`}
+    ${body}
+    ${file?`<a class="linkish dark" href="${esc(file)}" target="_blank" rel="noopener">Allegato: ${esc(d.fileName||'apri file')}</a>`:''}
+    ${st==='modifiche'&&d.reviewNote?`<div class="rev">Da rivedere: ${esc(d.reviewNote)}</div>`:''}
+    ${(st==='approvato'||st==='pubblicato')&&d.approvedBy?`<div class="appr">Approvato da ${esc(d.approvedByName||nameOf(d.approvedBy))}${d.approvedAt?' il '+new Date(d.approvedAt).toLocaleDateString('it-IT',{day:'numeric',month:'short'}):''}</div>`:''}
+    ${st==='revisione'?`<div class="note">Da approvare: ${APPROVER}${canApprove()?'':' · solo chi ha il ruolo di approvatore può approvare'}</div>`:''}
+    ${rv?`<textarea id="dr-note-${esc(d.id)}" maxlength="1000" placeholder="Cosa va cambiato?" aria-label="Note per le modifiche"></textarea><div class="acts"><button class="btn sm red" data-act="dreviewsend" data-id="${esc(d.id)}" type="button">Invia richiesta di modifiche</button><button class="linkish" data-act="dcancel" type="button">Annulla</button></div>`:''}
+    <div class="foot2"><span class="badge b-${st}">${DSTATUS[st]}</span><span class="note">${esc(d.author&&d.author!=='Da assegnare'?d.author:'Autore non indicato')}${a?' · '+esc(a.name):''}</span><div class="acts">${acts}</div></div>
+  </article>`;
+}
+function draftsHtml(list,empty){
+  if(!S.loaded.drafts) return `<div class="empty" style="grid-column:1/-1">Carico le bozze…</div>`;
+  if(!list.length) return `<div class="empty" style="grid-column:1/-1">${empty}</div>`;
+  return list.map(draftCard).join('');
+}
+function sortDrafts(L){const o={revisione:0,modifiche:1,bozza:2,approvato:3,pubblicato:4};return [...L].sort((a,b)=>(o[a.status]??2)-(o[b.status]??2)||(b.updatedAt||b.createdAt||0)-(a.updatedAt||a.createdAt||0))}
+function refCard(r){
+  const media=okThumb(r.thumb)?`<img src="${r.thumb}" alt="${esc(r.title)}" loading="lazy">`:`<div class="ph">${esc(r.title)}</div>`;
+  const url=safeUrl(r.driveUrl)||safeUrl(r.url),ck='r:'+r.id;
+  return `<figure class="obj ref" style="margin:0"><div class="art">${media}</div>
+    <div class="nm">${esc(r.title)}</div>${r.note?`<p>${esc(r.note)}</p>`:''}
+    <div class="tags">${(r.tags||[]).map(t=>`<span>${esc(t)}</span>`).join('')}</div>
+    <div class="refacts">${safeUrl(r.driveUrl)?`<a class="linkish" href="${esc(safeUrl(r.driveUrl))}" target="_blank" rel="noopener">Originale su Drive</a>`:''}${safeUrl(r.url)?`<a class="linkish" href="${esc(safeUrl(r.url))}" target="_blank" rel="noopener">Link</a>`:''}
+      ${S.canWrite?`<button class="x ${S.confirmDel===ck?'confirm':''}" data-act="delref" data-id="${esc(r.id)}" aria-label="Elimina reference">${S.confirmDel===ck?'Ok?':'×'}</button>`:''}</div>
+  </figure>`;
+}
+function refsHtml(list,empty){
+  if(!S.loaded.refs) return `<div class="empty">Carico le reference…</div>`;
+  if(!list.length) return `<div class="empty" style="grid-column:1/-1">${empty}</div>`;
+  return list.map(refCard).join('');
+}
+function uploadsHtml(){
+  if(!S.loaded.uploads) return `<div class="empty">Carico l'elenco…</div>`;
+  if(!S.uploads.length) return `<div class="empty">Ancora nessun file caricato da qui.</div>`;
+  return `<div class="up tr head" style="display:grid"><span>File</span><span>Formato</span><span>Area</span><span>Destinazione</span><span>Data</span><span></span></div>`+
+    S.uploads.slice(0,40).map(u=>{const a=AREA[u.area],url=safeUrl(u.url);
+    return `<div class="up"><span class="nm">${esc(u.original||u.name)}<small>${esc(u.name)}${u.byName?' · '+esc(u.byName):''}</small></span><span class="note">${esc(u.format||'')}</span><span class="note">${esc(a?a.name:'')}</span><span class="note">${esc(USE_NUM[u.use]?USE_NUM[u.use]+' '+u.use:(u.use||''))}${u.format?' / '+esc(u.format):''}</span><span class="note">${u.createdAt?new Date(u.createdAt).toLocaleDateString('it-IT',{day:'numeric',month:'short'}):''}</span><span>${url?`<a class="linkish dark" href="${esc(url)}" target="_blank" rel="noopener">Apri</a>`:''}</span></div>`}).join('');
+}
+function countdown(){
+  const d=S.drop.date;
+  if(isDate(d)){const n=daysTo(d);return {big:n>0?'T-'+n:n===0?'Giorno T':'T+'+(-n),hud:n>0?'T-'+n:n===0?'Giorno T':'Uscito',txt:fmtLong(d)}}
+  return {big:'Giorno T',hud:'T da definire',txt:'data da definire'};
+}
+
+/* ---------- fill ---------- */
+function fill(){
+  const r=route(),T=S.tasks,open=T.filter(t=>t.status!=='done'),done=T.length-open.length,cd=countdown();
+  const set=(id,html)=>{const el=$(id);if(el)el.innerHTML=html};
+  const txt=(id,v)=>{const el=$(id);if(el)el.textContent=v};
+  const tk=$('ticker');if(tk){const items=['NoKap HQ','Drop 01 — Aspettando la Trap Musicale',cd.hud==='T da definire'?'Giorno T da definire':cd.hud+' al drop',S.loaded.tasks?open.length+' attività aperte':'',S.loaded.drafts?S.drafts.filter(d=>d.status==='revisione').length+' bozze da approvare':'',S.loaded.tasks?open.filter(noOwner).length+' senza responsabile':'','Firenze'].filter(Boolean);
+    const one=items.map(t=>`<span>${esc(t)}</span>`).join('');const html=one+one+one+one;if(tk.dataset.h!==html){tk.dataset.h=html;tk.innerHTML=html}}
+  txt('hudcd',cd.hud);txt('bigcd',cd.big);txt('cdtxt',cd.txt);
+  txt('pct',S.loaded.tasks?`${done}/${T.length} attività fatte`:'—');
+  const bf=$('barfill');if(bf)bf.style.width=T.length?(done/T.length*100)+'%':'0';
+  const di=$('dropdate');if(di&&document.activeElement!==di)di.value=S.drop.date||'';
+  if($('overlay').classList.contains('open'))buildMenu();
+  // footer
+  const L=k=>S.links.find(l=>l.id===k);
+  $('footleft').innerHTML=['slack','drive','notion','shopify'].map(k=>{const l=L(k);const u=l&&safeUrl(l.url);return l?(u?`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(l.label.replace(' (admin)',''))}</a>`:`<a href="#link" class="off">${esc(l.label.replace(' (admin)',''))}</a>`):''}).join('');
+  const ig=L('instagram'),igu=ig&&safeUrl(ig.url),fi=$('footig');
+  if(igu){fi.href=igu;fi.target='_blank';fi.rel='noopener'}else{fi.href='#link';fi.removeAttribute('target')}
+  const DL=allDeadlines(),upcoming=DL.filter(x=>daysTo(x.date)>=-3);
+  // home
+  set('tl-att',S.loaded.tasks?`${open.length} aperte · ${open.filter(noOwner).length} senza responsabile`:'—');
+  set('tl-dl',S.loaded.deadlines?(DL.filter(x=>{const n=daysTo(x.date);return n>=0&&n<=7}).length+' entro 7 giorni'):'—');
+  set('tl-txt',S.loaded.drafts?(S.drafts.filter(d=>d.status==='revisione').length+' da approvare'):'—');
+  set('areacards',AREAS.map(a=>{const ao=open.filter(t=>t.area===a.id),w=ao.filter(noOwner).length;
+    return `<a class="obj ${w?'hot':''}" href="#area-${a.id}"><div class="art"><span class="idx">${String(AREAS.indexOf(a)+1).padStart(2,'0')}</span><span class="mk">${S.loaded.tasks?ao.length:'–'}<small>aperte</small></span></div><div class="nm">${esc(a.name)}</div><div class="ow">${esc(a.owner)}</div>${S.loaded.tasks&&w?`<div class="ct warn">${w} senza responsabile</div>`:''}</a>`}).join(''));
+  set('homedl',dlRows(upcoming.slice(0,6),false));
+  set('homedrafts',draftsHtml(sortDrafts(S.drafts.filter(d=>d.status==='revisione')).slice(0,3),'Niente da approvare in questo momento.'));
+  set('hometasks',trackRows(sortTasks(open).slice(0,8),'Niente di aperto. Tutto fatto.'));
+  // tasks
+  const tf=$('taskfilters');
+  if(tf){const opts=[['all','Tutte'],['open','Aperte'],['noowner','Senza responsabile'],...AREAS.map(a=>[a.id,a.name]),['done','Fatte']];
+    tf.innerHTML=opts.map(([k,l])=>`<button class="chip ${S.taskFilter===k?'on':''}" data-act="tfilter" data-k="${k}" type="button">${esc(l)}</button>`).join('');
+    let X=T;const f=S.taskFilter;
+    if(f==='open')X=open;else if(f==='done')X=T.filter(t=>t.status==='done');else if(f==='noowner')X=T.filter(noOwner);else if(AREA[f])X=T.filter(t=>t.area===f);
+    set('alltasks',trackRows(sortTasks(X),'Nessuna attività con questo filtro.'));}
+  // deadlines
+  set('alldl',dlRows(DL,true));
+  // drafts
+  const dfl=$('draftfilters');
+  if(dfl){const cnt=k=>S.drafts.filter(d=>d.status===k).length;
+    const opts=[['attivi','In lavorazione',S.drafts.filter(d=>d.status!=='pubblicato').length],['revisione','In approvazione',cnt('revisione')],['modifiche','Da rivedere',cnt('modifiche')],['bozza','Bozze',cnt('bozza')],['approvato','Approvate',cnt('approvato')],['pubblicato','Pubblicate',cnt('pubblicato')]];
+    dfl.innerHTML=opts.map(([k,l,n])=>`<button class="chip ${S.draftFilter===k?'on':''}" data-act="dfilter" data-k="${k}" type="button">${l}<small>${S.loaded.drafts?n:''}</small></button>`).join('');
+    const X=S.draftFilter==='attivi'?S.drafts.filter(d=>d.status!=='pubblicato'):S.drafts.filter(d=>d.status===S.draftFilter);
+    set('alldrafts',draftsHtml(sortDrafts(X),'Nessuna bozza qui. Scrivine una qui sopra.'));}
+  // area
+  if(r.startsWith('area-')){const id=r.slice(5),at=T.filter(t=>t.area===id);
+    txt('area-count',S.loaded.tasks?`${at.filter(t=>t.status!=='done').length} attività aperte`:'—');
+    set('areatasks',trackRows(sortTasks(at),'Ancora nessuna attività in quest\'area.'));
+    set('areadrafts',draftsHtml(sortDrafts(S.drafts.filter(d=>d.area===id&&d.status!=='pubblicato')),'Nessuna bozza in lavorazione per quest\'area.'));
+    set('arearefs',refsHtml(S.refs.filter(x=>x.area===id),'Ancora nessuna reference per quest\'area.'));}
+  // moodboard
+  const rf=$('reffilters');
+  if(rf){const tags=[...new Set(S.refs.flatMap(x=>x.tags||[]))].slice(0,20);
+    rf.innerHTML=[['all','Tutte'],...tags.map(t=>[t,t])].map(([k,l])=>`<button class="chip ${S.refFilter===k?'on':''}" data-act="rfilter" data-k="${esc(k)}" type="button">${esc(l)}</button>`).join('');
+    const X=S.refFilter==='all'?S.refs:S.refs.filter(x=>(x.tags||[]).includes(S.refFilter));
+    set('allrefs',refsHtml(X,'La moodboard è vuota. Aggiungi la prima reference qui sopra.'));}
+  // files
+  set('alluploads',uploadsHtml());
+  const dh=$('drivehint');
+  if(dh){const u=safeUrl(S.drive.url);dh.innerHTML=(u?`Cartella di destinazione: <a class="linkish dark" href="${esc(u)}" target="_blank" rel="noopener">${esc(S.drive.name||'Drive del team')}</a>. `:'Cartella Drive non ancora impostata. ')+
+    'Il file parte dal tuo account Google: serve l\'accesso in modifica alla cartella. La prima volta Google ti chiede il permesso.'}
+  // links
+  if($('alllinks')){
+    if(!S.loaded.links)set('alllinks',`<div class="empty">Carico i link…</div>`);
+    else set('alllinks',LGROUPS.map(g=>{const X=S.links.filter(l=>(l.group||'Altro')===g).sort((a,b)=>(a.order??999)-(b.order??999));if(!X.length)return '';
+      return `<div class="lgroup"><h3>${esc(g)}</h3>${X.map(l=>{const u=safeUrl(l.url),ed=S.editingLink===l.id;
+        return `<div class="lk"><div style="min-width:0"><div class="nm">${u?`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(l.label)}</a>`:esc(l.label)}</div>
+          ${ed?`<input id="le-${esc(l.id)}" type="url" value="${esc(l.url||'')}" placeholder="https://…" aria-label="Link per ${esc(l.label)}">`:`<div class="u ${u?'':'miss'}">${u?esc(u.replace(/^https?:\/\//,'')):'Link da inserire'}</div>`}
+          ${l.note&&!ed?`<div class="u">${esc(l.note)}</div>`:''}</div>
+          <div>${S.canWrite?(ed?`<button class="linkish" data-act="savelink" data-id="${esc(l.id)}" type="button">Salva</button>`:`<button class="linkish" data-act="editlink" data-id="${esc(l.id)}" type="button">Modifica</button>`):''}</div></div>`}).join('')}</div>`}).join('')||`<div class="empty">Nessun link ancora.</div>`);}
+  if($('allmembers')){const admins=(CFG.admins||[]).map(lc);const el=$('allmembers');const mg=canManageTeam();
+    const sig=JSON.stringify(S.members.map(m=>[m.email,m.name,m.role]))+'|'+S.confirmDel+'|'+S.editingMember;
+    if(el.dataset.sig!==sig&&!(el.contains(document.activeElement)&&/INPUT|SELECT/.test(document.activeElement.tagName))){el.dataset.sig=sig;
+    const rows=[...S.members,...admins.filter(e=>!S.members.some(m=>lc(m.email)===e)).map(e=>({email:e,name:'',role:'Approvatore',virtual:true}))].sort((a,b)=>(a.name||a.email).localeCompare(b.name||b.email));
+    el.innerHTML=rows.length?`<div class="mrow tr head" style="display:grid"><span>Nome</span><span>Email</span><span>Ruolo</span><span></span></div>`+rows.map(m=>{const ck='m:'+m.email,k=esc(m.email),adm=admins.includes(lc(m.email)),ed=mg&&S.editingMember===m.email;
+      if(ed)return `<div class="mrow"><span><input class="minput" data-mname="${k}" value="${esc(m.name||'')}" maxlength="60" placeholder="Nome e cognome" aria-label="Nome per ${k}"></span>
+        <span class="note" style="word-break:break-all">${k}</span>
+        <span><select class="osel" data-mrole="${k}" aria-label="Ruolo di ${k}"><option ${m.role!=='Approvatore'?'selected':''}>Membro</option><option ${m.role==='Approvatore'?'selected':''}>Approvatore</option></select></span>
+        <span style="display:flex;gap:10px;align-items:center"><button class="linkish dark" data-act="savemember" data-id="${k}" type="button">Salva</button><button class="linkish" data-act="cancelmember" type="button">Annulla</button></span></div>`;
+      return `<div class="mrow"><span style="font-weight:700">${esc(m.name||'—')}${adm?'<small class="ntf" style="color:var(--mute)">amministratore</small>':''}</span>
+        <span class="note" style="word-break:break-all">${k}</span><span class="note">${esc(m.role||'Membro')}</span>
+        <span style="display:flex;gap:10px;align-items:center;justify-content:end">${mg?`<button class="linkish" data-act="editmember" data-id="${k}" type="button">Modifica</button>${adm||m.virtual?'':`<button class="x ${S.confirmDel===ck?'confirm':''}" data-act="delmember" data-id="${k}" aria-label="Rimuovi dal team">${S.confirmDel===ck?'Ok?':'×'}</button>`}`:''}</span></div>`}).join(''):`<div class="empty">Nessun membro.</div>`}}
+  ['tf-owner','df-owner','dr-author'].forEach(id=>{const el=$(id);if(el&&document.activeElement!==el&&el.dataset.n!==String(S.members.length)){const v=el.value;el.innerHTML=teamOpts(v);el.dataset.n=String(S.members.length)}});
+  const myT=open.filter(mine);
+  set('mytasks',myT.length?trackRows(sortTasks(myT)):'');const ms=$('mysec');if(ms)ms.hidden=!myT.length;
+  document.body.classList.toggle('ro',!S.canWrite||!S.db);
+  resolveNames();
+}
+let nameReq=false;
+async function resolveNames(){return;
+  if(!S.user||!S.user.profiles||nameReq)return;
+  const ids=[...new Set([...S.drafts.map(d=>d.approvedBy),...S.uploads.map(u=>u.by)].filter(Boolean))].filter(id=>!(id in S.names));
+  if(!ids.length)return;nameReq=true;
+  try{const ps=await S.user.profiles(ids);let ch=false;ids.forEach(id=>{const n=ps&&ps[id]&&ps[id].name;S.names[id]=n||'Qualcuno del team';ch=true});nameReq=false;if(ch)fill()}catch(_){nameReq=false}
+}
+function render(){
+  const r=route();let h;
+  const V={team:viewTeam,attivita:viewTasks,scadenze:viewDeadlines,testi:viewTexts,file:viewFiles,moodboard:viewMood,link:viewLinks,brand:viewBrand};
+  h=V[r]?V[r]():r.startsWith('area-')?viewArea(r.slice(5)):viewHome();
+  $('main').innerHTML=h;window.scrollTo(0,0);S.confirmDel=null;S.editingLink=null;S.editingDraft=null;S.reviewing=null;setMenu(false);fill();showNote();
+}
+let noteMsg='';
+function showNote(m){if(m!==undefined)noteMsg=m;const el=$('netnote');if(el){el.textContent=noteMsg;el.classList.toggle('show',!!noteMsg)}}
+
+/* ---------- Drive upload ---------- */
+const slug=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40)||'file';
+function formatOf(f){const e=(f.name.includes('.')?f.name.split('.').pop():'').toLowerCase();
+  const F=[['Immagini','jpg jpeg png webp gif heic heif tif tiff bmp'],['Video','mp4 mov m4v webm avi mkv'],['Audio','mp3 wav aif aiff m4a flac'],['Vettoriali','svg ai eps'],['Sorgenti grafiche','psd psb indd fig sketch xd afdesign afphoto procreate'],['PDF','pdf'],['Font','ttf otf woff woff2'],['Documenti','doc docx txt md rtf pages odt'],['Fogli','xls xlsx csv numbers ods'],['Presentazioni','ppt pptx key odp'],['Archivi','zip rar 7z']];
+  for(const [l,x] of F)if(x.split(' ').includes(e))return l;return 'Altro'}
+function driveName(f,area,use){const d=today().replace(/-/g,''),ext=(f.name.includes('.')?'.'+f.name.split('.').pop().toLowerCase().replace(/[^a-z0-9]/g,''):'');
+  return `${d}_${area||'gen'}_${slug(use)}_${slug(f.name.replace(/\.[^.]+$/,''))}${ext}`}
+const GSCOPE='https://www.googleapis.com/auth/drive';
+function provider(){const p=new firebase.auth.GoogleAuthProvider();p.addScope(GSCOPE);p.setCustomParameters({prompt:'select_account'});return p}
+function driveToken(){
+  if(S.token&&Date.now()-S.tokenAt<50*60000)return Promise.resolve(S.token);
+  const u=firebase.auth().currentUser;if(!u)return Promise.reject({code:'no_auth'});
+  const p=new firebase.auth.GoogleAuthProvider();p.addScope(GSCOPE);p.setCustomParameters({login_hint:u.email});
+  return u.reauthenticateWithPopup(p).then(r=>{const t=r.credential&&r.credential.accessToken;if(!t)throw {code:'no_token'};S.token=t;S.tokenAt=Date.now();return t})
+    .catch(e=>{throw (e&&e.code&&String(e.code).startsWith('auth/'))?{code:'popup',detail:e.code}:e});
+}
+async function toDrive(f,area,use,note,tokenP){
+  if(!S.drive.folderId)throw {code:'no_folder'};
+  if(f.size>100*1024*1024)throw {code:'too_big'};
+  const token=await (tokenP||driveToken());
+  const name=driveName(f,area,use),type=f.type||'application/octet-stream';
+  const meta={name,parents:[S.drive.folderId]};
+  const bd='nokap'+Math.random().toString(36).slice(2);
+  const body=new Blob([`--${bd}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(meta)}\r\n--${bd}\r\nContent-Type: ${type}\r\n\r\n`,f,`\r\n--${bd}--`]);
+  let res;
+  try{res=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&supportsAllDrives=true&fields=id,webViewLink',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'multipart/related; boundary='+bd},body})}
+  catch(_){throw {code:'network'}}
+  if(res.status===401){S.token=null;throw {code:'expired'}}
+  if(!res.ok){let msg='';try{msg=(await res.json()).error.message||''}catch(_){}throw {code:res.status===403||res.status===404?'forbidden':'http',status:res.status,msg}}
+  const p=await res.json(),id=p.id||'',url=safeUrl(p.webViewLink)||(id?'https://drive.google.com/file/d/'+encodeURIComponent(id)+'/view':'');
+  const rec={name,original:f.name.slice(0,120),driveId:String(id).slice(0,100),url,mime:type.slice(0,80),format:formatOf(f),area:area||null,use:use||'',note:(note||'').slice(0,200),by:S.me||null,byName:whoName(),createdAt:Date.now()};
+  try{await S.db.collection('uploads').add(rec)}catch(_){}
+  return rec;
+}
+function upErr(e){
+  const u=safeUrl(S.drive.url),open=u?' Puoi anche caricarlo a mano nella cartella Drive.':'';
+  const c=e&&e.code;
+  if(c==='no_folder')return 'La cartella Drive di destinazione non è ancora impostata. Chiedi a Lorenzo.';
+  if(c==='too_big')return 'File oltre 100 MB: caricalo direttamente nella cartella Drive.';
+  if(c==='popup')return 'Serve il tuo ok a Google Drive: riprova e consenti nella finestra di Google (controlla che il browser non blocchi i popup).';
+  if(c==='expired')return 'Il permesso di Google Drive è scaduto: riprova, ti verrà richiesto di nuovo.';
+  if(c==='forbidden')return 'Drive ha rifiutato il file: non hai accesso in modifica alla cartella. Chiedi a Lorenzo di condividerla con '+(S.email||'il tuo account')+'.';
+  if(c==='network')return 'Connessione interrotta: non so se il file è arrivato. Controlla la cartella prima di riprovare.'+open;
+  return 'Caricamento non riuscito'+(e&&e.msg?': '+e.msg:'.')+open}
+function thumbOf(f){return new Promise(res=>{if(!f||!f.type.startsWith('image/'))return res(null);const u=URL.createObjectURL(f),img=new Image();
+  img.onload=()=>{let w=img.naturalWidth,h=img.naturalHeight,m=480;if(w>h&&w>m){h=Math.round(h*m/w);w=m}else if(h>m){w=Math.round(w*m/h);h=m}
+    const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);URL.revokeObjectURL(u);
+    let q=.72,d=c.toDataURL('image/jpeg',q);while(d.length>240000&&q>.3){q-=.15;d=c.toDataURL('image/jpeg',q)}res(d.length<250000?d:null)};
+  img.onerror=()=>{URL.revokeObjectURL(u);res(null)};img.src=u})}
+
+/* ---------- actions ---------- */
+async function guard(fn){if(!S.db){showNote('Per salvare devi prima accedere.');return false}
+  try{await fn();return true}catch(e){const c=e&&e.code;
+    if(c==='invalid_argument'||c==='permission-denied'){S.canWrite=false;fill();showNote('Non hai i permessi per modificare. Chiedi a Lorenzo di aggiungerti al team.')}
+    else if(c==='quota_exceeded'||c==='resource-exhausted')showNote('Spazio pieno: elimina qualche elemento vecchio e riprova.');
+    else showNote('Non sono riuscito a salvare. Riprova tra poco.');return false}}
+const D=id=>S.db.doc('drafts/'+id);
+document.addEventListener('click',e=>{
+  if(e.target.closest('#gate-btn')){signIn();return}
+  if(e.target.id==='gate-out'){firebase.auth().signOut();return}
+  if(e.target.id==='seedbtn'){importSeed();return}
+  if(e.target.closest('[data-act="logout"]')){e.preventDefault();setMenu(false);firebase.auth().signOut();return}
+  const em2=e.target.closest('[data-act="editmember"]');if(em2&&canManageTeam()){S.editingMember=em2.dataset.id;fill();const i=document.querySelector(`[data-mname="${CSS.escape(S.editingMember)}"]`);if(i)i.focus();return}
+  if(e.target.closest('[data-act="cancelmember"]')){S.editingMember=null;fill();return}
+  const sm=e.target.closest('[data-act="savemember"]');if(sm&&canManageTeam()){S.editingMember=null;const em=sm.dataset.id,ni=document.querySelector(`[data-mname="${CSS.escape(em)}"]`),ro=document.querySelector(`[data-mrole="${CSS.escape(em)}"]`);
+    const name=(ni&&ni.value.trim())||'',role=(ro&&ro.value)||'Membro';
+    guard(async()=>{const ref=S.db.collection('members').doc(lc(em));const old=S.members.find(m=>lc(m.email)===lc(em));
+      await ref.set({...(old||{}),email:lc(em),name,role,updatedAt:Date.now()});
+      if(name){const b=S.db.batch();let n=0;
+        S.tasks.filter(t=>lc(t.ownerEmail)===lc(em)&&t.owner!==name).forEach(t=>{b.update(S.db.collection('tasks').doc(t.id),{owner:name});n++});
+        S.deadlines.filter(t=>lc(t.ownerEmail)===lc(em)&&t.owner!==name).forEach(t=>{b.update(S.db.collection('deadlines').doc(t.id),{owner:name});n++});
+        [['tasks',S.tasks],['deadlines',S.deadlines]].forEach(([c,L])=>L.filter(t=>!t.ownerEmail&&(lc(t.owner)===lc(name)||(old&&old.name&&lc(t.owner)===lc(old.name)))).forEach(t=>{b.update(S.db.collection(c).doc(t.id),{owner:name,ownerEmail:lc(em)});n++}));
+        if(n)await b.commit()}
+      showNote('Salvato: '+(name||em)+'.')});return}
+  const dm=e.target.closest('[data-act="delmember"]');if(dm&&canManageTeam()){const id=dm.dataset.id,key='m:'+id;if(S.confirmDel!==key){S.confirmDel=key;fill();return}S.confirmDel=null;guard(()=>S.db.collection('members').doc(lc(id)).delete());return}
+  if(e.target.id==='savedate'){const v=$('dropdate').value;guard(()=>S.db.doc('config/drop').set({...S.drop,date:v||null}));return}
+  const b=e.target.closest('[data-act]');if(!b)return;
+  const act=b.dataset.act,id=b.dataset.id;
+  if(act==='startreassign'){S.reassigning=id;fill();const s=document.querySelector(`select[data-act="reassign"][data-id="${CSS.escape(id)}"]`);if(s)s.focus();return}
+  if(act==='tfilter'){S.taskFilter=b.dataset.k;fill();return}
+  if(act==='rfilter'){S.refFilter=b.dataset.k;fill();return}
+  if(act==='dfilter'){S.draftFilter=b.dataset.k;fill();return}
+  if(act==='cycle'){const t=S.tasks.find(x=>x.id===id);if(t)guard(()=>S.db.doc('tasks/'+id).update({status:NEXT[t.status]||'doing'}));return}
+  const delMap={deltask:['t:','tasks/'],delref:['r:','refs/'],deldl:['d:','deadlines/'],ddel:['x:','drafts/']};
+  if(delMap[act]){const [p,col]=delMap[act],key=p+id;if(S.confirmDel!==key){S.confirmDel=key;fill();return}S.confirmDel=null;guard(()=>S.db.doc(col+id).delete());return}
+  if(act==='editlink'){S.editingLink=id;fill();const i=$('le-'+id);if(i)i.focus();return}
+  if(act==='savelink'){const i=$('le-'+id),v=i?i.value.trim():'';
+    if(v&&!safeUrl(v)){i.setCustomValidity('Serve un link che inizia con https://');i.reportValidity();return}
+    S.editingLink=null;guard(()=>S.db.doc('links/'+id).update({url:v}));fill();return}
+  if(act==='dtoggle'){S.openBody[id]=!S.openBody[id];fill();return}
+  if(act==='dedit'){S.editingDraft=id;S.reviewing=null;fill();const t=$('de-body-'+id);if(t)t.focus();return}
+  if(act==='dcancel'){S.editingDraft=null;S.reviewing=null;fill();return}
+  if(act==='dsave'){const t=$('de-title-'+id),bd=$('de-body-'+id);const title=(t&&t.value.trim())||'';if(!title){t.focus();return}
+    S.editingDraft=null;guard(()=>D(id).update({title,body:bd?bd.value:'',updatedAt:Date.now()}));fill();return}
+  if(act==='dsubmit'){guard(()=>D(id).update({status:'revisione',updatedAt:Date.now()}));return}
+  if(act==='dapprove'){guard(()=>D(id).update({status:'approvato',approvedBy:S.me||null,approvedByName:whoName(),approvedAt:Date.now(),reviewNote:'',updatedAt:Date.now()}));return}
+  if(act==='dreview'){S.reviewing=id;S.editingDraft=null;fill();const t=$('dr-note-'+id);if(t)t.focus();return}
+  if(act==='dreviewsend'){const t=$('dr-note-'+id),v=t?t.value.trim():'';if(!v){t.setCustomValidity('Scrivi cosa va cambiato');t.reportValidity();return}
+    S.reviewing=null;guard(()=>D(id).update({status:'modifiche',reviewNote:v,reviewedBy:S.me||null,reviewedByName:whoName(),updatedAt:Date.now()}));fill();return}
+  if(act==='dpublish'){guard(()=>D(id).update({status:'pubblicato',publishedAt:Date.now(),updatedAt:Date.now()}));return}
+});
+function busy(btnId,on,label){const b=$(btnId);if(!b)return;b.disabled=on;if(on){b.dataset.l=b.textContent;b.textContent=label||'Carico…'}else if(b.dataset.l)b.textContent=b.dataset.l}
+document.addEventListener('submit',async e=>{
+  e.preventDefault();const f=e.target;
+  if(f.id==='memberform'&&canManageTeam()){const em=lc($('mf-email').value);if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em))return;
+    await guard(async()=>{const name=$('mf-name').value.trim();await S.db.collection('members').doc(em).set({email:em,name,role:$('mf-role').value,addedBy:S.email,createdAt:Date.now()});
+      if(name){const b=S.db.batch();let n=0;[['tasks',S.tasks],['deadlines',S.deadlines]].forEach(([c,L])=>L.filter(t=>!t.ownerEmail&&lc(t.owner)===lc(name)).forEach(t=>{b.update(S.db.collection(c).doc(t.id),{ownerEmail:em});n++}));if(n){await b.commit();showNote(n+' attività già assegnate a '+name+' ora sono collegate alla sua email.')}}
+      f.reset()});}
+  if(f.id==='taskform'){const title=$('tf-title').value.trim();if(!title)return;
+    const dd=$('tf-date').value;const data={title,area:$('tf-area').value,...pick($('tf-owner').value),dueDate:isDate(dd)?dd:null,due:isDate(dd)?'':'Da definire',status:'todo',createdAt:Date.now()};
+    await guard(async()=>{await S.db.collection('tasks').add(data);const keep=$('tf-area').value;f.reset();$('tf-area').value=keep});}
+  if(f.id==='dlform'){const title=$('df-title').value.trim(),date=$('df-date').value;if(!title||!isDate(date))return;
+    await guard(async()=>{await S.db.collection('deadlines').add({title,date,area:$('df-area').value,...pick($('df-owner').value),createdAt:Date.now()});f.reset()});}
+  if(f.id==='linkform'){const label=$('lf-label').value.trim(),url=safeUrl($('lf-url').value.trim());if(!label||!url)return;
+    await guard(async()=>{await S.db.collection('links').add({label,url,group:$('lf-group').value,order:Date.now()});f.reset()});}
+  if(f.id==='draftform'){if(S.busy)return;const title=$('dr-title').value.trim();if(!title)return;const tokP=$('dr-file').files[0]?driveToken():null;if(tokP)tokP.catch(()=>{});
+    const link=$('dr-link').value.trim();if(link&&!safeUrl(link)){$('dr-link').setCustomValidity('Serve un link che inizia con https://');$('dr-link').reportValidity();return}
+    const dd=$('dr-date').value,file=$('dr-file').files[0],area=$('dr-area').value;
+    const data={title,kind:$('dr-kind').value,channel:$('dr-channel').value,area,author:pick($('dr-author').value).owner,date:isDate(dd)?dd:null,body:$('dr-body').value,fileUrl:safeUrl(link),fileName:'',status:'bozza',createdBy:S.me||null,createdByName:whoName(),createdAt:Date.now(),updatedAt:Date.now()};
+    S.busy=true;busy('dr-btn',true,'Salvo…');
+    try{if(file){try{const up=await toDrive(file,area,KIND_USE(data.kind),title,tokP);data.fileUrl=up.url;data.fileName=file.name.slice(0,120)}catch(err){showNote('Bozza non salvata. '+upErr(err));return}}
+      const ok=await guard(async()=>{await S.db.collection('drafts').add(data)});if(ok){f.reset();showNote('')}}
+    finally{S.busy=false;busy('dr-btn',false)}}
+  if(f.id==='upform'){if(S.busy)return;const files=[...$('uf-file').files];if(!files.length)return;const tokP=driveToken();tokP.catch(()=>{});
+    const area=$('uf-area').value,use=$('uf-use').value,note=$('uf-note').value.trim();
+    S.busy=true;busy('uf-btn',true,'Carico…');let ok=0,fail='';
+    try{for(const [i,file] of files.entries()){showNote(`Carico ${i+1} di ${files.length}: ${file.name}`);try{await toDrive(file,area,use,note,i===0?tokP:null);ok++}catch(err){fail=upErr(err);break}}}
+    finally{S.busy=false;busy('uf-btn',false)}
+    showNote(fail?(ok?`${ok} file caricati. Poi mi sono fermato: `:'')+fail:`${ok} file caricati su Drive.`);if(!fail)f.reset();}
+  if(f.id==='refform'){if(S.busy)return;const title=$('rf-title').value.trim();if(!title)return;const tokP=$('rf-file').files[0]?driveToken():null;if(tokP)tokP.catch(()=>{});
+    const url=$('rf-url').value.trim();if(url&&!safeUrl(url)){$('rf-url').setCustomValidity('Serve un link che inizia con https://');$('rf-url').reportValidity();return}
+    const file=$('rf-file').files[0],area=$('rf-area').value||null;
+    const tags=$('rf-tags').value.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean).slice(0,6);
+    const data={title,note:$('rf-note').value.trim(),tags,url:safeUrl(url),area,createdAt:Date.now()};
+    S.busy=true;busy('rf-btn',true,'Carico…');
+    try{if(file){const th=await thumbOf(file);if(th)data.thumb=th;
+        try{const up=await toDrive(file,area,'Reference',title,tokP);data.driveUrl=up.url}catch(err){showNote('Reference non salvata. '+upErr(err));return}}
+      const ok=await guard(async()=>{await S.db.collection('refs').add(data)});if(ok){f.reset();showNote('')}}
+    finally{S.busy=false;busy('rf-btn',false)}}
+});
+document.addEventListener('change',e=>{const s=e.target.closest('[data-act="reassign"]');if(!s)return;const p=pick(s.value);S.reassigning=null;
+  guard(()=>S.db.collection('tasks').doc(s.dataset.id).update({...p,notifiedOwner:'',remindedFor:''}));});
+document.addEventListener('input',e=>{if(e.target.setCustomValidity)e.target.setCustomValidity('')});
+window.addEventListener('hashchange',render);
+
+/* ---------- start ---------- */
+function gate(show,title,text,btn,out){const g=$('gate');g.hidden=!show;if(!show)return;$('gate-t').textContent=title;$('gate-p').textContent=text;$('gate-btn').hidden=!btn;$('gate-out').hidden=!out}
+function signIn(){firebase.auth().signInWithPopup(provider()).then(r=>{const t=r.credential&&r.credential.accessToken;if(t){S.token=t;S.tokenAt=Date.now()}})
+  .catch(e=>{const c=e&&e.code||'';gate(true,'Accesso non riuscito',c==='auth/popup-blocked'?'Il browser ha bloccato la finestra di Google: consenti i popup per questo sito e riprova.':c==='auth/unauthorized-domain'?'Questo indirizzo non è autorizzato in Firebase: aggiungilo nei domini autorizzati (vedi la guida).':'Riprova. Se il problema continua, scrivi a Lorenzo.',true,false)})}
+async function importSeed(){
+  if(!S.isAdmin)return;const b=$('seedbtn');b.disabled=true;b.textContent='Importo…';
+  try{const seed=await (await fetch('seed.json',{cache:'no-store'})).json();
+    const ex=await S.db.collection('tasks').limit(1).get();
+    if(!ex.empty){showNote('Il database ha già delle attività: import annullato per non creare doppioni.');b.disabled=false;b.textContent='Importa dati iniziali';return}
+    const batch=S.db.batch();let n=0;
+    for(const col of Object.keys(seed))for(const id of Object.keys(seed[col])){batch.set(S.db.collection(col).doc(id),seed[col][id]);n++}
+    await batch.commit();showNote(n+' elementi importati.');b.textContent='Importati'}
+  catch(e){showNote('Import non riuscito: '+(e&&e.message||'riprova.'));b.disabled=false;b.textContent='Importa dati iniziali'}}
+let unsubs=[];
+function startData(){
+  const timer=setTimeout(()=>{if(!S.loaded.tasks)showNote('I dati non sono ancora raggiungibili. Controlla la connessione: la pagina si aggiorna da sola.')},10000);
+  const onErr=e=>{clearTimeout(timer);showNote(e&&e.code==='permission-denied'?'Non hai accesso ai dati del team. Chiedi a Lorenzo di aggiungerti.':'Collegamento ai dati interrotto. Ricarica la pagina.')};
+  const toList=s=>s.docs.map(d=>({id:d.id,...d.data()}));
+  const sub=(name,q)=>unsubs.push(q.onSnapshot({includeMetadataChanges:false},s=>{S[name]=toList(s);S.loaded[name]=true;if(name==='tasks'){clearTimeout(timer);showNote('')}fill()},onErr));
+  sub('tasks',S.db.collection('tasks'));
+  sub('links',S.db.collection('links'));
+  sub('refs',S.db.collection('refs').orderBy('createdAt','desc'));
+  sub('drafts',S.db.collection('drafts'));
+  sub('deadlines',S.db.collection('deadlines'));
+  sub('uploads',S.db.collection('uploads').orderBy('createdAt','desc').limit(60));
+  unsubs.push(S.db.collection('config').doc('drop').onSnapshot(s=>{S.drop=s.exists?s.data():{};fill()},()=>{}));
+  unsubs.push(S.db.collection('config').doc('drive').onSnapshot(s=>{S.drive=s.exists?s.data():{};fill()},()=>{}));
+  unsubs.push(S.db.collection('members').onSnapshot(s=>{S.members=toList(s);fill()},()=>{}));
+}
+drawBg();makeGrain();render();
+(function boot(){
+  if(!window.firebase||!window.NOKAP_FIREBASE||!window.NOKAP_FIREBASE.apiKey||/INCOLLA/.test(window.NOKAP_FIREBASE.apiKey)){
+    gate(true,'Configurazione mancante','Manca la configurazione di Firebase: compila il file firebase-config.js come spiegato nella guida.',false,false);return}
+  firebase.initializeApp(window.NOKAP_FIREBASE);
+  const auth=firebase.auth();S.db=firebase.firestore();
+  try{S.db.enablePersistence({synchronizeTabs:true}).catch(()=>{})}catch(_){}
+  gate(true,'NoKap HQ','Un attimo…',false,false);
+  auth.onAuthStateChanged(async u=>{
+    unsubs.forEach(f=>{try{f()}catch(_){}});unsubs=[];
+    if(!u){S.me=null;S.email='';S.token=null;gate(true,'NoKap HQ','La home del team. Entra con il tuo account Google.',true,false);return}
+    S.me=u.uid;S.email=lc(u.email);S.myName=u.displayName||'';S.names[u.uid]=S.myName;
+    S.isAdmin=(CFG.admins||[]).map(lc).includes(S.email);
+    let member=S.isAdmin;
+    if(!member){try{const d=await S.db.collection('members').doc(S.email).get();member=d.exists;if(member){const m=d.data();if(m.name)S.myName=m.name;S.myRole=m.role||'Membro'}}catch(_){member=false}}
+    if(!member){gate(true,'Non sei ancora nel team','Hai fatto l\'accesso come '+S.email+'. Chiedi a Lorenzo di aggiungere questa email in "Team e accessi", poi ricarica la pagina.',false,true);return}
+    gate(false);S.canWrite=true;render();startData();
+  });
+})();
+</script>
+</body>
+</html>
