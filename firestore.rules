@@ -15,6 +15,9 @@ service cloud.firestore {
     match /members/{mail} {
       allow read: if isMember() || (signedIn() && email() == mail);
       allow write: if signedIn() && email() == 'nokapmerch@gmail.com';
+      // Ognuno può scrivere solo la propria città (per la pagina Dove siamo).
+      allow update: if signedIn() && email() == mail
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['city', 'lat', 'lng', 'cityAt']);
     }
 
     // Bozze: tutti i membri le creano e modificano, ma solo gli approvatori le approvano.
