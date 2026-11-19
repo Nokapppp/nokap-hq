@@ -431,8 +431,8 @@ const KIND_USE=k=>['Post','Carosello','Reel','Story','Caption'].includes(k)?'Soc
 const APPROVER='Gabriele Caponnetto';
 
 const S={tasks:[],links:[],refs:[],drafts:[],deadlines:[],uploads:[],drop:{},drive:{},
-  loaded:{tasks:false,links:false,refs:false,drafts:false,deadlines:false,uploads:false,suppliers:false,mailtpl:false,outbox:false,refitems:false},
-  db:null,user:null,me:null,editingMember:null,reassigning:null,editingTask:null,editingCity:null,globeMode:'italia',editingBrand:false,editingSupplier:null,editingTpl:null,scheduling:null,supCat:'all',supReg:'',suppliers:[],mailtpl:[],outbox:[],refitems:[],brandkit:null,myCanBrand:false,email:'',myName:'',isAdmin:false,members:[],token:null,tokenAt:0,names:{},canWrite:true,
+  loaded:{tasks:false,links:false,refs:false,drafts:false,deadlines:false,uploads:false,suppliers:false,mailtpl:false,outbox:false,refitems:false,openspots:false},
+  db:null,user:null,me:null,editingMember:null,reassigning:null,editingTask:null,editingCity:null,openspots:[],globeMode:'italia',editingBrand:false,editingSupplier:null,editingTpl:null,scheduling:null,supCat:'all',supReg:'',suppliers:[],mailtpl:[],outbox:[],refitems:[],brandkit:null,myCanBrand:false,email:'',myName:'',isAdmin:false,members:[],token:null,tokenAt:0,names:{},canWrite:true,
   taskFilter:'all',refFilter:'all',draftFilter:'attivi',editingLink:null,editingDraft:null,reviewing:null,openBody:{},confirmDel:null,busy:false};
 
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -751,7 +751,14 @@ function viewDove(){
       <div class="globe-stat" id="globe-stat"></div>
       <div class="globe-ui"><button type="button" data-act="gmode" data-k="italia" class="${S.globeMode==='italia'?'on':''}">Italia</button><button type="button" data-act="gmode" data-k="mondo" class="${S.globeMode==='mondo'?'on':''}">Mondo</button></div></div></section>
     <section><div class="sec-head"><h2>Chi dove</h2><span class="note">Trascina il globo per girarlo</span></div>
-      <div class="panel" id="citylist"></div></section>`;
+      <div class="panel" id="citylist"></div></section>
+    <section><div class="sec-head"><h2>Posizioni da coprire</h2><span class="note">Città dove ci serve qualcuno · sul globo col cerchio vuoto</span></div>
+      <form class="form" id="spotform">
+        <label for="os-city">Città<input id="os-city" required maxlength="60" list="nk-cities" placeholder="Es. Napoli"></label>
+        <label class="wide" for="os-role">Cosa serve<input id="os-role" maxlength="80" placeholder="Es. foto e video, PR, pop-up, social"></label>
+        <label class="wide" for="os-note">Nota<input id="os-note" maxlength="200" placeholder="Facoltativa"></label>
+        <button class="btn" type="submit" id="os-btn">Aggiungi posizione</button></form>
+      <div class="panel" id="spotlist" style="margin-top:16px"></div></section>`;
 }
 /* --- città: tabella rapida + ricerca su OpenStreetMap --- */
 const CITY={milano:[45.4642,9.19],roma:[41.9028,12.4964],firenze:[43.7696,11.2558],torino:[45.0703,7.6869],napoli:[40.8518,14.2681],bologna:[44.4949,11.3426],venezia:[45.4408,12.3155],genova:[44.4056,8.9463],palermo:[38.1157,13.3615],bari:[41.1171,16.8719],pisa:[43.7228,10.4017],siena:[43.3188,11.3308],prato:[43.8777,11.1022],livorno:[43.5485,10.3106],lucca:[43.8429,10.5027],arezzo:[43.4633,11.8796],grosseto:[42.7635,11.1124],orbetello:[42.4396,11.2125],verona:[45.4384,10.9916],padova:[45.4064,11.8768],trieste:[45.6495,13.7768],cagliari:[39.2238,9.1217],catania:[37.5079,15.083],perugia:[43.1107,12.3908],ancona:[43.6158,13.5189],pescara:[42.4618,14.2161],lecce:[40.3515,18.175],bergamo:[45.6983,9.6773],brescia:[45.5416,10.2118],modena:[44.6471,10.9252],parma:[44.8015,10.3279],monza:[45.5845,9.2744],rimini:[44.0678,12.5695],salerno:[40.6824,14.7681],
@@ -785,7 +792,7 @@ const vec=(lo,la)=>[Math.cos(la*D2R)*Math.cos(lo*D2R),Math.cos(la*D2R)*Math.sin(
 const unvec=v=>[Math.atan2(v[1],v[0])/D2R,Math.asin(Math.max(-1,Math.min(1,v[2])))/D2R];
 function globePeople(){return S.members.filter(m=>typeof m.lat==='number'&&typeof m.lng==='number')}
 function globeTarget(w,h){const mondo=S.globeMode==='mondo';G.tR=mondo?Math.min(w,h)*0.42:Math.max(w,h)*1.55;
-  if(!mondo){const P=globePeople();if(P.length){const la=P.reduce((s,m)=>s+m.lat,0)/P.length,lo=P.reduce((s,m)=>s+m.lng,0)/P.length;G.tLat=Math.max(-60,Math.min(70,la-0.6));G.tLon=lo}else{G.tLat=42.6;G.tLon=11.6}}}
+  if(!mondo){const P=[...globePeople(),...S.openspots.filter(o=>typeof o.lat==='number')];if(P.length){const la=P.reduce((s,m)=>s+m.lat,0)/P.length,lo=P.reduce((s,m)=>s+m.lng,0)/P.length;G.tLat=Math.max(-60,Math.min(70,la-0.6));G.tLon=lo}else{G.tLat=42.6;G.tLon=11.6}}}
 function startGlobe(){const wrap=$('globe'),cv=$('globe-c');if(!wrap||!cv||cv.dataset.on)return;cv.dataset.on='1';
   const ctx=cv.getContext('2d');let w=0,h=0,dpr=1;
   const size=()=>{dpr=Math.min(2,window.devicePixelRatio||1);w=wrap.clientWidth;h=wrap.clientHeight;cv.width=w*dpr;cv.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);globeTarget(w,h);if(!G.R)G.R=G.tR};
@@ -811,13 +818,16 @@ function startGlobe(){const wrap=$('globe'),cv=$('globe-c');if(!wrap||!cv||cv.da
       ctx.beginPath();ctx.arc(x,y,4+pulse*14,0,Math.PI*2);ctx.strokeStyle=`rgba(185,30,26,${0.5*(1-pulse)})`;ctx.lineWidth=1.5;ctx.stroke();
       ctx.beginPath();ctx.arc(x,y,4.5,0,Math.PI*2);ctx.fillStyle='#B91E1A';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();
       labs.push({x,y,t1:g.names.join(', '),t2:g.city||''})});
+    S.openspots.filter(o=>typeof o.lat==='number'&&typeof o.lng==='number').forEach(o=>{const [x,y,z]=proj(o.lng,o.lat,1,cx,cy);if(z<=0)return;
+      ctx.beginPath();ctx.arc(x,y,6,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,.9)';ctx.fill();ctx.setLineDash([3,2.5]);ctx.strokeStyle='#B91E1A';ctx.lineWidth=1.6;ctx.stroke();ctx.setLineDash([]);
+      labs.push({x,y,t1:'Da coprire'+(o.role?' · '+o.role:''),t2:o.city||'',open:true})});
     labs.sort((a,b)=>a.y-b.y);const placed=[];ctx.font='700 12px "Creato Display",system-ui,sans-serif';
     labs.forEach(l=>{const tw=Math.max(ctx.measureText(l.t1).width,(ctx.font='500 11px "Creato Display",system-ui,sans-serif',ctx.measureText(l.t2).width));ctx.font='700 12px "Creato Display",system-ui,sans-serif';
       let bx=l.x+12,by=l.y-17;const bw=tw+16,bh=34;if(bx+bw>w-6)bx=l.x-12-bw;
       placed.forEach(p=>{if(bx<p.x+p.w&&bx+bw>p.x&&by<p.y+p.h+4&&by+bh+4>p.y)by=p.y+p.h+4});placed.push({x:bx,y:by,w:bw,h:bh});
       ctx.strokeStyle='rgba(17,17,17,.35)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(l.x,l.y);ctx.lineTo(bx<l.x?bx+bw:bx,by+bh/2);ctx.stroke();
-      ctx.fillStyle='rgba(255,255,255,.94)';ctx.fillRect(bx,by,bw,bh);ctx.strokeRect(bx+.5,by+.5,bw-1,bh-1);
-      ctx.fillStyle='#111';ctx.fillText(l.t1,bx+8,by+15);ctx.font='500 11px "Creato Display",system-ui,sans-serif';ctx.fillStyle='#6C6967';ctx.fillText(l.t2,bx+8,by+28);ctx.font='700 12px "Creato Display",system-ui,sans-serif'});
+      ctx.fillStyle='rgba(255,255,255,.94)';ctx.fillRect(bx,by,bw,bh);if(l.open){ctx.setLineDash([3,2]);ctx.strokeStyle='#B91E1A'}ctx.strokeRect(bx+.5,by+.5,bw-1,bh-1);ctx.setLineDash([]);
+      ctx.fillStyle=l.open?'#B91E1A':'#111';ctx.fillText(l.t1,bx+8,by+15);ctx.font='500 11px "Creato Display",system-ui,sans-serif';ctx.fillStyle='#6C6967';ctx.fillText(l.t2,bx+8,by+28);ctx.font='700 12px "Creato Display",system-ui,sans-serif'});
     G.raf=requestAnimationFrame(frame)};
   G.raf=requestAnimationFrame(frame)}
 function viewTeam(){
@@ -957,7 +967,11 @@ function countdown(){
 
 /* ---------- fill sezioni nuove ---------- */
 function fillExtra(r){
-  if($('globe')){startGlobe();const P=globePeople(),cities=new Set(P.map(m=>normCity(m.city)));const st=$('globe-stat');if(st)st.innerHTML=`<b>${cities.size}</b>${cities.size===1?'città':'città'} · ${P.length} ${P.length===1?'persona':'persone'}`;
+  if($('globe')){startGlobe();const P=globePeople(),cities=new Set(P.map(m=>normCity(m.city)));const st=$('globe-stat');const O=S.openspots.length;if(st)st.innerHTML=`<b>${cities.size}</b>città · ${P.length} ${P.length===1?'persona':'persone'}${O?`<br><span style="color:var(--red)">${O} ${O===1?'posizione':'posizioni'} da coprire</span>`:''}`;
+    const sl=$('spotlist');if(sl){const L=[...S.openspots].sort((a,b)=>normCity(a.city).localeCompare(normCity(b.city)));
+      sl.innerHTML=!S.loaded.openspots?'<div class="empty">Carico…</div>':L.length?L.map(o=>{const ck='os:'+o.id,has=typeof o.lat==='number';return `<div class="crow"><span style="font-weight:700"><span class="pin off" style="border-color:var(--red)"></span>${esc(o.city)}${has?'':' <small class="note">· non trovata sul globo</small>'}</span>
+        <span>${o.role?esc(o.role):'<span class="note">Da definire</span>'}${o.note?`<br><span class="note">${esc(o.note)}</span>`:''}</span>
+        <span style="display:flex;gap:10px;justify-content:end;align-items:center"><span class="note">${esc(o.createdByName||'')}</span>${S.canWrite?`<button class="x ${S.confirmDel===ck?'confirm':''}" data-act="delspot" data-id="${esc(o.id)}" aria-label="Togli posizione" title="Coperta o non serve più">${S.confirmDel===ck?'Ok?':'×'}</button>`:''}</span></div>`}).join(''):'<div class="empty">Nessuna posizione aperta. Aggiungi una città dove vi serve qualcuno.</div>'}
     const el=$('citylist');if(el&&!(el.contains(document.activeElement)&&document.activeElement.tagName==='INPUT')){const mg=canManageTeam();
       const rows=[...S.members].sort((a,b)=>normCity(a.city||'zzz').localeCompare(normCity(b.city||'zzz'))||(a.name||a.email).localeCompare(b.name||b.email));
       el.innerHTML=rows.length?rows.map(m=>{const k=esc(m.email),self=lc(m.email)===S.email,can=self||mg,ed=can&&S.editingCity===m.email,has=typeof m.lat==='number';
@@ -1269,6 +1283,7 @@ document.addEventListener('click',e=>{
   const b=e.target.closest('[data-act]');if(!b)return;const act=b.dataset.act,id=b.dataset.id;
   const conf=(key,fn)=>{if(S.confirmDel!==key){S.confirmDel=key;fill();return}S.confirmDel=null;guard(fn)};
   if(act==='gmode'){S.globeMode=b.dataset.k;G.spin=S.globeMode==='mondo';const wrap=$('globe');if(wrap){globeTarget(wrap.clientWidth,wrap.clientHeight);if(S.globeMode==='mondo'){G.tLat=25}}document.querySelectorAll('[data-act=gmode]').forEach(x=>x.classList.toggle('on',x.dataset.k===S.globeMode));return}
+  if(act==='delspot'){conf('os:'+id,()=>S.db.collection('openspots').doc(id).delete());return}
   if(act==='editcity'){S.editingCity=id;fill();return}
   if(act==='cancelcity'){S.editingCity=null;if(document.activeElement)document.activeElement.blur();fill();return}
   if(act==='savecity'){const inp=document.querySelector(`[data-city="${CSS.escape(id)}"]`),city=inp?inp.value.trim().replace(/\s+/g,' '):'';const m=S.members.find(x=>lc(x.email)===lc(id));if(!m)return;
@@ -1321,6 +1336,9 @@ document.addEventListener('submit',async e=>{const f=e.target;
         try{up=await toDrive(file,ref&&ref.area,'Reference',(ref?ref.title+' ':'')+note,i===0?tokP:null)}catch(err){showNote(upErr(err));return}
         await guard(()=>S.db.collection('refitems').add({refId,kind:'photo',thumb:th||'',driveUrl:up.url,note,byName:whoName(),createdAt:Date.now()}))}
       f.reset();showNote('')}finally{S.busy=false;busy('ri-btn',false)}}
+  if(f.id==='spotform'){e.preventDefault();const city=$('os-city').value.trim().replace(/\s+/g,' ');if(!city)return;busy('os-btn',true,'Cerco…');
+    try{const c=await geocode(city);await guard(()=>S.db.collection('openspots').add({city,role:$('os-role').value.trim(),note:$('os-note').value.trim(),lat:c?c[0]:null,lng:c?c[1]:null,createdByName:whoName(),createdAt:Date.now()}));
+      f.reset();if(!c)showNote('Non trovo "'+city+'" sul globo. La posizione è salvata, ma prova a scrivere la città meglio.')}finally{busy('os-btn',false)}}
   if(f.id==='supform'){e.preventDefault();const name=$('sp-name').value.trim();if(!name)return;const url=$('sp-url').value.trim();
     if(url&&!safeUrl(url)){$('sp-url').setCustomValidity('Serve un link che inizia con https://');$('sp-url').reportValidity();return}
     const data={name,category:$('sp-cat').value,region:$('sp-reg').value,city:$('sp-city').value.trim(),url:safeUrl(url),email:lc($('sp-email').value),phone:$('sp-phone').value.trim(),contact:$('sp-contact').value.trim(),status:$('sp-status').value,note:$('sp-note').value.trim(),updatedAt:Date.now()};
@@ -1364,6 +1382,7 @@ function startData(){
   sub('mailtpl',S.db.collection('mailtpl'));
   sub('outbox',S.db.collection('outbox').orderBy('sendAt','desc').limit(150));
   sub('refitems',S.db.collection('refitems'));
+  sub('openspots',S.db.collection('openspots'));
   unsubs.push(S.db.collection('members').onSnapshot(s=>{S.members=toList(s);const me=S.members.find(m=>lc(m.email)===S.email);S.myCanBrand=!!(me&&me.canBrand);if(me&&me.role)S.myRole=me.role;fill()},()=>{}));
 }
 drawBg();makeGrain();render();
