@@ -1,6 +1,10 @@
 rules_version = '2';
 // NoKap HQ – chi può leggere e scrivere.
-// Gli amministratori devono essere gli stessi di firebase-config.js.
+// Livelli: A = Gabriele e Lorenzo (gestiscono tutto, accessi compresi)
+//          B = team fidato (tutto tranne gli accessi)
+//          C = partner (area ridotta: solo la propria collab, niente marketing né fornitori)
+//          D = collaboratori (foto, video, modelli, PR: niente marketing, fornitori, partnership)
+// Gli amministratori (A) devono essere gli stessi di firebase-config.js.
 service cloud.firestore {
   match /databases/{database}/documents {
     function email() { return request.auth.token.email.lower(); }
@@ -8,19 +12,23 @@ service cloud.firestore {
     function isAdmin() { return signedIn() && email() in ['nokapmerch@gmail.com', 'lorenzociampana@gmail.com']; }
     function memberDoc() { return /databases/$(database)/documents/members/$(email()); }
     function isMember() { return isAdmin() || (signedIn() && exists(memberDoc())); }
-    function canApprove() { return isAdmin() || (isMember() && get(memberDoc()).data.role == 'Approvatore'); }
-    function canBrand() { return isAdmin() || (isMember() && get(memberDoc()).data.get('canBrand', false) == true); }
+    function me() { return get(memberDoc()).data; }
+    function level() { return isAdmin() ? 'A' : me().get('level', 'B'); }
+    function full() { return isMember() && level() in ['A', 'B']; }
+    function partnerId() { return me().get('partnerId', ''); }
+    function canApprove() { return isAdmin() || (full() && me().role == 'Approvatore'); }
+    function canBrand() { return isAdmin() || (full() && me().get('canBrand', false) == true); }
 
-    // Elenco del team: lo leggono tutti i membri (serve per assegnare le attività), lo modifica solo Gabriele (nokapmerch).
+    // Elenco del team: lo leggono tutti i membri, gli accessi li gestiscono solo Gabriele e Lorenzo (A).
     match /members/{mail} {
       allow read: if isMember() || (signedIn() && email() == mail);
-      allow write: if signedIn() && email() == 'nokapmerch@gmail.com';
+      allow write: if isAdmin();
       // Ognuno può scrivere solo la propria città (per la pagina Dove siamo).
       allow update: if signedIn() && email() == mail
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['city', 'lat', 'lng', 'cityAt']);
     }
 
-    // Bozze: tutti i membri le creano e modificano, ma solo gli approvatori le approvano.
+    // Bozze: tutti i membri le creano e modificano, ma solo gli approvatori (A o B) le approvano.
     match /drafts/{id} {
       allow read, create, delete: if isMember();
       allow update: if isMember() && (
@@ -29,27 +37,39 @@ service cloud.firestore {
         canApprove());
     }
 
-    // Brand kit: lo leggono tutti, lo modificano solo le persone abilitate da Gabriele.
+    // Partnership: il team (A e B) vede e modifica tutto; un partner (C) legge solo la propria scheda.
+    match /collabs/{id} {
+      allow read: if full() || (isMember() && level() == 'C' && partnerId() == id);
+      allow write: if full();
+    }
+
+    // Brand kit: lo leggono tutti, lo modificano solo le persone abilitate.
     match /config/brandkit {
       allow read: if isMember();
       allow write: if canBrand();
     }
 
-    // Modelli email ed email programmate ai fornitori: le gestiscono solo gli approvatori.
+    // Modelli email ed email programmate ai fornitori: solo gli approvatori.
     match /mailtpl/{id} {
-      allow read: if isMember();
+      allow read: if full();
       allow write: if canApprove();
     }
     match /outbox/{id} {
-      allow read: if isMember();
+      allow read: if full();
       allow write: if canApprove();
     }
 
-    // Tutto il resto (attività, scadenze, link, reference e foto, fornitori, caricamenti, config).
+    // Parte economica e marketing: solo A e B.
+    match /metrics/{id} { allow read, write: if full(); }
+    match /strategies/{id} { allow read, write: if full(); }
+    match /suppliers/{id} { allow read, write: if full(); }
+
+    // Tutto il resto (attività, scadenze, eventi, link, reference e foto, caricamenti, dove siamo, config).
     match /{col}/{id} {
       allow read, write: if isMember()
-        && !(col in ['members', 'drafts', 'mailtpl', 'outbox'])
-        && !(col == 'config' && id == 'brandkit');
+        && !(col in ['members', 'drafts', 'mailtpl', 'outbox', 'collabs', 'metrics', 'strategies', 'suppliers'])
+        && !(col == 'config' && id == 'brandkit')
+        && (full() || !(col == 'config' && request.method != 'get'));
     }
   }
 }

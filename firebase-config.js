@@ -16,5 +16,5 @@ window.NOKAP_FIREBASE = {
 window.NOKAP_CONFIG = {
   admins: ["nokapmerch@gmail.com", "lorenzociampana@gmail.com"],
   // solo chi è qui può aggiungere, rinominare o togliere persone dal team
-  teamManagers: ["nokapmerch@gmail.com"]
+  teamManagers: ["nokapmerch@gmail.com", "lorenzociampana@gmail.com"]
 };
