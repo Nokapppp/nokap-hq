@@ -388,6 +388,28 @@ a.refl{display:contents}
 .evd{display:flex;flex-direction:column;align-items:center;font-size:11px;text-transform:uppercase;color:var(--mute);line-height:1.1}
 .evd b{font-size:24px;color:var(--ink);text-transform:none}.evd small{font-size:10.5px;margin-top:2px}
 #evnext,#evpast{overflow-x:auto}
+/* ---- filosofie e strategie ---- */
+.stcols{display:grid;gap:22px;margin-top:14px}.stcols.c2{grid-template-columns:1fr 1fr}.stcols.c1{grid-template-columns:1fr}
+.stcol{display:flex;flex-direction:column;gap:14px;min-width:0}
+.sthead{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--ink);padding-bottom:8px}
+.sthead b{font-size:14px}
+.stcard{border:1px solid var(--line);background:rgba(255,255,255,.62);padding:16px 18px 12px;position:relative}
+.stcard.t-filosofia{border-left:3px solid var(--ink)}
+.stcard.t-strategia{border-left:3px solid var(--red)}
+.stcard.t-tattica{border-left:3px dashed var(--red)}
+.sttop{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:12px}
+.sttipo{font-weight:700;text-transform:uppercase;letter-spacing:.05em;font-size:11px}
+.ststat{margin-left:auto;font-size:11px;font-weight:700;border:1px solid var(--line);padding:2px 8px}
+.ststat.s-approvata,.ststat.s-in-corso{color:var(--red);border-color:var(--red)}
+.ststat.s-fatta{color:var(--ok);border-color:var(--ok)}
+.ststat.s-messa-da-parte{color:var(--mute);text-decoration:line-through}
+.stcard h3{font-size:17px;margin:8px 0 6px;line-height:1.3}
+.stdesc{font-size:14px;line-height:1.55;margin:0 0 10px;color:var(--ink)}
+.stcard dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:13px;margin:0 0 8px}
+.stcard dt{color:var(--mute);font-weight:700;font-size:11.5px}.stcard dd{margin:0}
+.stfoot{display:flex;justify-content:space-between;align-items:center;gap:10px;border-top:1px solid var(--line);padding-top:8px}
+.stcard .gedit{padding:12px 0 0;border:0;background:transparent;min-width:0}
+@media (max-width:760px){.stcols.c2{grid-template-columns:1fr}}
 /* ---- marketing ---- */
 .mkbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
 .mkgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;position:relative}
@@ -508,8 +530,8 @@ const KIND_USE=k=>['Post','Carosello','Reel','Story','Caption'].includes(k)?'Soc
 const APPROVER='Gabriele Caponnetto';
 
 const S={tasks:[],links:[],refs:[],drafts:[],deadlines:[],uploads:[],drop:{},drive:{},
-  loaded:{tasks:false,links:false,refs:false,drafts:false,deadlines:false,uploads:false,suppliers:false,mailtpl:false,outbox:false,refitems:false,pending:false,events:false,metrics:false},
-  db:null,user:null,me:null,editingMember:null,reassigning:null,editingTask:null,editingCity:null,gedit:null,events:[],metrics:[],cal:{},mkScale:'settimana',gdraft:null,pending:[],globeMode:'italia',editingBrand:false,editingSupplier:null,editingTpl:null,scheduling:null,supCat:'all',supReg:'',suppliers:[],mailtpl:[],outbox:[],refitems:[],brandkit:null,myCanBrand:false,email:'',myName:'',isAdmin:false,members:[],token:null,tokenAt:0,names:{},canWrite:true,
+  loaded:{tasks:false,links:false,refs:false,drafts:false,deadlines:false,uploads:false,suppliers:false,mailtpl:false,outbox:false,refitems:false,pending:false,events:false,metrics:false,strategies:false},
+  db:null,user:null,me:null,editingMember:null,reassigning:null,editingTask:null,editingCity:null,gedit:null,events:[],metrics:[],strategies:[],stF:{tipo:'',metodo:'',orizz:''},cal:{},mkScale:'settimana',gdraft:null,pending:[],globeMode:'italia',editingBrand:false,editingSupplier:null,editingTpl:null,scheduling:null,supCat:'all',supReg:'',suppliers:[],mailtpl:[],outbox:[],refitems:[],brandkit:null,myCanBrand:false,email:'',myName:'',isAdmin:false,members:[],token:null,tokenAt:0,names:{},canWrite:true,
   taskFilter:'all',refFilter:'all',draftFilter:'attivi',editingLink:null,editingDraft:null,reviewing:null,openBody:{},confirmDel:null,busy:false};
 
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -569,6 +591,7 @@ const GSPEC={
   outbox:o=>[{k:'to',l:'Email',t:'email',v:o.to,w:2},{k:'sendAt',l:'Invio il',t:'datetime',v:o.sendAt},{k:'subject',l:'Oggetto',t:'text',v:o.subject,w:3},{k:'body',l:'Testo',t:'textarea',v:o.body,w:3}],
   pending:p=>[{k:'role',l:'Cosa serve',t:'text',v:p.role,w:2},{k:'city',l:'Città',t:'city',v:p.city},{k:'name',l:'Chi potrebbe coprirla',t:'person',v:p.name},{k:'note',l:'Nota',t:'text',v:p.note,w:2}],
   uploads:u=>[{k:'note',l:'Nota',t:'text',v:u.note,w:3}],
+  strategies:s=>[{k:'title',l:'Titolo',t:'text',v:s.title,w:3},{k:'tipo',l:'Tipologia',t:'select',o:STIPI.map(x=>[x,x]),v:s.tipo},{k:'metodo',l:'Metodologia',t:'metodo',v:s.metodo},{k:'orizz',l:'Orizzonte',t:'select',o:SORIZZ.map(x=>[x,x]),v:s.orizz},{k:'status',l:'Stato',t:'select',o:SSTATI.map(x=>[x,x]),v:s.status||'Proposta'},{k:'desc',l:"L'idea",t:'textarea',v:s.desc,w:3},{k:'goal',l:'Obiettivo',t:'text',v:s.goal,w:3},{k:'measure',l:'Come la misuriamo',t:'text',v:s.measure,w:3}],
   events:e=>[{k:'title',l:'Evento',t:'text',v:e.title,w:2},{k:'kind',l:'Tipo',t:'select',o:EKINDS.map(x=>[x,x]),v:e.kind},{k:'status',l:'Stato',t:'select',o:ESTATUS.map(x=>[x,x]),v:e.status||'Idea'},{k:'date',l:'Data',t:'date',v:e.date,req:1},{k:'time',l:'Ora',t:'time',v:e.time},{k:'city',l:'Città',t:'city',v:e.city},{k:'place',l:'Posto',t:'text',v:e.place},{k:'owner',l:'Responsabile',t:'owner',v:ownerVal(e)},{k:'helpers',l:'Con',t:'helpers',v:(e.helpers||[]).map(h=>h.email)},{k:'link',l:'Link',t:'url',v:e.link,w:2},{k:'attendance',l:'Presenze',t:'number',v:e.attendance},{k:'contacts',l:'Contatti raccolti',t:'number',v:e.contacts},{k:'sold',l:'Pezzi venduti',t:'number',v:e.sold},{k:'note',l:'Note',t:'textarea',v:e.note,w:3}],
   metrics:m=>[...Object.keys(m.values||{}).sort(mkSort).map(k=>({k:'v:'+k,l:k,t:'number',v:m.values[k]})),{k:'note',l:'Nota',t:'text',v:m.note,w:3}]
 };
@@ -584,6 +607,7 @@ function gField(f){const k=f.k,d=S.gdraft&&k in S.gdraft?S.gdraft[k]:f.v,v=d==nu
   else if(f.t==='time')inp=`<input id="${id}" data-gf="${k}" type="time" value="${esc(v)}">`;
   else if(f.t==='datetime')inp=`<input id="${id}" data-gf="${k}" type="datetime-local" value="${typeof v==='number'?dtLocal(v):esc(v)}">`;
   else if(f.t==='loc')inp=`<input id="${id}" data-gf="${k}" list="nk-locs" maxlength="60" autocomplete="off" value="${esc(v)}" placeholder="Online, Firenze… o scrivi tu">`;
+  else if(f.t==='metodo')inp=`<input id="${id}" data-gf="${k}" list="nk-metodi" maxlength="60" value="${esc(v)}">`;
   else if(f.t==='city')inp=`<input id="${id}" data-gf="${k}" list="nk-cities" maxlength="60" value="${esc(v)}">`;
   else if(f.t==='person')inp=`<input id="${id}" data-gf="${k}" list="nk-people" maxlength="60" value="${esc(v)}" placeholder="Scegli o scrivi un nome">`;
   else inp=`<input id="${id}" data-gf="${k}" type="${f.t==='url'?'url':f.t==='email'?'email':'text'}" maxlength="${f.t==='url'?500:200}" value="${esc(v)}">`;
@@ -924,6 +948,21 @@ function viewMarketing(){
   return `${head('Numeri','Marketing','Caricate i dati ogni settimana o ogni mese: i grafici si aggiornano da soli.')}
     <section><div class="mkbar"><div class="filters" role="tablist" style="margin:0">${[['settimana','Settimanale'],['mese','Mensile']].map(([k,l])=>`<button class="chip ${S.mkScale===k?'on':''}" data-act="mkscale" data-k="${k}" type="button">${l}</button>`).join('')}</div><span class="note" id="mk-range"></span></div>
       <div class="mkgrid" id="mkgrid"></div><div class="mktip" id="mktip" hidden></div></section>
+    <section><div class="sec-head"><h2>Filosofie e strategie</h2><span class="note">Come pensiamo il marketing di NoKap e cosa proviamo</span></div>
+      <details class="addbox" id="st-add"><summary class="btn ghost">Condividi un'idea</summary>
+      <form class="form" id="stform">
+        <label class="wide" for="st-title">Titolo<input id="st-title" required maxlength="120" placeholder="Es. Poco online, tanto per strada"></label>
+        <label for="st-tipo">Tipologia<select id="st-tipo">${optsOf(STIPI,'Strategia')}</select></label>
+        <label for="st-metodo">Metodologia<input id="st-metodo" list="nk-metodi" maxlength="60" placeholder="Scegli o scrivi"></label>
+        <label for="st-orizz">Orizzonte<select id="st-orizz">${optsOf(SORIZZ,'Breve termine')}</select></label>
+        <label class="full" for="st-desc">L'idea<textarea id="st-desc" rows="4" maxlength="4000" placeholder="Cosa pensiamo e perché. Scrivila come la spiegheresti al team."></textarea></label>
+        <label class="wide" for="st-goal">Obiettivo<input id="st-goal" maxlength="200" placeholder="Es. 100 iscritti alla lista prima del drop"></label>
+        <label class="wide" for="st-measure">Come la misuriamo<input id="st-measure" maxlength="200" placeholder="Es. scansioni QR per lotto, presenze agli eventi"></label>
+        <label for="st-status">Stato<select id="st-status">${optsOf(SSTATI,'Proposta')}</select></label>
+        <button class="btn" type="submit" id="st-btn">Condividi</button></form></details>
+      <datalist id="nk-metodi">${SMETODI.map(m=>`<option value="${esc(m)}">`).join('')}</datalist>
+      <div class="filters" id="stfilters" style="margin-top:6px"></div>
+      <div class="stboard" id="stboard"></div></section>
     <section><div class="sec-head"><h2>Carica i dati</h2><span class="note">A mano o da un file CSV/Excel salvato come CSV</span></div>
       <div class="grid2">
         <form class="box bform" id="mkform"><h3>Inserisci a mano</h3>
@@ -941,6 +980,16 @@ function viewMarketing(){
           <p class="note" id="mk-fnote"></p></div>
       </div></section>
     <section><div class="sec-head"><h2>Tutti i dati</h2><span class="note">Correggi un valore con Modifica</span></div><div class="panel" id="mktable" style="overflow-x:auto"></div></section>`}
+const STIPI=['Filosofia','Strategia','Tattica'];
+const SORIZZ=['Breve termine','Lungo termine'];
+const SSTATI=['Proposta','Approvata','In corso','Fatta','Messa da parte'];
+const SMETODI=['Sticker e guerrilla','Eventi dal vivo','Collab con artisti','Community e passaparola','Contenuti social','Scarsità e drop','PR e stampa','Pop-up e retail','Partnership con brand','Prodotto'];
+function stCard(s){const ck='st:'+s.id;
+  return `<article class="stcard t-${esc((s.tipo||'').toLowerCase())}"><div class="sttop"><span class="sttipo">${esc(s.tipo||'Strategia')}</span>${s.metodo?`<span class="note">${esc(s.metodo)}</span>`:''}<span class="ststat s-${esc((s.status||'Proposta').toLowerCase().replace(/\s+/g,'-'))}">${esc(s.status||'Proposta')}</span></div>
+    <h3>${esc(s.title)}</h3>${s.desc?`<p class="stdesc">${esc(s.desc).replace(/\n/g,'<br>')}</p>`:''}
+    ${s.goal||s.measure?`<dl>${s.goal?`<dt>Obiettivo</dt><dd>${esc(s.goal)}</dd>`:''}${s.measure?`<dt>Come la misuriamo</dt><dd>${esc(s.measure)}</dd>`:''}</dl>`:''}
+    <div class="stfoot"><span class="note">${esc(s.byName||'')}${s.createdAt?' · '+new Date(s.createdAt).toLocaleDateString('it-IT',{day:'numeric',month:'short'}):''}</span><span style="display:flex;gap:8px">${S.canWrite?`<button class="linkish" data-act="gedit" data-col="strategies" data-id="${esc(s.id)}" type="button">Modifica</button><button class="x ${S.confirmDel===ck?'confirm':''}" data-act="delst" data-id="${esc(s.id)}" aria-label="Elimina">${S.confirmDel===ck?'Ok?':'×'}</button>`:''}</span></div>
+    ${gOpen('strategies',s.id)?gEditor('strategies',s):''}</article>`}
 function mkChart(lab,pts,scale){const W=340,H=130,P={l:44,r:12,t:12,b:24},vals=pts.map(p=>p.v);let lo=Math.min(...vals),hi=Math.max(...vals);
   if(lo===hi){lo=lo>0?lo*0.9:lo-1;hi=hi>0?hi*1.1:hi+1}const pad=(hi-lo)*0.12;lo=Math.max(lo>=0?0:-Infinity,lo-pad);hi=hi+pad;
   const x=i=>P.l+(pts.length===1?(W-P.l-P.r)/2:i*(W-P.l-P.r)/(pts.length-1)),y=v=>P.t+(H-P.t-P.b)*(1-(v-lo)/(hi-lo));
@@ -1192,6 +1241,16 @@ function fillExtra(r){
     const keep=el=>el&&el.contains(document.activeElement)&&/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName);
     if(!keep($('evnext')))$('evnext').innerHTML=!S.loaded.events?'<div class="empty">Carico…</div>':nx.length?nx.map(evRow).join(''):'<div class="empty">Nessun evento in arrivo. Aggiungine uno con "Nuovo evento".</div>';
     if(!keep($('evpast')))$('evpast').innerHTML=ps.length?ps.map(evRow).join(''):'<div class="empty">Ancora nessun evento fatto.</div>'}
+  // filosofie e strategie
+  if($('stboard')){const F=S.stF,metodi=[...new Set(S.strategies.map(s=>s.metodo).filter(Boolean))].sort();
+    const fx=$('stfilters');const fh=[['','Tutte'],...STIPI.map(t=>[t,t])].map(([k,l])=>`<button class="chip ${F.tipo===k?'on':''}" data-act="stf" data-f="tipo" data-k="${esc(k)}" type="button">${esc(l)}</button>`).join('')+
+      `<select class="osel" id="st-fmetodo" aria-label="Filtra per metodologia" style="margin-left:8px">${optsOf(metodi,F.metodo,'Tutte le metodologie')}</select>`+
+      `<select class="osel" id="st-forizz" aria-label="Filtra per orizzonte" style="margin-left:8px">${optsOf(SORIZZ,F.orizz,'Breve e lungo termine')}</select>`;
+    if(fx.dataset.h!==fh){fx.dataset.h=fh;fx.innerHTML=fh}
+    const bd=$('stboard');if(!(bd.contains(document.activeElement)&&/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName))){
+      const L=S.strategies.filter(s=>(!F.tipo||s.tipo===F.tipo)&&(!F.metodo||s.metodo===F.metodo)).sort((a,b)=>STIPI.indexOf(a.tipo)-STIPI.indexOf(b.tipo)||(b.createdAt||0)-(a.createdAt||0));
+      const cols=(F.orizz?[F.orizz]:SORIZZ);
+      bd.innerHTML=!S.loaded.strategies?'<div class="empty">Carico…</div>':!S.strategies.length?'<div class="empty">Ancora nessuna idea. Condividi la prima: anche una frase basta.</div>':`<div class="stcols c${cols.length}">${cols.map(o=>{const X=L.filter(s=>(s.orizz||'Breve termine')===o);return `<div class="stcol"><div class="sthead"><b>${o}</b><span class="note">${X.length}</span></div>${X.length?X.map(stCard).join(''):'<div class="empty" style="padding:22px 12px">Niente con questi filtri.</div>'}</div>`}).join('')}</div>`}}
   // marketing
   if($('mkgrid')){const sc=S.mkScale,D=S.metrics.filter(m=>m.scale===sc&&m.period).sort((a,b)=>a.period.localeCompare(b.period));
     const labs=[...new Set(D.flatMap(m=>Object.keys(m.values||{})))].sort(mkSort);
@@ -1541,6 +1600,8 @@ document.addEventListener('mouseover',e=>{const t=e.target.closest&&e.target.clo
 document.addEventListener('mousemove',e=>{const tip=$('mktip');if(!tip||tip.hidden)return;const w=tip.offsetWidth;tip.style.left=Math.min(window.innerWidth-w-8,e.clientX+14)+'px';tip.style.top=(e.clientY-tip.offsetHeight-10)+'px'});
 document.addEventListener('change',e=>{
   const m=e.target.closest('details.multi');if(m){const n=m.querySelectorAll('input:checked').length;m.querySelector('summary').textContent=n?n+' persone':'Nessuno'}
+  if(e.target.id==='st-fmetodo'){S.stF.metodo=e.target.value;fill()}
+  if(e.target.id==='st-forizz'){S.stF.orizz=e.target.value;fill()}
   if(e.target.id==='supreg'){S.supReg=e.target.value;fill()}
 });
 document.addEventListener('click',e=>{
@@ -1549,7 +1610,7 @@ document.addEventListener('click',e=>{
   if(act==='gedit'){const col=b.dataset.col;if(col==='outbox'&&!canApprove())return;S.gedit=col+':'+id;S.gdraft={};S.editingTask=null;S.reviewing=null;fill();const f=document.querySelector('.gedit [data-gf]');if(f)f.focus({preventScroll:true});return}
   if(act==='gcancel'){S.gedit=null;S.gdraft=null;if(document.activeElement)document.activeElement.blur();fill();return}
   if(act==='dellink2'){conf('l:'+id,()=>S.db.collection('links').doc(id).delete());return}
-  if(act==='gsave'){const col=b.dataset.col,list={events:S.events,metrics:S.metrics,tasks:S.tasks,deadlines:S.deadlines,drafts:S.drafts,refs:S.refs,refitems:S.refitems,links:S.links,outbox:S.outbox,pending:S.pending,uploads:S.uploads}[col]||[];const doc=list.find(x=>x.id===id);if(!doc)return;
+  if(act==='gsave'){const col=b.dataset.col,list={strategies:S.strategies,events:S.events,metrics:S.metrics,tasks:S.tasks,deadlines:S.deadlines,drafts:S.drafts,refs:S.refs,refitems:S.refitems,links:S.links,outbox:S.outbox,pending:S.pending,uploads:S.uploads}[col]||[];const doc=list.find(x=>x.id===id);if(!doc)return;
     const box=b.closest('.gedit'),F=GSPEC[col](doc),upd={};let bad='';
     for(const f of F){const el=box.querySelector('#ge-'+f.k.replace(/[^a-zA-Z0-9_-]/g,c=>'_'+c.charCodeAt(0)));if(!el&&f.t!=='helpers')continue;const raw=el&&'value' in el?el.value:'';
       if(f.t==='owner'){const p=pick(raw);Object.assign(upd,p);if(lc(p.ownerEmail)!==lc(doc.ownerEmail)){upd.notifiedOwner=''}}
@@ -1572,6 +1633,8 @@ document.addEventListener('click',e=>{
     upd.updatedAt=Date.now();b.textContent='Salvo…';
     guard(async()=>{if(col==='pending'&&normCity(upd.city)!==normCity(doc.city)){const c=upd.city?await geocode(upd.city):null;upd.lat=c?c[0]:null;upd.lng=c?c[1]:null;if(upd.city&&!c)showNote('Non trovo "'+upd.city+'" sul globo. Prova a scriverla meglio.')}
       await S.db.collection(col).doc(id).update(upd);S.gedit=null;S.gdraft=null;if(document.activeElement)document.activeElement.blur();fill()});return}
+  if(act==='stf'){S.stF[b.dataset.f]=b.dataset.k;fill();return}
+  if(act==='delst'){conf('st:'+id,()=>S.db.collection('strategies').doc(id).delete());return}
   if(act==='calnav'){const k=b.dataset.k,d=+b.dataset.d;if(!d){S.cal[k]=null}else{const cur=S.cal[k]||ymd(new Date()).slice(0,7);const [Y,M]=cur.split('-').map(Number);const n=new Date(Y,M-1+d,1,12);S.cal[k]=ymd(n).slice(0,7)}fill();return}
   if(act==='calgo'){const col=b.dataset.col;if(!col||!id)return;if(col==='drafts'){location.hash='#testi';return}
     const open=()=>{S.gedit=col+':'+id;S.gdraft={};fill();const el=document.querySelector(`.gedit[data-gid="${CSS.escape(id)}"]`);if(el)el.scrollIntoView({behavior:'smooth',block:'center'})};
@@ -1634,6 +1697,9 @@ document.addEventListener('submit',async e=>{const f=e.target;
         try{up=await toDrive(file,ref&&ref.area,'Reference',(ref?ref.title+' ':'')+note,i===0?tokP:null)}catch(err){showNote(upErr(err));return}
         await guard(()=>S.db.collection('refitems').add({refId,kind:'photo',thumb:th||'',driveUrl:up.url,note,byName:whoName(),createdAt:Date.now()}))}
       f.reset();showNote('')}finally{S.busy=false;busy('ri-btn',false)}}
+  if(f.id==='stform'){e.preventDefault();const title=$('st-title').value.trim();if(!title)return;
+    await guard(()=>S.db.collection('strategies').add({title,tipo:$('st-tipo').value,metodo:$('st-metodo').value.trim(),orizz:$('st-orizz').value,status:$('st-status').value,desc:$('st-desc').value,goal:$('st-goal').value.trim(),measure:$('st-measure').value.trim(),byName:whoName(),createdAt:Date.now()}));
+    f.reset();$('st-add').open=false;fill()}
   if(f.id==='evform'){e.preventDefault();const title=$('ev-title').value.trim(),date=$('ev-date').value;if(!title||!isDate(date))return;
     await guard(()=>S.db.collection('events').add({title,kind:$('ev-kind').value,status:$('ev-status').value,date,time:$('ev-time').value,city:$('ev-city').value.trim(),place:$('ev-place').value.trim(),...pick($('ev-owner').value),helpers:readMulti('ev-helpers'),note:$('ev-note').value.trim(),link:'',createdByName:whoName(),createdAt:Date.now()}));
     f.reset();$('ev-add').open=false;S.cal.ev=date.slice(0,7);fill()}
@@ -1695,6 +1761,7 @@ function startData(){
   sub('pending',S.db.collection('pending'));
   sub('events',S.db.collection('events'));
   sub('metrics',S.db.collection('metrics'));
+  sub('strategies',S.db.collection('strategies'));
   unsubs.push(S.db.collection('members').onSnapshot(s=>{S.members=toList(s);const me=S.members.find(m=>lc(m.email)===S.email);S.myCanBrand=!!(me&&me.canBrand);if(me&&me.role)S.myRole=me.role;fill()},()=>{}));
 }
 drawBg();makeGrain();render();
