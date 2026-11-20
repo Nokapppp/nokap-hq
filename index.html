@@ -388,6 +388,20 @@ a.refl{display:contents}
 .evd{display:flex;flex-direction:column;align-items:center;font-size:11px;text-transform:uppercase;color:var(--mute);line-height:1.1}
 .evd b{font-size:24px;color:var(--ink);text-transform:none}.evd small{font-size:10.5px;margin-top:2px}
 #evnext,#evpast{overflow-x:auto}
+/* ---- partnership ---- */
+.cbboard{overflow-x:auto;margin-top:14px;padding-bottom:6px}
+.cbcols{display:grid;grid-template-columns:repeat(5,minmax(190px,1fr));gap:12px;min-width:1000px}
+.cbcard{border:1px solid var(--line);background:rgba(255,255,255,.66);padding:14px 14px 10px}
+.cbcard.p-alta{border-top:3px solid var(--red)}.cbcard.p-media{border-top:3px solid var(--ink)}.cbcard.p-bassa{border-top:3px solid var(--line)}
+.cbcard h3{font-size:16px;margin:8px 0 2px}.cbcard h3 a{text-decoration:underline;text-underline-offset:3px}
+.cbtitle{font-size:12.5px;font-weight:700;color:var(--red);margin-bottom:8px}
+.cbprio{margin-left:auto;font-size:11px;color:var(--mute)}
+.cbcard .stdesc{font-size:13px}.cbcard dl{font-size:12.5px;display:block}.cbcard dt{margin-top:4px}.cbcard dd{margin:0}
+.cbcard .stfoot{flex-direction:column;align-items:flex-start;gap:6px}.cbcard .stfoot>span:last-child{width:100%;justify-content:space-between}
+.cbcard .gedit{padding:10px 0 0;border:0;background:transparent;min-width:0}
+.cbempty{border:1px dashed var(--line);min-height:70px}
+.cboff{margin-top:22px}.cboff summary{cursor:pointer;font-weight:700}
+.cbofrow .cbcard{border:0;border-bottom:1px solid var(--line);opacity:.7}
 /* ---- filosofie e strategie ---- */
 .stcols{display:grid;gap:22px;margin-top:14px}.stcols.c2{grid-template-columns:1fr 1fr}.stcols.c1{grid-template-columns:1fr}
 .stcol{display:flex;flex-direction:column;gap:14px;min-width:0}
@@ -530,8 +544,8 @@ const KIND_USE=k=>['Post','Carosello','Reel','Story','Caption'].includes(k)?'Soc
 const APPROVER='Gabriele Caponnetto';
 
 const S={tasks:[],links:[],refs:[],drafts:[],deadlines:[],uploads:[],drop:{},drive:{},
-  loaded:{tasks:false,links:false,refs:false,drafts:false,deadlines:false,uploads:false,suppliers:false,mailtpl:false,outbox:false,refitems:false,pending:false,events:false,metrics:false,strategies:false},
-  db:null,user:null,me:null,editingMember:null,reassigning:null,editingTask:null,editingCity:null,gedit:null,events:[],metrics:[],strategies:[],stF:{tipo:'',metodo:'',orizz:''},cal:{},mkScale:'settimana',gdraft:null,pending:[],globeMode:'italia',editingBrand:false,editingSupplier:null,editingTpl:null,scheduling:null,supCat:'all',supReg:'',suppliers:[],mailtpl:[],outbox:[],refitems:[],brandkit:null,myCanBrand:false,email:'',myName:'',isAdmin:false,members:[],token:null,tokenAt:0,names:{},canWrite:true,
+  loaded:{tasks:false,links:false,refs:false,drafts:false,deadlines:false,uploads:false,suppliers:false,mailtpl:false,outbox:false,refitems:false,pending:false,events:false,metrics:false,strategies:false,collabs:false},
+  db:null,user:null,me:null,editingMember:null,reassigning:null,editingTask:null,editingCity:null,gedit:null,events:[],metrics:[],strategies:[],collabs:[],cbF:{tipo:'',owner:''},stF:{tipo:'',metodo:'',orizz:''},cal:{},mkScale:'settimana',gdraft:null,pending:[],globeMode:'italia',editingBrand:false,editingSupplier:null,editingTpl:null,scheduling:null,supCat:'all',supReg:'',suppliers:[],mailtpl:[],outbox:[],refitems:[],brandkit:null,myCanBrand:false,email:'',myName:'',isAdmin:false,members:[],token:null,tokenAt:0,names:{},canWrite:true,
   taskFilter:'all',refFilter:'all',draftFilter:'attivi',editingLink:null,editingDraft:null,reviewing:null,openBody:{},confirmDel:null,busy:false};
 
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -591,6 +605,7 @@ const GSPEC={
   outbox:o=>[{k:'to',l:'Email',t:'email',v:o.to,w:2},{k:'sendAt',l:'Invio il',t:'datetime',v:o.sendAt},{k:'subject',l:'Oggetto',t:'text',v:o.subject,w:3},{k:'body',l:'Testo',t:'textarea',v:o.body,w:3}],
   pending:p=>[{k:'role',l:'Cosa serve',t:'text',v:p.role,w:2},{k:'city',l:'Città',t:'city',v:p.city},{k:'name',l:'Chi potrebbe coprirla',t:'person',v:p.name},{k:'note',l:'Nota',t:'text',v:p.note,w:2}],
   uploads:u=>[{k:'note',l:'Nota',t:'text',v:u.note,w:3}],
+  collabs:c=>[{k:'name',l:'Con chi',t:'text',v:c.name,w:2},{k:'tipo',l:'Tipo',t:'select',o:CTIPI.map(x=>[x,x]),v:c.tipo},{k:'title',l:'Titolo della collab',t:'text',v:c.title,w:2},{k:'stage',l:'Fase',t:'select',o:[...CSTAGES,...COFF].map(x=>[x,x]),v:c.stage||'Idea'},{k:'prio',l:'Priorità',t:'select',o:CPRIO.map(x=>[x,x]),v:c.prio||'Media'},{k:'owner',l:'Chi la segue',t:'owner',v:ownerVal(c)},{k:'idea',l:"L'idea",t:'textarea',v:c.idea,w:3},{k:'offer',l:'Cosa offriamo',t:'text',v:c.offer,w:3},{k:'ask',l:'Cosa chiediamo',t:'text',v:c.ask,w:3},{k:'city',l:'Città',t:'city',v:c.city},{k:'link',l:'Profilo o link',t:'url',v:c.link,w:2},{k:'contact',l:'Contatto',t:'text',v:c.contact,w:2},{k:'when',l:'Quando',t:'text',v:c.when}],
   strategies:s=>[{k:'title',l:'Titolo',t:'text',v:s.title,w:3},{k:'tipo',l:'Tipologia',t:'select',o:STIPI.map(x=>[x,x]),v:s.tipo},{k:'metodo',l:'Metodologia',t:'metodo',v:s.metodo},{k:'orizz',l:'Orizzonte',t:'select',o:SORIZZ.map(x=>[x,x]),v:s.orizz},{k:'status',l:'Stato',t:'select',o:SSTATI.map(x=>[x,x]),v:s.status||'Proposta'},{k:'desc',l:"L'idea",t:'textarea',v:s.desc,w:3},{k:'goal',l:'Obiettivo',t:'text',v:s.goal,w:3},{k:'measure',l:'Come la misuriamo',t:'text',v:s.measure,w:3}],
   events:e=>[{k:'title',l:'Evento',t:'text',v:e.title,w:2},{k:'kind',l:'Tipo',t:'select',o:EKINDS.map(x=>[x,x]),v:e.kind},{k:'status',l:'Stato',t:'select',o:ESTATUS.map(x=>[x,x]),v:e.status||'Idea'},{k:'date',l:'Data',t:'date',v:e.date,req:1},{k:'time',l:'Ora',t:'time',v:e.time},{k:'city',l:'Città',t:'city',v:e.city},{k:'place',l:'Posto',t:'text',v:e.place},{k:'owner',l:'Responsabile',t:'owner',v:ownerVal(e)},{k:'helpers',l:'Con',t:'helpers',v:(e.helpers||[]).map(h=>h.email)},{k:'link',l:'Link',t:'url',v:e.link,w:2},{k:'attendance',l:'Presenze',t:'number',v:e.attendance},{k:'contacts',l:'Contatti raccolti',t:'number',v:e.contacts},{k:'sold',l:'Pezzi venduti',t:'number',v:e.sold},{k:'note',l:'Note',t:'textarea',v:e.note,w:3}],
   metrics:m=>[...Object.keys(m.values||{}).sort(mkSort).map(k=>({k:'v:'+k,l:k,t:'number',v:m.values[k]})),{k:'note',l:'Nota',t:'text',v:m.note,w:3}]
@@ -657,6 +672,7 @@ function buildMenu(){
     ${it('scadenze','Scadenze')}
     ${it('eventi','Eventi',(()=>{const n=S.events.filter(e=>isDate(e.date)&&daysTo(e.date)>=0&&e.status!=='Annullato').length;return n?n+(n===1?' in arrivo':' in arrivo'):''})())}
     ${it('marketing','Marketing')}
+    ${it('collab','Partnership',(()=>{const n=S.collabs.filter(c=>c.stage==='In trattativa').length;return n?n+' in trattativa':''})())}
     ${it('testi','Testi & editoria',inRev?inRev+' da approvare':'')}
     ${it('file','Carica file')}
     ${it('moodboard','Moodboard')}
@@ -990,6 +1006,40 @@ function stCard(s){const ck='st:'+s.id;
     ${s.goal||s.measure?`<dl>${s.goal?`<dt>Obiettivo</dt><dd>${esc(s.goal)}</dd>`:''}${s.measure?`<dt>Come la misuriamo</dt><dd>${esc(s.measure)}</dd>`:''}</dl>`:''}
     <div class="stfoot"><span class="note">${esc(s.byName||'')}${s.createdAt?' · '+new Date(s.createdAt).toLocaleDateString('it-IT',{day:'numeric',month:'short'}):''}</span><span style="display:flex;gap:8px">${S.canWrite?`<button class="linkish" data-act="gedit" data-col="strategies" data-id="${esc(s.id)}" type="button">Modifica</button><button class="x ${S.confirmDel===ck?'confirm':''}" data-act="delst" data-id="${esc(s.id)}" aria-label="Elimina">${S.confirmDel===ck?'Ok?':'×'}</button>`:''}</span></div>
     ${gOpen('strategies',s.id)?gEditor('strategies',s):''}</article>`}
+const CSTAGES=['Idea','Da contattare','Contattato','In trattativa','Confermata'];
+const COFF=['In pausa','Non va'];
+const CTIPI=['Artista','Collettivo','Brand','Locale o venue','Fotografo o creativo','Media','Altro'];
+const CPRIO=['Alta','Media','Bassa'];
+const collabTitle=c=>'NoKap × '+(c.name||'…')+(c.title?' – '+c.title:'');
+function viewCollabs(){
+  return `${head('Community & Partnership','Partnership','Le collab possibili, dalla prima idea alla firma. NoKap viene sempre per primo: NoKap × Artista – Titolo.')}
+    <section><details class="addbox" id="cb-add"><summary class="btn ghost">Nuova collab</summary>
+      <form class="form" id="cbform">
+        <label for="cb-name">Con chi<input id="cb-name" required maxlength="80" placeholder="Es. Love Gang"></label>
+        <label for="cb-tipo">Tipo<select id="cb-tipo">${optsOf(CTIPI,'Artista')}</select></label>
+        <label class="wide" for="cb-title">Titolo della collab<input id="cb-title" maxlength="80" placeholder="Es. Aspettando la Trap Musicale"></label>
+        <p class="full note" id="cb-preview" style="margin:-4px 0 4px">NoKap × … </p>
+        <label class="full" for="cb-idea">L'idea<textarea id="cb-idea" rows="3" maxlength="3000" placeholder="Cosa faremmo insieme: capo, evento, contenuto…"></textarea></label>
+        <label class="wide" for="cb-offer">Cosa offriamo noi<input id="cb-offer" maxlength="200" placeholder="Es. capsule co-firmata, visibilità, quota sul venduto"></label>
+        <label class="wide" for="cb-ask">Cosa chiediamo<input id="cb-ask" maxlength="200" placeholder="Es. post collab, presenza all'evento"></label>
+        <label for="cb-city">Città<input id="cb-city" list="nk-cities" maxlength="60"></label>
+        <label for="cb-link">Profilo o link<input id="cb-link" type="url" placeholder="https://instagram.com/…"></label>
+        <label for="cb-contact">Contatto<input id="cb-contact" maxlength="120" placeholder="Manager, email, telefono"></label>
+        <label for="cb-when">Quando<input id="cb-when" maxlength="60" placeholder="Es. drop primavera 2027"></label>
+        <label for="cb-prio">Priorità<select id="cb-prio">${optsOf(CPRIO,'Media')}</select></label>
+        <label for="cb-stage">Fase<select id="cb-stage">${optsOf([...CSTAGES,...COFF],'Idea')}</select></label>
+        <label for="cb-owner">Chi la segue<select id="cb-owner">${teamOpts()}</select></label>
+        <button class="btn" type="submit" id="cb-btn">Aggiungi</button></form></details>
+      <div class="filters" id="cbfilters"></div>
+      <div class="cbboard" id="cbboard"></div>
+      <details class="cboff" id="cboff"><summary class="note">In pausa o non va</summary><div class="panel" id="cbofflist"></div></details></section>`}
+function cbCard(c){const ck='cb:'+c.id,i=CSTAGES.indexOf(c.stage||'Idea'),u=safeUrl(c.link);
+  return `<article class="cbcard p-${esc((c.prio||'Media').toLowerCase())}"><div class="sttop"><span class="sttipo">${esc(c.tipo||'')}</span>${c.city?`<span class="note">${esc(c.city)}</span>`:''}<span class="cbprio">${esc(c.prio||'Media')}</span></div>
+    <h3>${u?`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(c.name)}</a>`:esc(c.name)}</h3><div class="cbtitle">${esc(collabTitle(c))}</div>
+    ${c.idea?`<p class="stdesc">${esc(c.idea).replace(/\n/g,'<br>')}</p>`:''}
+    ${c.offer||c.ask||c.when||c.contact?`<dl>${c.offer?`<dt>Offriamo</dt><dd>${esc(c.offer)}</dd>`:''}${c.ask?`<dt>Chiediamo</dt><dd>${esc(c.ask)}</dd>`:''}${c.when?`<dt>Quando</dt><dd>${esc(c.when)}</dd>`:''}${c.contact?`<dt>Contatto</dt><dd>${esc(c.contact)}</dd>`:''}</dl>`:''}
+    <div class="stfoot"><span class="who ${noOwner(c)?'warn':''}" style="font-size:12px">${noOwner(c)?'Senza responsabile':esc(c.owner||'')}</span><span style="display:flex;gap:8px;align-items:center">${S.canWrite?`${i>=0&&i<CSTAGES.length-1?`<button class="linkish dark" data-act="cbnext" data-id="${esc(c.id)}" type="button" title="Passa a: ${esc(CSTAGES[i+1])}">${esc(CSTAGES[i+1])} →</button>`:''}<button class="linkish" data-act="gedit" data-col="collabs" data-id="${esc(c.id)}" type="button">Modifica</button><button class="x ${S.confirmDel===ck?'confirm':''}" data-act="delcb" data-id="${esc(c.id)}" aria-label="Elimina">${S.confirmDel===ck?'Ok?':'×'}</button>`:''}</span></div>
+    ${gOpen('collabs',c.id)?gEditor('collabs',c):''}</article>`}
 function mkChart(lab,pts,scale){const W=340,H=130,P={l:44,r:12,t:12,b:24},vals=pts.map(p=>p.v);let lo=Math.min(...vals),hi=Math.max(...vals);
   if(lo===hi){lo=lo>0?lo*0.9:lo-1;hi=hi>0?hi*1.1:hi+1}const pad=(hi-lo)*0.12;lo=Math.max(lo>=0?0:-Infinity,lo-pad);hi=hi+pad;
   const x=i=>P.l+(pts.length===1?(W-P.l-P.r)/2:i*(W-P.l-P.r)/(pts.length-1)),y=v=>P.t+(H-P.t-P.b)*(1-(v-lo)/(hi-lo));
@@ -1241,6 +1291,15 @@ function fillExtra(r){
     const keep=el=>el&&el.contains(document.activeElement)&&/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName);
     if(!keep($('evnext')))$('evnext').innerHTML=!S.loaded.events?'<div class="empty">Carico…</div>':nx.length?nx.map(evRow).join(''):'<div class="empty">Nessun evento in arrivo. Aggiungine uno con "Nuovo evento".</div>';
     if(!keep($('evpast')))$('evpast').innerHTML=ps.length?ps.map(evRow).join(''):'<div class="empty">Ancora nessun evento fatto.</div>'}
+  // partnership
+  if($('cbboard')){const F=S.cbF,tipi=[...new Set(S.collabs.map(c=>c.tipo).filter(Boolean))];
+    const fh=[['','Tutti'],...CTIPI.filter(t=>tipi.includes(t)).map(t=>[t,t])].map(([k,l])=>`<button class="chip ${F.tipo===k?'on':''}" data-act="cbf" data-k="${esc(k)}" type="button">${esc(l)}</button>`).join('');
+    const fx=$('cbfilters');if(fx.dataset.h!==fh){fx.dataset.h=fh;fx.innerHTML=fh}
+    const busy=el=>el&&el.contains(document.activeElement)&&/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName);
+    const P={Alta:0,Media:1,Bassa:2},L=S.collabs.filter(c=>!F.tipo||c.tipo===F.tipo).sort((a,b)=>(P[a.prio]??1)-(P[b.prio]??1)||(b.updatedAt||b.createdAt||0)-(a.updatedAt||a.createdAt||0));
+    const bd=$('cbboard');if(!busy(bd))bd.innerHTML=!S.loaded.collabs?'<div class="empty">Carico…</div>':!S.collabs.length?'<div class="empty">Ancora nessuna collab. Aggiungi la prima: anche solo un nome va bene.</div>':`<div class="cbcols">${CSTAGES.map(s=>{const X=L.filter(c=>(c.stage||'Idea')===s);return `<div class="stcol"><div class="sthead"><b>${s}</b><span class="note">${X.length}</span></div>${X.map(cbCard).join('')||'<div class="cbempty"></div>'}</div>`}).join('')}</div>`;
+    const off=L.filter(c=>COFF.includes(c.stage)),ol=$('cbofflist');$('cboff').hidden=!off.length;if(!busy(ol))ol.innerHTML=off.map(c=>`<div class="cbofrow">${cbCard(c)}<span class="note" style="padding:0 16px 12px;display:block">${esc(c.stage)}</span></div>`).join('');
+    const pv=$('cb-preview');if(pv){const n=$('cb-name').value.trim(),t=$('cb-title').value.trim();pv.textContent=collabTitle({name:n,title:t})}}
   // filosofie e strategie
   if($('stboard')){const F=S.stF,metodi=[...new Set(S.strategies.map(s=>s.metodo).filter(Boolean))].sort();
     const fx=$('stfilters');const fh=[['','Tutte'],...STIPI.map(t=>[t,t])].map(([k,l])=>`<button class="chip ${F.tipo===k?'on':''}" data-act="stf" data-f="tipo" data-k="${esc(k)}" type="button">${esc(l)}</button>`).join('')+
@@ -1422,7 +1481,7 @@ async function resolveNames(){return;
 }
 function render(){
   const r=route();let h;
-  const V={eventi:viewEvents,marketing:viewMarketing,dove:viewDove,fornitori:viewSuppliers,team:viewTeam,attivita:viewTasks,scadenze:viewDeadlines,testi:viewTexts,file:viewFiles,moodboard:viewMood,link:viewLinks,brand:viewBrand};
+  const V={collab:viewCollabs,eventi:viewEvents,marketing:viewMarketing,dove:viewDove,fornitori:viewSuppliers,team:viewTeam,attivita:viewTasks,scadenze:viewDeadlines,testi:viewTexts,file:viewFiles,moodboard:viewMood,link:viewLinks,brand:viewBrand};
   h=V[r]?V[r]():r.startsWith('area-')?viewArea(r.slice(5)):r.startsWith('ref-')?viewRef(r.slice(4)):viewHome();
   $('main').innerHTML=h;window.scrollTo(0,0);S.confirmDel=null;S.editingTask=null;S.gedit=null;S.gdraft=null;S.editingCity=null;S.editingBrand=false;S.editingSupplier=null;S.editingTpl=null;S.scheduling=null;S.editingLink=null;S.editingDraft=null;S.reviewing=null;setMenu(false);fill();showNote();
 }
@@ -1582,7 +1641,7 @@ document.addEventListener('submit',async e=>{
       const ok=await guard(async()=>{await S.db.collection('refs').add(data)});if(ok){f.reset();showNote('')}}
     finally{S.busy=false;busy('rf-btn',false)}}
 });
-document.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.gf;if(k&&S.gdraft)S.gdraft[k]=e.target.value});
+document.addEventListener('input',e=>{if(e.target.id==='cb-name'||e.target.id==='cb-title'){const pv=$('cb-preview');if(pv)pv.textContent=collabTitle({name:$('cb-name').value.trim(),title:$('cb-title').value.trim()})}const k=e.target.dataset&&e.target.dataset.gf;if(k&&S.gdraft)S.gdraft[k]=e.target.value});
 document.addEventListener('change',e=>{if(e.target.closest&&e.target.closest('.gedit details.multi')&&S.gdraft)S.gdraft.helpers=[...e.target.closest('details').querySelectorAll('input:checked')].map(i=>i.value);const k=e.target.dataset&&e.target.dataset.gf;if(k&&S.gdraft)S.gdraft[k]=e.target.value});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&S.gedit&&e.target.closest&&e.target.closest('.gedit')){S.gedit=null;S.gdraft=null;e.target.blur();fill();return}if(e.key==='Enter'&&e.target.matches&&e.target.matches('.gedit input')){e.preventDefault();const b=e.target.closest('.gedit').querySelector('[data-act=gsave]');if(b)b.click();return}if(e.key==='Enter'&&e.target.matches&&e.target.matches('[data-city]')){e.preventDefault();const b=document.querySelector('[data-act=savecity]');if(b)b.click()}});
 document.addEventListener('change',e=>{const s=e.target.closest('[data-act="reassign"]');if(!s)return;const p=pick(s.value);S.reassigning=null;
@@ -1610,7 +1669,7 @@ document.addEventListener('click',e=>{
   if(act==='gedit'){const col=b.dataset.col;if(col==='outbox'&&!canApprove())return;S.gedit=col+':'+id;S.gdraft={};S.editingTask=null;S.reviewing=null;fill();const f=document.querySelector('.gedit [data-gf]');if(f)f.focus({preventScroll:true});return}
   if(act==='gcancel'){S.gedit=null;S.gdraft=null;if(document.activeElement)document.activeElement.blur();fill();return}
   if(act==='dellink2'){conf('l:'+id,()=>S.db.collection('links').doc(id).delete());return}
-  if(act==='gsave'){const col=b.dataset.col,list={strategies:S.strategies,events:S.events,metrics:S.metrics,tasks:S.tasks,deadlines:S.deadlines,drafts:S.drafts,refs:S.refs,refitems:S.refitems,links:S.links,outbox:S.outbox,pending:S.pending,uploads:S.uploads}[col]||[];const doc=list.find(x=>x.id===id);if(!doc)return;
+  if(act==='gsave'){const col=b.dataset.col,list={collabs:S.collabs,strategies:S.strategies,events:S.events,metrics:S.metrics,tasks:S.tasks,deadlines:S.deadlines,drafts:S.drafts,refs:S.refs,refitems:S.refitems,links:S.links,outbox:S.outbox,pending:S.pending,uploads:S.uploads}[col]||[];const doc=list.find(x=>x.id===id);if(!doc)return;
     const box=b.closest('.gedit'),F=GSPEC[col](doc),upd={};let bad='';
     for(const f of F){const el=box.querySelector('#ge-'+f.k.replace(/[^a-zA-Z0-9_-]/g,c=>'_'+c.charCodeAt(0)));if(!el&&f.t!=='helpers')continue;const raw=el&&'value' in el?el.value:'';
       if(f.t==='owner'){const p=pick(raw);Object.assign(upd,p);if(lc(p.ownerEmail)!==lc(doc.ownerEmail)){upd.notifiedOwner=''}}
@@ -1633,6 +1692,9 @@ document.addEventListener('click',e=>{
     upd.updatedAt=Date.now();b.textContent='Salvo…';
     guard(async()=>{if(col==='pending'&&normCity(upd.city)!==normCity(doc.city)){const c=upd.city?await geocode(upd.city):null;upd.lat=c?c[0]:null;upd.lng=c?c[1]:null;if(upd.city&&!c)showNote('Non trovo "'+upd.city+'" sul globo. Prova a scriverla meglio.')}
       await S.db.collection(col).doc(id).update(upd);S.gedit=null;S.gdraft=null;if(document.activeElement)document.activeElement.blur();fill()});return}
+  if(act==='cbf'){S.cbF.tipo=b.dataset.k;fill();return}
+  if(act==='delcb'){conf('cb:'+id,()=>S.db.collection('collabs').doc(id).delete());return}
+  if(act==='cbnext'){const c=S.collabs.find(x=>x.id===id);if(!c)return;const i=CSTAGES.indexOf(c.stage||'Idea');if(i<0||i>=CSTAGES.length-1)return;guard(()=>S.db.collection('collabs').doc(id).update({stage:CSTAGES[i+1],updatedAt:Date.now()}));return}
   if(act==='stf'){S.stF[b.dataset.f]=b.dataset.k;fill();return}
   if(act==='delst'){conf('st:'+id,()=>S.db.collection('strategies').doc(id).delete());return}
   if(act==='calnav'){const k=b.dataset.k,d=+b.dataset.d;if(!d){S.cal[k]=null}else{const cur=S.cal[k]||ymd(new Date()).slice(0,7);const [Y,M]=cur.split('-').map(Number);const n=new Date(Y,M-1+d,1,12);S.cal[k]=ymd(n).slice(0,7)}fill();return}
@@ -1697,6 +1759,9 @@ document.addEventListener('submit',async e=>{const f=e.target;
         try{up=await toDrive(file,ref&&ref.area,'Reference',(ref?ref.title+' ':'')+note,i===0?tokP:null)}catch(err){showNote(upErr(err));return}
         await guard(()=>S.db.collection('refitems').add({refId,kind:'photo',thumb:th||'',driveUrl:up.url,note,byName:whoName(),createdAt:Date.now()}))}
       f.reset();showNote('')}finally{S.busy=false;busy('ri-btn',false)}}
+  if(f.id==='cbform'){e.preventDefault();const name=$('cb-name').value.trim();if(!name)return;const lk=$('cb-link').value.trim();if(lk&&!safeUrl(lk)){$('cb-link').setCustomValidity('Serve un link che inizia con https://');$('cb-link').reportValidity();return}
+    await guard(()=>S.db.collection('collabs').add({name,tipo:$('cb-tipo').value,title:$('cb-title').value.trim(),idea:$('cb-idea').value,offer:$('cb-offer').value.trim(),ask:$('cb-ask').value.trim(),city:$('cb-city').value.trim(),link:safeUrl(lk),contact:$('cb-contact').value.trim(),when:$('cb-when').value.trim(),prio:$('cb-prio').value,stage:$('cb-stage').value,...pick($('cb-owner').value),byName:whoName(),createdAt:Date.now()}));
+    f.reset();$('cb-add').open=false;fill()}
   if(f.id==='stform'){e.preventDefault();const title=$('st-title').value.trim();if(!title)return;
     await guard(()=>S.db.collection('strategies').add({title,tipo:$('st-tipo').value,metodo:$('st-metodo').value.trim(),orizz:$('st-orizz').value,status:$('st-status').value,desc:$('st-desc').value,goal:$('st-goal').value.trim(),measure:$('st-measure').value.trim(),byName:whoName(),createdAt:Date.now()}));
     f.reset();$('st-add').open=false;fill()}
@@ -1762,6 +1827,7 @@ function startData(){
   sub('events',S.db.collection('events'));
   sub('metrics',S.db.collection('metrics'));
   sub('strategies',S.db.collection('strategies'));
+  sub('collabs',S.db.collection('collabs'));
   unsubs.push(S.db.collection('members').onSnapshot(s=>{S.members=toList(s);const me=S.members.find(m=>lc(m.email)===S.email);S.myCanBrand=!!(me&&me.canBrand);if(me&&me.role)S.myRole=me.role;fill()},()=>{}));
 }
 drawBg();makeGrain();render();
