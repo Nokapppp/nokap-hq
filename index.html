@@ -38,6 +38,9 @@ button{cursor:pointer}
 /* header */
 .top{position:sticky;top:0;z-index:20;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:14px 22px;background:var(--bg)}
 .top::after{content:"";position:absolute;left:0;right:0;top:100%;height:36px;pointer-events:none;background:linear-gradient(var(--bg),rgba(235,234,232,0))}
+.mwrap{justify-self:start;display:flex;flex-direction:column;align-items:flex-start}
+.notelink{font-size:11.5px;font-weight:500;color:var(--mute);margin:-2px 0 0 28px;text-decoration:none}
+.notelink:hover{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
 .menu-btn{justify-self:start;background:none;border:0;padding:6px 0;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700}
 .menu-btn i{display:block;width:18px;height:9px;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);transition:transform .2s}
 .menu-btn[aria-expanded="true"] i{transform:scaleX(.6)}
@@ -388,6 +391,24 @@ a.refl{display:contents}
 .evd{display:flex;flex-direction:column;align-items:center;font-size:11px;text-transform:uppercase;color:var(--mute);line-height:1.1}
 .evd b{font-size:24px;color:var(--ink);text-transform:none}.evd small{font-size:10.5px;margin-top:2px}
 #evnext,#evpast{overflow-x:auto}
+/* ---- note ---- */
+.notegrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:14px;align-items:start}
+.ncard{border:1px solid var(--line);background:rgba(255,255,255,.66);padding:16px 16px 10px;position:relative}
+.ncard.pin{border-top:3px solid var(--red)}
+.ncard h3{font-size:15px;margin:0 22px 6px 0}
+.ncard p{font-size:14px;line-height:1.55;margin:0 0 10px;white-space:normal;word-break:break-word}
+.npin{position:absolute;top:10px;right:10px;background:none;border:0;font-size:16px;color:var(--red);cursor:pointer;padding:0}
+.ncard .gedit{padding:10px 0 0;border:0;background:transparent;min-width:0}
+/* ---- classi ---- */
+.clstbl{border-collapse:collapse;font-size:13px;min-width:980px;width:100%}
+.clstbl th,.clstbl td{padding:9px 8px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
+.clstbl th:first-child,.clstbl td:first-child{text-align:left;position:sticky;left:0;background:#F6F5F3;z-index:1}
+.clstbl thead th{font-size:10.5px;color:var(--mute);font-weight:700;vertical-align:bottom;height:96px}
+.clstbl thead th span{writing-mode:vertical-rl;transform:rotate(180deg);display:inline-block}
+.clstbl thead th:first-child,.clstbl thead th:nth-last-child(2),.clstbl thead th:last-child{writing-mode:initial}
+.clstbl tr.locked td{color:var(--mute)}
+.clstbl .minput{width:140px;margin-left:6px}
+.clstbl input[type=checkbox]{width:16px;height:16px;accent-color:#B91E1A}
 /* ---- livelli / partner ---- */
 header.top .logo{display:flex;align-items:center;gap:14px}
 header.top .logo .cox{font-size:22px;font-weight:300;color:var(--mute)}
@@ -506,7 +527,7 @@ body.partner .wordmark{opacity:.5}
 <div class="grain" id="grain" aria-hidden="true"></div>
 
 <header class="top">
-  <button class="menu-btn" id="menubtn" aria-expanded="false" aria-controls="overlay" type="button"><i></i>Menu</button>
+  <div class="mwrap"><button class="menu-btn" id="menubtn" aria-expanded="false" aria-controls="overlay" type="button"><i></i>Menu</button><a class="notelink" id="notelink" href="#note" hidden>Note</a></div>
   <a class="logo" href="#home" aria-label="NoKap HQ, home"><img src="assets/logo_nokap.png" alt="NoKap" width="160" height="52"></a>
   <a class="hud" href="#scadenze"><span class="lb">Drop 01</span><span class="lb">/</span><span class="cd" id="hudcd">T da definire</span></a>
 </header>
@@ -555,8 +576,8 @@ const KIND_USE=k=>['Post','Carosello','Reel','Story','Caption'].includes(k)?'Soc
 const APPROVER='Gabriele Caponnetto';
 
 const S={tasks:[],links:[],refs:[],drafts:[],deadlines:[],uploads:[],drop:{},drive:{},
-  loaded:{tasks:false,links:false,refs:false,drafts:false,deadlines:false,uploads:false,suppliers:false,mailtpl:false,outbox:false,refitems:false,pending:false,events:false,metrics:false,strategies:false,collabs:false},
-  db:null,user:null,me:null,editingMember:null,reassigning:null,editingTask:null,editingCity:null,gedit:null,events:[],metrics:[],strategies:[],collabs:[],cbF:{tipo:'',owner:''},stF:{tipo:'',metodo:'',orizz:''},cal:{},mkScale:'settimana',gdraft:null,pending:[],globeMode:'italia',editingBrand:false,editingSupplier:null,editingTpl:null,scheduling:null,supCat:'all',supReg:'',suppliers:[],mailtpl:[],outbox:[],refitems:[],brandkit:null,myCanBrand:false,email:'',myName:'',isAdmin:false,members:[],token:null,tokenAt:0,names:{},canWrite:true,
+  loaded:{tasks:false,links:false,refs:false,drafts:false,deadlines:false,uploads:false,suppliers:false,mailtpl:false,outbox:false,refitems:false,pending:false,events:false,metrics:false,strategies:false,collabs:false,notes:false},
+  db:null,user:null,me:null,editingMember:null,reassigning:null,editingTask:null,editingCity:null,gedit:null,events:[],metrics:[],strategies:[],collabs:[],notes:[],ntF:'tutte',clsDraft:null,cbF:{tipo:'',owner:''},stF:{tipo:'',metodo:'',orizz:''},cal:{},mkScale:'settimana',gdraft:null,pending:[],globeMode:'italia',editingBrand:false,editingSupplier:null,editingTpl:null,scheduling:null,supCat:'all',supReg:'',suppliers:[],mailtpl:[],outbox:[],refitems:[],brandkit:null,myCanBrand:false,email:'',myName:'',isAdmin:false,members:[],token:null,tokenAt:0,names:{},canWrite:true,
   taskFilter:'all',refFilter:'all',draftFilter:'attivi',editingLink:null,editingDraft:null,reviewing:null,openBody:{},confirmDel:null,busy:false};
 
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -572,13 +593,22 @@ const fmtLong=d=>isDate(d)?new Date(d+'T00:00:00').toLocaleDateString('it-IT',{w
 const nameOf=id=>id?(S.names[id]||'Qualcuno del team'):'';
 const CFG=window.NOKAP_CONFIG||{};
 const lc=s=>String(s||'').trim().toLowerCase();
-const LEVELS={A:'A · Gestione completa',B:'B · Team',C:'C · Partner',D:'D · Collaboratore'};
-const LVL_AREAS={C:['attivita','scadenze','eventi','collab','testi','file','moodboard','link','dove','brand'],D:['attivita','scadenze','eventi','testi','file','moodboard','link','dove','brand']};
-const effLevel=()=>S.preview?'C':(S.level||'B');
-const isFull=()=>['A','B'].includes(effLevel());
-function allowed(r){const L=effLevel();if(L==='A')return true;if(L==='B')return r!=='team';const A=LVL_AREAS[L]||[];if(r.startsWith('ref-'))return A.includes('moodboard');return A.includes(r)}
-const homeOf=()=>{const L=effLevel();return L==='C'?'collab':L==='D'?'attivita':'home'};
-const myPartnerId=()=>S.preview?S.preview.partnerId:(S.level==='C'?S.myPartnerId:'');
+const SITE_AREAS=[['home','Home'],['attivita','Attività'],['scadenze','Scadenze'],['eventi','Eventi'],['marketing','Marketing'],['collab','Partnership'],['testi','Testi & editoria'],['file','Carica file'],['moodboard','Moodboard'],['link','Link utili'],['dove','Dove siamo'],['fornitori','Fornitori'],['brand','Brand kit']];
+const ALL_AREAS=SITE_AREAS.map(a=>a[0]);
+const DEFAULT_CLASSES={B:{name:'Team',areas:ALL_AREAS,partner:false,order:1},C:{name:'Partner',areas:['attivita','scadenze','eventi','collab','testi','file','moodboard','link','dove','brand'],partner:true,order:2},D:{name:'Collaboratore',areas:['attivita','scadenze','eventi','testi','file','moodboard','link','dove','brand'],partner:false,order:3}};
+const classes=()=>(S.levels&&S.levels.map&&Object.keys(S.levels.map).length)?S.levels.map:DEFAULT_CLASSES;
+const classIds=()=>Object.keys(classes()).sort((a,b)=>(classes()[a].order||99)-(classes()[b].order||99)||a.localeCompare(b));
+const classOf=id=>classes()[id]||classes().B||DEFAULT_CLASSES.B;
+const partnerClassId=()=>(classIds().find(k=>classes()[k].partner))||'C';
+const levelName=id=>id==='A'?'A · Gestione completa':id+' · '+(classOf(id).name||'');
+const effLevel=()=>S.preview?partnerClassId():(S.level||'B');
+const effClass=()=>effLevel()==='A'?{name:'Gestione completa',areas:ALL_AREAS,partner:false}:classOf(effLevel());
+const isPartnerView=()=>!!effClass().partner;
+const isFull=()=>!isPartnerView()&&(effLevel()==='A'||(effClass().areas||[]).includes('collab'));
+const canSee=(...ar)=>effLevel()==='A'||ar.some(x=>(effClass().areas||[]).includes(x));
+function allowed(r){if(r==='note')return true;if(effLevel()==='A')return true;if(r==='team')return false;const A=effClass().areas||[];if(r.startsWith('ref-'))return A.includes('moodboard');if(r.startsWith('area-'))return A.includes('home');return A.includes(r)}
+const homeOf=()=>{if(allowed('home'))return 'home';if(isPartnerView()&&allowed('collab'))return 'collab';return (SITE_AREAS.find(([k])=>allowed(k))||['note'])[0]};
+const myPartnerId=()=>S.preview?S.preview.partnerId:(isPartnerView()?S.myPartnerId:'');
 const myPartner=()=>S.collabs.find(c=>c.id===myPartnerId());
 const canApprove=()=>S.isAdmin||(S.myRole==='Approvatore'&&isFull());
 const canManageTeam=()=>!!S.isAdmin&&!S.preview;
@@ -624,6 +654,7 @@ const GSPEC={
   outbox:o=>[{k:'to',l:'Email',t:'email',v:o.to,w:2},{k:'sendAt',l:'Invio il',t:'datetime',v:o.sendAt},{k:'subject',l:'Oggetto',t:'text',v:o.subject,w:3},{k:'body',l:'Testo',t:'textarea',v:o.body,w:3}],
   pending:p=>[{k:'role',l:'Cosa serve',t:'text',v:p.role,w:2},{k:'city',l:'Città',t:'city',v:p.city},{k:'name',l:'Chi potrebbe coprirla',t:'person',v:p.name},{k:'note',l:'Nota',t:'text',v:p.note,w:2}],
   uploads:u=>[{k:'note',l:'Nota',t:'text',v:u.note,w:3}],
+  notes:n=>[{k:'title',l:'Titolo',t:'text',v:n.title,w:2},{k:'vis',l:'Chi la vede',t:'select',o:NVIS.filter(v=>v[0]!=='team'||!isPartnerView()),v:n.vis||'io'},{k:'body',l:'Nota',t:'textarea',v:n.body,w:3}],
   collabs:c=>[{k:'name',l:'Con chi',t:'text',v:c.name,w:2},{k:'tipo',l:'Tipo',t:'select',o:CTIPI.map(x=>[x,x]),v:c.tipo},{k:'title',l:'Titolo della collab',t:'text',v:c.title,w:2},{k:'stage',l:'Fase',t:'select',o:[...CSTAGES,...COFF].map(x=>[x,x]),v:c.stage||'Idea'},{k:'prio',l:'Priorità',t:'select',o:CPRIO.map(x=>[x,x]),v:c.prio||'Media'},{k:'owner',l:'Chi la segue',t:'owner',v:ownerVal(c)},{k:'idea',l:"L'idea",t:'textarea',v:c.idea,w:3},{k:'offer',l:'Cosa offriamo',t:'text',v:c.offer,w:3},{k:'ask',l:'Cosa chiediamo',t:'text',v:c.ask,w:3},{k:'city',l:'Città',t:'city',v:c.city},{k:'link',l:'Profilo o link',t:'url',v:c.link,w:2},{k:'contact',l:'Contatto',t:'text',v:c.contact,w:2},{k:'when',l:'Quando',t:'text',v:c.when},{k:'durata',l:'Durata',t:'select',o:CDUR.map(x=>[x,x]),v:c.durata||'Breve periodo'},{k:'logo',l:'Logo del partner',t:'logo',v:c.logo},...(S.isAdmin?[{k:'emails',l:'Account partner (email Google, separate da virgola)',t:'emails',v:(c.emails||[]).join(', '),w:3}]:[])],
   strategies:s=>[{k:'title',l:'Titolo',t:'text',v:s.title,w:3},{k:'tipo',l:'Tipologia',t:'select',o:STIPI.map(x=>[x,x]),v:s.tipo},{k:'metodo',l:'Metodologia',t:'metodo',v:s.metodo},{k:'orizz',l:'Orizzonte',t:'select',o:SORIZZ.map(x=>[x,x]),v:s.orizz},{k:'status',l:'Stato',t:'select',o:SSTATI.map(x=>[x,x]),v:s.status||'Proposta'},{k:'desc',l:"L'idea",t:'textarea',v:s.desc,w:3},{k:'goal',l:'Obiettivo',t:'text',v:s.goal,w:3},{k:'measure',l:'Come la misuriamo',t:'text',v:s.measure,w:3}],
   events:e=>[{k:'title',l:'Evento',t:'text',v:e.title,w:2},{k:'kind',l:'Tipo',t:'select',o:EKINDS.map(x=>[x,x]),v:e.kind},{k:'status',l:'Stato',t:'select',o:ESTATUS.map(x=>[x,x]),v:e.status||'Idea'},{k:'date',l:'Data',t:'date',v:e.date,req:1},{k:'time',l:'Ora',t:'time',v:e.time},{k:'city',l:'Città',t:'city',v:e.city},{k:'place',l:'Posto',t:'text',v:e.place},{k:'owner',l:'Responsabile',t:'owner',v:ownerVal(e)},{k:'helpers',l:'Con',t:'helpers',v:(e.helpers||[]).map(h=>h.email)},{k:'link',l:'Link',t:'url',v:e.link,w:2},{k:'attendance',l:'Presenze',t:'number',v:e.attendance},{k:'contacts',l:'Contatti raccolti',t:'number',v:e.contacts},{k:'sold',l:'Pezzi venduti',t:'number',v:e.sold},{k:'note',l:'Note',t:'textarea',v:e.note,w:3}],
@@ -703,7 +734,7 @@ function buildMenu(){
     ${it('brand','Brand kit')}
     ${S.isAdmin&&!S.preview?it('team','Team e accessi'):''}${S.preview?`<li><a href="#collab" data-act="endpreview">Esci dall'anteprima partner</a></li>`:''}
     <li><a href="#home" data-act="logout">Esci<small style="color:var(--mute)">${esc(S.email)}</small></a></li>
-    ${isFull()?`<li class="grp">Aree</li>
+    ${allowed('home')?`<li class="grp">Aree</li>
     <li><ul class="sub">${AREAS.map(a=>{const n=T.filter(t=>t.area===a.id&&t.status!=='done').length;return `<li><a href="#area-${a.id}" class="${r==='area-'+a.id?'on':''}">${esc(a.name)}<small>${esc(a.owner)}${S.loaded.tasks?' · '+n+' aperte':''}</small></a></li>`}).join('')}</ul></li>`:''}
   </ul>`;
 }
@@ -1034,7 +1065,7 @@ const CPRIO=['Alta','Media','Bassa'];
 const CDUR=['Lungo periodo','Breve periodo'];
 const collabTitle=c=>'NoKap × '+(c.name||'…')+(c.title?' – '+c.title:'');
 function viewCollabs(){
-  if(effLevel()==='C'){const p=myPartner();return `${head('Area partner',esc(p?'NoKap × '+p.name:'La nostra collab'),'La scheda della collab che portiamo avanti insieme. Attività, scadenze, eventi e materiali condivisi sono nel menu.')}<section><div id="cbfilters"></div><div id="cbpartner"></div><div id="cbboard"></div><details id="cboff" hidden><summary></summary><div id="cbofflist"></div></details></section>`}
+  if(isPartnerView()){const p=myPartner();return `${head('Area partner',esc(p?'NoKap × '+p.name:'La nostra collab'),'La scheda della collab che portiamo avanti insieme. Attività, scadenze, eventi e materiali condivisi sono nel menu.')}<section><div id="cbfilters"></div><div id="cbpartner"></div><div id="cbboard"></div><details id="cboff" hidden><summary></summary><div id="cbofflist"></div></details></section>`}
   return `${head('Community & Partnership','Partnership','Le collab possibili, dalla prima idea alla firma. NoKap viene sempre per primo: NoKap × Artista – Titolo.')}
     <section><details class="addbox" id="cb-add"><summary class="btn ghost">Nuova collab</summary>
       <form class="form" id="cbform">
@@ -1060,10 +1091,10 @@ function viewCollabs(){
       <div id="cbpartner"></div>
       <div class="cbboard" id="cbboard"></div>
       <details class="cboff" id="cboff"><summary class="note">In pausa o non va</summary><div class="panel" id="cbofflist"></div></details></section>`}
-function partnerSynced(c){const want=(c.emails||[]).map(lc);return want.every(e=>S.members.some(m=>lc(m.email)===e&&m.level==='C'&&m.partnerId===c.id))&&!S.members.some(m=>m.level==='C'&&m.partnerId===c.id&&!want.includes(lc(m.email)))}
+function partnerSynced(c){const want=(c.emails||[]).map(lc);return want.every(e=>S.members.some(m=>lc(m.email)===e&&classOf(m.level).partner&&m.partnerId===c.id))&&!S.members.some(m=>classOf(m.level).partner&&m.partnerId===c.id&&!want.includes(lc(m.email)))}
 async function syncPartner(c){if(!S.isAdmin)return 0;const want=[...new Set((c.emails||[]).map(lc).filter(e=>/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)))];const adm=(CFG.admins||[]).map(lc);const bt=S.db.batch();let n=0;
-  want.forEach(e=>{if(adm.includes(e))return;const old=S.members.find(m=>lc(m.email)===e);if(old&&old.level&&old.level!=='C'&&old.level!=='B')return;if(old&&(old.level||'B')==='B'&&!old.partnerId&&!old.addedAsPartner)return;bt.set(S.db.collection('members').doc(e),{...(old||{}),email:e,name:(old&&old.name)||c.name,role:'Membro',level:'C',partnerId:c.id,addedAsPartner:true,addedBy:S.email,updatedAt:Date.now()});n++});
-  S.members.filter(m=>m.level==='C'&&m.partnerId===c.id&&!want.includes(lc(m.email))).forEach(m=>{bt.delete(S.db.collection('members').doc(lc(m.email)));n++});
+  want.forEach(e=>{if(adm.includes(e))return;const old=S.members.find(m=>lc(m.email)===e);if(old&&old.level&&!classOf(old.level).partner&&old.level!=='B')return;if(old&&(old.level||'B')==='B'&&!old.partnerId&&!old.addedAsPartner)return;bt.set(S.db.collection('members').doc(e),{...(old||{}),email:e,name:(old&&old.name)||c.name,role:'Membro',level:partnerClassId(),partnerId:c.id,addedAsPartner:true,addedBy:S.email,updatedAt:Date.now()});n++});
+  S.members.filter(m=>classOf(m.level).partner&&m.partnerId===c.id&&!want.includes(lc(m.email))).forEach(m=>{bt.delete(S.db.collection('members').doc(lc(m.email)));n++});
   if(n)await bt.commit();return n}
 const logoOf=f=>new Promise((ok,ko)=>{if(!f)return ok('');if(!/^image\//.test(f.type))return ko(new Error('Il logo deve essere un\'immagine'));const u=URL.createObjectURL(f),img=new Image();img.onload=()=>{let w=img.naturalWidth||400,hh=img.naturalHeight||200;const m=420,s=Math.min(1,m/Math.max(w,hh));w=Math.round(w*s);hh=Math.round(hh*s);const c=document.createElement('canvas');c.width=w;c.height=hh;c.getContext('2d').drawImage(img,0,0,w,hh);URL.revokeObjectURL(u);let d=c.toDataURL('image/png');if(d.length>260000)d=c.toDataURL('image/webp',0.9);if(d.length>400000)return ko(new Error('Logo troppo pesante, usane uno più piccolo'));ok(d)};img.onerror=()=>{URL.revokeObjectURL(u);ko(new Error('Non riesco a leggere il logo'))};img.src=u});
 function cbCard(c){const ck='cb:'+c.id,i=CSTAGES.indexOf(c.stage||'Idea'),u=safeUrl(c.link);
@@ -1180,19 +1211,35 @@ function startGlobe(){const wrap=$('globe'),cv=$('globe-c');if(!wrap||!cv||cv.da
       else if(!tip.hidden){tip.hidden=true;tip.dataset.k=''}}
     G.raf=requestAnimationFrame(frame)};
   G.raf=requestAnimationFrame(frame)}
+const NVIS=[['io','Solo io'],['team','Team'],['tutti','Tutti, anche partner e collaboratori']];
+function viewNotes(){
+  return `${head('Appunti','Note','Idee al volo, promemoria, cose da non perdere. Puoi tenerle per te o condividerle.')}
+    <section><form class="form" id="noteform">
+      <label class="wide" for="nt-title">Titolo<input id="nt-title" maxlength="120" placeholder="Facoltativo"></label>
+      <label for="nt-vis">Chi la vede<select id="nt-vis">${NVIS.filter(v=>v[0]!=='team'||!isPartnerView()).map(([k,l])=>`<option value="${k}">${l}</option>`).join('')}</select></label>
+      <label class="full" for="nt-body">Nota<textarea id="nt-body" rows="4" maxlength="6000" required placeholder="Scrivi qui…"></textarea></label>
+      <button class="btn" type="submit" id="nt-btn">Salva nota</button></form>
+      <div class="filters" id="ntfilters" style="margin-top:22px"></div>
+      <div class="notegrid" id="notelist"></div></section>`}
+function noteCard(n){const mine=lc(n.byEmail)===S.email,ck='nt:'+n.id,vis=({io:'Solo io',team:'Team',tutti:'Tutti'})[n.vis]||'Solo io';
+  return `<article class="ncard ${n.pinned?'pin':''}">${mine?`<button class="npin" data-act="ntpin" data-id="${esc(n.id)}" type="button" aria-label="${n.pinned?'Togli dai fissati':'Fissa in alto'}" title="${n.pinned?'Togli dai fissati':'Fissa in alto'}">${n.pinned?'★':'☆'}</button>`:''}
+    ${n.title?`<h3>${esc(n.title)}</h3>`:''}<p>${esc(n.body||'').replace(/\n/g,'<br>')}</p>
+    <div class="stfoot"><span class="note">${mine?'Tu':esc(n.byName||'')} · ${n.updatedAt||n.createdAt?new Date(n.updatedAt||n.createdAt).toLocaleDateString('it-IT',{day:'numeric',month:'short'}):''} · ${esc(vis)}</span><span style="display:flex;gap:8px">${mine?`<button class="linkish" data-act="gedit" data-col="notes" data-id="${esc(n.id)}" type="button">Modifica</button>`:''}${mine||S.isAdmin?`<button class="x ${S.confirmDel===ck?'confirm':''}" data-act="delnote" data-id="${esc(n.id)}" aria-label="Elimina nota">${S.confirmDel===ck?'Ok?':'×'}</button>`:''}</span></div>
+    ${gOpen('notes',n.id)?gEditor('notes',n):''}</article>`}
 function viewTeam(){
   if(!S.isAdmin)return viewHome();
   const mg=canManageTeam();
-  return `${head('Team e accessi','Chi entra in NoKap HQ',mg?'Aggiungi l\'email Google di chi deve entrare e scegli il livello. A: Gabriele e Lorenzo, gestiscono tutto. B: team fidato, tutto tranne gli accessi. C: partner, area ridotta col loro logo. D: collaboratori (foto, video, modelli, PR), senza parte economica e gestione.':'Solo Gabriele può aggiungere, rinominare o togliere persone dal team.')}
+  return `${head('Team e accessi','Chi entra in NoKap HQ',mg?'Aggiungi l\'email Google di chi deve entrare e scegli la classe. Cosa vede ogni classe si decide qui sotto, in Classi di accesso.':'Solo Gabriele può aggiungere, rinominare o togliere persone dal team.')}
     <section>${mg?'':'<!--'}<form class="form" id="memberform">
       <label class="wide" for="mf-email">Email Google<input id="mf-email" type="email" required placeholder="nome@gmail.com"></label>
       <label for="mf-name">Nome<input id="mf-name" maxlength="60" placeholder="Es. Tommaso Carlini"></label>
-      <label for="mf-level">Livello<select id="mf-level"><option value="B">${LEVELS.B}</option><option value="C">${LEVELS.C}</option><option value="D">${LEVELS.D}</option></select></label>
+      <label for="mf-level">Classe<select id="mf-level">${classIds().map(k=>`<option value="${esc(k)}">${esc(levelName(k))}</option>`).join('')}</select></label>
       <label for="mf-role">Ruolo<select id="mf-role"><option>Membro</option><option>Approvatore</option></select></label>
-      <label for="mf-partner">Partner (solo livello C)<select id="mf-partner"><option value="">—</option>${S.collabs.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('')}</select></label>
+      <label for="mf-partner">Partner (solo classi partner)<select id="mf-partner"><option value="">—</option>${S.collabs.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('')}</select></label>
       <button class="btn" type="submit">Aggiungi al team</button>
     </form>${mg?'':'-->'}
     <div class="panel" id="allmembers" style="margin-top:24px"></div></section>
+    ${mg?`<section><div class="sec-head"><h2>Classi di accesso</h2><span class="note">Cosa vede ogni classe. A (Gabriele e Lorenzo) vede sempre tutto e gestisce gli accessi.</span></div><div id="clsedit"></div></section>`:''}
     <section><div class="sec-head"><h2>Dati iniziali</h2></div>
       <div class="box"><p class="note" style="margin:0 0 12px">Importa attività, link, reference e cartella Drive da NoKap HQ. Da fare una volta sola, a database vuoto.</p>
       <button class="btn ghost" id="seedbtn" type="button">Importa dati iniziali</button></div></section>`;
@@ -1327,6 +1374,19 @@ function fillExtra(r){
     const keep=el=>el&&el.contains(document.activeElement)&&/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName);
     if(!keep($('evnext')))$('evnext').innerHTML=!S.loaded.events?'<div class="empty">Carico…</div>':nx.length?nx.map(evRow).join(''):'<div class="empty">Nessun evento in arrivo. Aggiungine uno con "Nuovo evento".</div>';
     if(!keep($('evpast')))$('evpast').innerHTML=ps.length?ps.map(evRow).join(''):'<div class="empty">Ancora nessun evento fatto.</div>'}
+  // note
+  if($('notelist')){const F=S.ntF;const fh=[['tutte','Tutte'],['mie','Mie'],['condivise','Condivise con me']].map(([k,l])=>`<button class="chip ${F===k?'on':''}" data-act="ntf" data-k="${k}" type="button">${l}</button>`).join('');const fx=$('ntfilters');if(fx.dataset.h!==fh){fx.dataset.h=fh;fx.innerHTML=fh}
+    const el=$('notelist');if(!(el.contains(document.activeElement)&&/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName))){
+      const L=S.notes.filter(n=>F==='tutte'||(F==='mie'?lc(n.byEmail)===S.email:lc(n.byEmail)!==S.email)).sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||(b.updatedAt||b.createdAt||0)-(a.updatedAt||a.createdAt||0));
+      el.innerHTML=!S.loaded.notes?'<div class="empty">Carico…</div>':L.length?L.map(noteCard).join(''):'<div class="empty" style="grid-column:1/-1">Nessuna nota qui.</div>'}}
+  // classi di accesso
+  if($('clsedit')){const el=$('clsedit');if(!(el.contains(document.activeElement)&&document.activeElement.tagName==='INPUT'&&document.activeElement.type==='text')){
+    const D=S.clsDraft||JSON.parse(JSON.stringify(classes())),ids=Object.keys(D).sort((a,b)=>(D[a].order||99)-(D[b].order||99)||a.localeCompare(b));const cnt=id=>S.members.filter(m=>(m.level||'B')===id&&!(CFG.admins||[]).map(lc).includes(lc(m.email))).length;
+    el.innerHTML=`<div class="panel" style="overflow-x:auto"><table class="clstbl"><thead><tr><th>Classe</th>${SITE_AREAS.map(([k,l])=>`<th><span>${esc(l)}</span></th>`).join('')}<th><span>Partner</span></th><th>Persone</th><th></th></tr></thead><tbody>
+      <tr class="locked"><td><b>A</b> Gestione completa</td>${SITE_AREAS.map(()=>`<td><input type="checkbox" checked disabled></td>`).join('')}<td><input type="checkbox" disabled></td><td>${(CFG.admins||[]).length}</td><td></td></tr>
+      ${ids.map(id=>{const c=D[id];return `<tr><td><b>${esc(id)}</b> <input type="text" class="minput" data-clsname="${esc(id)}" value="${esc(c.name||'')}" maxlength="40" aria-label="Nome della classe ${esc(id)}"></td>${SITE_AREAS.map(([k,l])=>`<td><input type="checkbox" data-clsarea="${esc(id)}" value="${k}" ${(c.areas||[]).includes(k)?'checked':''} aria-label="${esc(l)} per la classe ${esc(id)}"></td>`).join('')}<td><input type="checkbox" data-clspartner="${esc(id)}" ${c.partner?'checked':''} aria-label="Classe partner ${esc(id)}" title="Vede solo la propria collab, con il doppio logo"></td><td>${cnt(id)}</td><td>${id!=='B'&&!cnt(id)?`<button class="x" data-act="clsdel" data-id="${esc(id)}" type="button" aria-label="Elimina classe ${esc(id)}">×</button>`:''}</td></tr>`}).join('')}</tbody></table></div>
+      <div style="display:flex;gap:16px;align-items:center;margin-top:14px;flex-wrap:wrap"><button class="linkish dark" data-act="clsadd" type="button">+ Aggiungi classe</button>${S.clsDraft?`<button class="btn sm" data-act="clssave" type="button">Salva le classi</button><button class="linkish" data-act="clscancel" type="button">Annulla</button><span class="note">Modifiche non ancora salvate</span>`:''}</div>
+      <p class="note" style="margin-top:10px">Partner: chi è in quella classe vede solo la scheda della propria collab, con il logo NoKap × logo del partner. Le Note le vedono tutti. La gestione degli accessi resta solo alla classe A.</p>`}}
   // partnership
   if($('cbboard')){const F=S.cbF,tipi=[...new Set(S.collabs.map(c=>c.tipo).filter(Boolean))];
     const fh=[['','Tutti'],...CTIPI.filter(t=>tipi.includes(t)).map(t=>[t,t])].map(([k,l])=>`<button class="chip ${F.tipo===k?'on':''}" data-act="cbf" data-k="${esc(k)}" type="button">${esc(l)}</button>`).join('');
@@ -1334,7 +1394,7 @@ function fillExtra(r){
     const busy=el=>el&&el.contains(document.activeElement)&&/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName);
     const P={Alta:0,Media:1,Bassa:2},L=S.collabs.filter(c=>!F.tipo||c.tipo===F.tipo).sort((a,b)=>(P[a.prio]??1)-(P[b.prio]??1)||(b.updatedAt||b.createdAt||0)-(a.updatedAt||a.createdAt||0));
     const pvb=$('cbpartner');
-    if(effLevel()==='C'){fx.innerHTML='';fx.dataset.h='';const ad=$('cb-add');if(ad)ad.hidden=true;$('cboff').hidden=true;const c=myPartner();
+    if(isPartnerView()){fx.innerHTML='';fx.dataset.h='';const ad=$('cb-add');if(ad)ad.hidden=true;$('cboff').hidden=true;const c=myPartner();
       if(!busy(pvb))pvb.innerHTML=!S.loaded.collabs?'<div class="empty">Carico…</div>':c?`<div class="pvbig">${cbCard(c)}</div>`:'<div class="empty">La scheda della vostra collab non è ancora pronta.</div>';$('cbboard').innerHTML='';return}
     if(pvb)pvb.innerHTML='';const ad0=$('cb-add');if(ad0)ad0.hidden=!isFull();
     const bd=$('cbboard');if(!busy(bd))bd.innerHTML=!S.loaded.collabs?'<div class="empty">Carico…</div>':!S.collabs.length?'<div class="empty">Ancora nessuna collab. Aggiungi la prima: anche solo un nome va bene.</div>':CDUR.map(d=>{const D=L.filter(c=>(c.durata||'Breve periodo')===d&&!COFF.includes(c.stage));return `<div class="sec-head" style="margin:26px 0 4px"><h2 style="font-size:14px">${d}</h2><span class="note">${D.length} ${D.length===1?'collab':'collab'}</span></div><div class="cbcols">${CSTAGES.map(s=>{const X=D.filter(c=>(c.stage||'Idea')===s);return `<div class="stcol"><div class="sthead"><b>${s}</b><span class="note">${X.length}</span></div>${X.map(cbCard).join('')||'<div class="cbempty"></div>'}</div>`}).join('')}</div>`}).join('');
@@ -1494,16 +1554,16 @@ function fillInner(){
           ${l.note&&!ed?`<div class="u">${esc(l.note)}</div>`:''}</div>
           <div style="display:flex;gap:8px;align-items:center">${S.canWrite&&!ged?`<button class="linkish" data-act="gedit" data-col="links" data-id="${esc(l.id)}" type="button">Modifica</button><button class="x ${S.confirmDel==='l:'+l.id?'confirm':''}" data-act="dellink2" data-id="${esc(l.id)}" aria-label="Elimina link">${S.confirmDel==='l:'+l.id?'Ok?':'×'}</button>`:''}</div>${ged?gEditor('links',l):''}</div>`}).join('')}</div>`}).join('')||`<div class="empty">Nessun link ancora.</div>`);}
   if($('allmembers')){const admins=(CFG.admins||[]).map(lc);const el=$('allmembers');const mg=canManageTeam();
-    const sig=JSON.stringify(S.members.map(m=>[m.email,m.name,m.role,m.level,m.partnerId,m.canBrand]))+'|'+S.collabs.length+'|'+S.confirmDel+'|'+S.editingMember;
+    const sig=JSON.stringify(S.members.map(m=>[m.email,m.name,m.role,m.level,m.partnerId,m.canBrand]))+'|'+S.collabs.length+'|'+JSON.stringify(classes())+'|'+S.confirmDel+'|'+S.editingMember;
     if(el.dataset.sig!==sig&&!(el.contains(document.activeElement)&&/INPUT|SELECT/.test(document.activeElement.tagName))){el.dataset.sig=sig;
     const rows=[...S.members,...admins.filter(e=>!S.members.some(m=>lc(m.email)===e)).map(e=>({email:e,name:'',role:'Approvatore',virtual:true}))].sort((a,b)=>(a.name||a.email).localeCompare(b.name||b.email));
     el.innerHTML=rows.length?`<div class="mrow tr head" style="display:grid"><span>Nome</span><span>Email</span><span>Livello e ruolo</span><span></span></div>`+rows.map(m=>{const ck='m:'+m.email,k=esc(m.email),adm=admins.includes(lc(m.email)),ed=mg&&S.editingMember===m.email;
       if(ed)return `<div class="mrow"><span><input class="minput" data-mname="${k}" value="${esc(m.name||'')}" maxlength="60" placeholder="Nome e cognome" aria-label="Nome per ${k}"></span>
         <span class="note" style="word-break:break-all">${k}</span>
-        <span style="display:flex;flex-direction:column;gap:6px">${adm?`<span class="note">${LEVELS.A}</span>`:`<select class="osel" data-mlevel="${k}" aria-label="Livello di ${k}">${['B','C','D'].map(l=>`<option value="${l}" ${(m.level||'B')===l?'selected':''}>${LEVELS[l]}</option>`).join('')}</select><select class="osel" data-mpartner="${k}" aria-label="Partner di ${k}"><option value="">Partner (solo C)</option>${S.collabs.map(c=>`<option value="${esc(c.id)}" ${m.partnerId===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select>`}<select class="osel" data-mrole="${k}" aria-label="Ruolo di ${k}"><option ${m.role!=='Approvatore'?'selected':''}>Membro</option><option ${m.role==='Approvatore'?'selected':''}>Approvatore</option></select><label class="note" style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-mbrand="${k}" ${m.canBrand?'checked':''}> Brand kit</label></span>
+        <span style="display:flex;flex-direction:column;gap:6px">${adm?`<span class="note">${levelName('A')}</span>`:`<select class="osel" data-mlevel="${k}" aria-label="Classe di ${k}">${classIds().map(l=>`<option value="${esc(l)}" ${(m.level||'B')===l?'selected':''}>${esc(levelName(l))}</option>`).join('')}</select><select class="osel" data-mpartner="${k}" aria-label="Partner di ${k}"><option value="">Partner (solo classi partner)</option>${S.collabs.map(c=>`<option value="${esc(c.id)}" ${m.partnerId===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select>`}<select class="osel" data-mrole="${k}" aria-label="Ruolo di ${k}"><option ${m.role!=='Approvatore'?'selected':''}>Membro</option><option ${m.role==='Approvatore'?'selected':''}>Approvatore</option></select><label class="note" style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-mbrand="${k}" ${m.canBrand?'checked':''}> Brand kit</label></span>
         <span style="display:flex;gap:10px;align-items:center"><button class="linkish dark" data-act="savemember" data-id="${k}" type="button">Salva</button><button class="linkish" data-act="cancelmember" type="button">Annulla</button></span></div>`;
       return `<div class="mrow"><span style="font-weight:700">${esc(m.name||'—')}${adm?'<small class="ntf" style="color:var(--mute)">amministratore</small>':''}</span>
-        <span class="note" style="word-break:break-all">${k}</span><span class="note">${adm?LEVELS.A:LEVELS[m.level||'B']}${m.level==='C'&&m.partnerId?' · '+esc((S.collabs.find(c=>c.id===m.partnerId)||{}).name||'partner'):''}<br>${esc(m.role||'Membro')}${m.canBrand?' · brand kit':''}</span>
+        <span class="note" style="word-break:break-all">${k}</span><span class="note">${esc(levelName(adm?'A':(m.level||'B')))}${classOf(m.level).partner&&m.partnerId?' · '+esc((S.collabs.find(c=>c.id===m.partnerId)||{}).name||'partner'):''}<br>${esc(m.role||'Membro')}${m.canBrand?' · brand kit':''}</span>
         <span style="display:flex;gap:10px;align-items:center;justify-content:end">${mg?`<button class="linkish" data-act="editmember" data-id="${k}" type="button">Modifica</button>${adm||m.virtual?'':`<button class="x ${S.confirmDel===ck?'confirm':''}" data-act="delmember" data-id="${k}" aria-label="Rimuovi dal team">${S.confirmDel===ck?'Ok?':'×'}</button>`}`:''}</span></div>`}).join(''):`<div class="empty">Nessun membro.</div>`}}
   ['tf-owner','df-owner','dr-author'].forEach(id=>{const el=$(id);if(el&&document.activeElement!==el&&el.dataset.n!==String(S.members.length)){const v=el.value;el.innerHTML=teamOpts(v);el.dataset.n=String(S.members.length)}});
   const myT=open.filter(mine);
@@ -1519,18 +1579,18 @@ async function resolveNames(){return;
   if(!ids.length)return;nameReq=true;
   try{const ps=await S.user.profiles(ids);let ch=false;ids.forEach(id=>{const n=ps&&ps[id]&&ps[id].name;S.names[id]=n||'Qualcuno del team';ch=true});nameReq=false;if(ch)fill()}catch(_){nameReq=false}
 }
-function updateChrome(){const lg=document.querySelector('header.top .logo');if(!lg)return;const p=effLevel()==='C'?myPartner():null,logo=p&&p.logo&&/^data:image\//.test(p.logo)?p.logo:'';
+function updateChrome(){const nl=$('notelink');if(nl)nl.hidden=!(S.email&&route()===homeOf());const lg=document.querySelector('header.top .logo');if(!lg)return;const p=isPartnerView()?myPartner():null,logo=p&&p.logo&&/^data:image\//.test(p.logo)?p.logo:'';
   const key=(p?p.id+':'+(logo?logo.length:0):'')+'|'+(S.preview?'pv':'');if(lg.dataset.k===key)return;lg.dataset.k=key;
   lg.href='#'+homeOf();
   lg.innerHTML=logo?`<img src="assets/logo_nokap.png" alt="NoKap" width="160" height="52"><span class="cox" aria-hidden="true">×</span><img class="plogo" src="${logo}" alt="${esc(p.name||'Partner')}">`:`<img src="assets/logo_nokap.png" alt="NoKap" width="160" height="52">`;
-  document.body.classList.toggle('partner',effLevel()==='C');document.body.classList.toggle('cobrand',!!logo);
-  let bar=$('pbar');if(effLevel()==='C'){if(!bar){bar=document.createElement('div');bar.id='pbar';bar.className='pbar';document.body.appendChild(bar)}
+  document.body.classList.toggle('partner',isPartnerView());document.body.classList.toggle('cobrand',!!logo);
+  let bar=$('pbar');if(isPartnerView()){if(!bar){bar=document.createElement('div');bar.id='pbar';bar.className='pbar';document.body.appendChild(bar)}
     bar.innerHTML=`<span>Area partner${p?' · <b>NoKap × '+esc(p.name)+'</b>':''}</span>${S.preview?`<button type="button" class="linkish" data-act="endpreview">Esci dall'anteprima</button>`:''}`}else if(bar)bar.remove()}
 function render(){
   const r=route();let h;
-  if(S.db&&S.email&&!allowed(r.startsWith('area-')?(isFull()?r:'x'):r)){location.replace('#'+homeOf());return}
+  if(S.db&&S.email&&!allowed(r)){location.replace('#'+homeOf());return}
   updateChrome();
-  const V={collab:viewCollabs,eventi:viewEvents,marketing:viewMarketing,dove:viewDove,fornitori:viewSuppliers,team:viewTeam,attivita:viewTasks,scadenze:viewDeadlines,testi:viewTexts,file:viewFiles,moodboard:viewMood,link:viewLinks,brand:viewBrand};
+  const V={note:viewNotes,collab:viewCollabs,eventi:viewEvents,marketing:viewMarketing,dove:viewDove,fornitori:viewSuppliers,team:viewTeam,attivita:viewTasks,scadenze:viewDeadlines,testi:viewTexts,file:viewFiles,moodboard:viewMood,link:viewLinks,brand:viewBrand};
   h=V[r]?V[r]():r.startsWith('area-')?viewArea(r.slice(5)):r.startsWith('ref-')?viewRef(r.slice(4)):viewHome();
   $('main').innerHTML=h;window.scrollTo(0,0);S.confirmDel=null;S.editingTask=null;S.gedit=null;S.gdraft=null;S.editingCity=null;S.editingBrand=false;S.editingSupplier=null;S.editingTpl=null;S.scheduling=null;S.editingLink=null;S.editingDraft=null;S.reviewing=null;setMenu(false);fill();showNote();
 }
@@ -1615,7 +1675,7 @@ document.addEventListener('click',e=>{
   const em2=e.target.closest('[data-act="editmember"]');if(em2&&canManageTeam()){S.editingMember=em2.dataset.id;fill();const i=document.querySelector(`[data-mname="${CSS.escape(S.editingMember)}"]`);if(i)i.focus();return}
   if(e.target.closest('[data-act="cancelmember"]')){S.editingMember=null;fill();return}
   const sm=e.target.closest('[data-act="savemember"]');if(sm&&canManageTeam()){S.editingMember=null;const em=sm.dataset.id,ni=document.querySelector(`[data-mname="${CSS.escape(em)}"]`),ro=document.querySelector(`[data-mrole="${CSS.escape(em)}"]`);
-    const lvEl=document.querySelector(`[data-mlevel="${CSS.escape(em)}"]`),pEl=document.querySelector(`[data-mpartner="${CSS.escape(em)}"]`),level=lvEl?lvEl.value:'B',partnerId=level==='C'&&pEl?pEl.value:'';if(level==='C'&&!partnerId){showNote('Per il livello C scegli il partner.');return}
+    const lvEl=document.querySelector(`[data-mlevel="${CSS.escape(em)}"]`),pEl=document.querySelector(`[data-mpartner="${CSS.escape(em)}"]`),level=lvEl?lvEl.value:'B',partnerId=classOf(level).partner&&pEl?pEl.value:'';if(classOf(level).partner&&!partnerId){showNote('Per una classe partner scegli il partner.');return}
     const name=(ni&&ni.value.trim())||'',role=(ro&&ro.value)||'Membro',bk=document.querySelector(`[data-mbrand="${CSS.escape(em)}"]`),canBrand=!!(bk&&bk.checked);
     guard(async()=>{const ref=S.db.collection('members').doc(lc(em));const old=S.members.find(m=>lc(m.email)===lc(em));
       await ref.set({...(old||{}),email:lc(em),name,role,canBrand,...((CFG.admins||[]).map(lc).includes(lc(em))?{}:{level,partnerId}),updatedAt:Date.now()});
@@ -1656,7 +1716,7 @@ function busy(btnId,on,label){const b=$(btnId);if(!b)return;b.disabled=on;if(on)
 document.addEventListener('submit',async e=>{
   e.preventDefault();const f=e.target;
   if(f.id==='memberform'&&canManageTeam()){const em=lc($('mf-email').value);if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em))return;
-    await guard(async()=>{const name=$('mf-name').value.trim();const lv=$('mf-level').value,pid=lv==='C'?$('mf-partner').value:'';if(lv==='C'&&!pid){showNote('Per il livello C scegli il partner.');return}await S.db.collection('members').doc(em).set({email:em,name,role:lv==='B'?$('mf-role').value:'Membro',level:lv,partnerId:pid,addedBy:S.email,createdAt:Date.now()});
+    await guard(async()=>{const name=$('mf-name').value.trim();const lv=$('mf-level').value,isP=classOf(lv).partner,pid=isP?$('mf-partner').value:'';if(isP&&!pid){showNote('Per una classe partner scegli il partner.');return}await S.db.collection('members').doc(em).set({email:em,name,role:isP?'Membro':$('mf-role').value,level:lv,partnerId:pid,addedBy:S.email,createdAt:Date.now()});
       if(name){const b=S.db.batch();let n=0;[['tasks',S.tasks],['deadlines',S.deadlines]].forEach(([c,L])=>L.filter(t=>!t.ownerEmail&&lc(t.owner)===lc(name)).forEach(t=>{b.update(S.db.collection(c).doc(t.id),{ownerEmail:em});n++}));if(n){await b.commit();showNote(n+' attività già assegnate a '+name+' ora sono collegate alla sua email.')}}
       f.reset()});}
   if(f.id==='taskform'){const title=$('tf-title').value.trim();if(!title)return;
@@ -1707,6 +1767,8 @@ document.addEventListener('change',async e=>{if(e.target.id!=='mk-file')return;c
   catch(err){note.textContent='Non riesco a leggere il file: '+(err.message||err)}finally{e.target.value=''}});
 document.addEventListener('mouseover',e=>{const t=e.target.closest&&e.target.closest('.mkhit'),tip=$('mktip');if(!tip)return;if(!t){tip.hidden=true;return}tip.innerHTML=t.getAttribute('data-tip');tip.hidden=false});
 document.addEventListener('mousemove',e=>{const tip=$('mktip');if(!tip||tip.hidden)return;const w=tip.offsetWidth;tip.style.left=Math.min(window.innerWidth-w-8,e.clientX+14)+'px';tip.style.top=(e.clientY-tip.offsetHeight-10)+'px'});
+document.addEventListener('change',e=>{const t=e.target;if(!t.dataset)return;if(t.dataset.clsarea||t.dataset.clspartner){const D=S.clsDraft||JSON.parse(JSON.stringify(classes()));if(t.dataset.clsarea){const c=D[t.dataset.clsarea];if(!c)return;const s=new Set(c.areas||[]);t.checked?s.add(t.value):s.delete(t.value);c.areas=[...s]}else{const c=D[t.dataset.clspartner];if(c)c.partner=t.checked}S.clsDraft=D;fill()}});
+document.addEventListener('input',e=>{const t=e.target;if(t.dataset&&t.dataset.clsname){const D=S.clsDraft||JSON.parse(JSON.stringify(classes()));if(D[t.dataset.clsname]){D[t.dataset.clsname].name=t.value;const was=!S.clsDraft;S.clsDraft=D;if(was)fill()}}});
 document.addEventListener('change',e=>{
   const m=e.target.closest('details.multi');if(m){const n=m.querySelectorAll('input:checked').length;m.querySelector('summary').textContent=n?n+' persone':'Nessuno'}
   if(e.target.id==='st-fmetodo'){S.stF.metodo=e.target.value;fill()}
@@ -1719,7 +1781,7 @@ document.addEventListener('click',e=>{
   if(act==='gedit'){const col=b.dataset.col;if(col==='outbox'&&!canApprove())return;S.gedit=col+':'+id;S.gdraft={};S.editingTask=null;S.reviewing=null;fill();const f=document.querySelector('.gedit [data-gf]');if(f)f.focus({preventScroll:true});return}
   if(act==='gcancel'){S.gedit=null;S.gdraft=null;if(document.activeElement)document.activeElement.blur();fill();return}
   if(act==='dellink2'){conf('l:'+id,()=>S.db.collection('links').doc(id).delete());return}
-  if(act==='gsave'){const col=b.dataset.col,list={collabs:S.collabs,strategies:S.strategies,events:S.events,metrics:S.metrics,tasks:S.tasks,deadlines:S.deadlines,drafts:S.drafts,refs:S.refs,refitems:S.refitems,links:S.links,outbox:S.outbox,pending:S.pending,uploads:S.uploads}[col]||[];const doc=list.find(x=>x.id===id);if(!doc)return;
+  if(act==='gsave'){const col=b.dataset.col,list={notes:S.notes,collabs:S.collabs,strategies:S.strategies,events:S.events,metrics:S.metrics,tasks:S.tasks,deadlines:S.deadlines,drafts:S.drafts,refs:S.refs,refitems:S.refitems,links:S.links,outbox:S.outbox,pending:S.pending,uploads:S.uploads}[col]||[];const doc=list.find(x=>x.id===id);if(!doc)return;
     const box=b.closest('.gedit'),F=GSPEC[col](doc),upd={};let bad='',logoFile=null;
     for(const f of F){const el=box.querySelector('#ge-'+f.k.replace(/[^a-zA-Z0-9_-]/g,c=>'_'+c.charCodeAt(0)));if(!el&&f.t!=='helpers')continue;const raw=el&&'value' in el?el.value:'';
       if(f.t==='owner'){const p=pick(raw);Object.assign(upd,p);if(lc(p.ownerEmail)!==lc(doc.ownerEmail)){upd.notifiedOwner=''}}
@@ -1745,6 +1807,15 @@ document.addEventListener('click',e=>{
     guard(async()=>{if(col==='pending'&&normCity(upd.city)!==normCity(doc.city)){const c=upd.city?await geocode(upd.city):null;upd.lat=c?c[0]:null;upd.lng=c?c[1]:null;if(upd.city&&!c)showNote('Non trovo "'+upd.city+'" sul globo. Prova a scriverla meglio.')}
       if(logoFile)upd.logo=await logoOf(logoFile);
       await S.db.collection(col).doc(id).update(upd);if(col==='collabs'&&S.isAdmin&&'emails' in upd){const n=await syncPartner({...doc,...upd,id});if(n)showNote('Accessi partner aggiornati.')}S.gedit=null;S.gdraft=null;if(document.activeElement)document.activeElement.blur();fill()});return}
+  if(act==='ntf'){S.ntF=b.dataset.k;fill();return}
+  if(act==='ntpin'){const n=S.notes.find(x=>x.id===id);if(n)guard(()=>S.db.collection('notes').doc(id).update({pinned:!n.pinned}));return}
+  if(act==='delnote'){conf('nt:'+id,()=>S.db.collection('notes').doc(id).delete());return}
+  if(act==='clsadd'){const D=S.clsDraft||JSON.parse(JSON.stringify(classes()));let c=69;while(D[String.fromCharCode(c)]||String.fromCharCode(c)==='A')c++;const id=String.fromCharCode(c);D[id]={name:'Nuova classe',areas:['attivita','scadenze','eventi'],partner:false,order:Object.keys(D).length+1};S.clsDraft=D;fill();return}
+  if(act==='clsdel'){const D=S.clsDraft||JSON.parse(JSON.stringify(classes()));delete D[id];S.clsDraft=D;fill();return}
+  if(act==='clscancel'){S.clsDraft=null;fill();return}
+  if(act==='clssave'&&S.isAdmin){const D=S.clsDraft;if(!D)return;if(!D.B){showNote('La classe B non si può togliere.');return}
+    Object.keys(D).forEach(k=>{D[k].areas=SITE_AREAS.map(a=>a[0]).filter(a=>(D[k].areas||[]).includes(a));D[k].name=String(D[k].name||k).slice(0,40);D[k].partner=!!D[k].partner});
+    guard(async()=>{await S.db.collection('config').doc('levels').set({map:D,updatedAt:Date.now(),updatedBy:S.email});S.clsDraft=null;fill();showNote('Classi salvate. Chi è collegato vede le modifiche al prossimo caricamento.')});return}
   if(act==='cbpreview'){S.preview={partnerId:id};location.hash='#collab';setTimeout(()=>{updateChrome();render()},30);return}
   if(act==='endpreview'){e.preventDefault();S.preview=null;const lg=document.querySelector('header.top .logo');if(lg)lg.dataset.k='';location.hash='#collab';updateChrome();render();return}
   if(act==='cbsync'){const c=S.collabs.find(x=>x.id===id);if(c)guard(async()=>{const n=await syncPartner(c);showNote(n?'Accessi partner attivati.':'Niente da cambiare.');fill()});return}
@@ -1815,6 +1886,8 @@ document.addEventListener('submit',async e=>{const f=e.target;
         try{up=await toDrive(file,ref&&ref.area,'Reference',(ref?ref.title+' ':'')+note,i===0?tokP:null)}catch(err){showNote(upErr(err));return}
         await guard(()=>S.db.collection('refitems').add({refId,kind:'photo',thumb:th||'',driveUrl:up.url,note,byName:whoName(),createdAt:Date.now()}))}
       f.reset();showNote('')}finally{S.busy=false;busy('ri-btn',false)}}
+  if(f.id==='noteform'){e.preventDefault();const body=$('nt-body').value;if(!body.trim())return;
+    await guard(()=>S.db.collection('notes').add({title:$('nt-title').value.trim(),body,vis:$('nt-vis').value,pinned:false,byEmail:S.email,byName:whoName(),createdAt:Date.now(),updatedAt:Date.now()}));f.reset();fill()}
   if(f.id==='cbform'){e.preventDefault();const name=$('cb-name').value.trim();if(!name)return;const lk=$('cb-link').value.trim();if(lk&&!safeUrl(lk)){$('cb-link').setCustomValidity('Serve un link che inizia con https://');$('cb-link').reportValidity();return}
     const ems=S.isAdmin&&$('cb-emails')?[...new Set($('cb-emails').value.split(/[,;\s]+/).map(s=>lc(s.trim())).filter(s=>/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(s)))]:[];
     let logo='';try{logo=await logoOf($('cb-logo').files[0])}catch(err){showNote(err.message);return}
@@ -1866,27 +1939,38 @@ async function importSeed(){
 let unsubs=[];
 function startData(){
   const timer=setTimeout(()=>{if(!S.loaded.tasks)showNote('I dati non sono ancora raggiungibili. Controlla la connessione: la pagina si aggiorna da sola.')},10000);
-  const onErr=e=>{clearTimeout(timer);showNote(e&&e.code==='permission-denied'?'Non hai accesso ai dati del team. Chiedi a Lorenzo di aggiungerti.':'Collegamento ai dati interrotto. Ricarica la pagina.')};
+  const onErr=e=>{clearTimeout(timer);showNote(e&&e.code==='permission-denied'?'Non hai accesso ad alcuni dati. Se ti serve, chiedi a Gabriele o Lorenzo.':'Collegamento ai dati interrotto. Ricarica la pagina.')};
   const toList=s=>s.docs.map(d=>({id:d.id,...d.data()}));
-  const sub=(name,q)=>unsubs.push(q.onSnapshot({includeMetadataChanges:false},s=>{S[name]=toList(s);S.loaded[name]=true;if(name==='tasks'){clearTimeout(timer);showNote('')}fill()},onErr));
-  sub('tasks',S.db.collection('tasks'));
-  sub('links',S.db.collection('links'));
-  sub('refs',S.db.collection('refs').orderBy('createdAt','desc'));
-  sub('drafts',S.db.collection('drafts'));
-  sub('deadlines',S.db.collection('deadlines'));
-  sub('uploads',S.db.collection('uploads').orderBy('createdAt','desc').limit(60));
+  const skip=name=>{S[name]=[];S.loaded[name]=true};
+  const sub=(name,q,...areas)=>{if(areas.length&&!canSee(...areas)){skip(name);return}unsubs.push(q.onSnapshot({includeMetadataChanges:false},s=>{S[name]=toList(s);S.loaded[name]=true;if(name==='tasks'){clearTimeout(timer);showNote('')}fill()},onErr))};
+  if(!canSee('attivita','scadenze','home'))clearTimeout(timer);
+  sub('tasks',S.db.collection('tasks'),'attivita','scadenze','home');
+  sub('links',S.db.collection('links'),'link');
+  sub('refs',S.db.collection('refs').orderBy('createdAt','desc'),'moodboard');
+  sub('drafts',S.db.collection('drafts'),'testi','scadenze','home');
+  sub('deadlines',S.db.collection('deadlines'),'scadenze','home');
+  sub('uploads',S.db.collection('uploads').orderBy('createdAt','desc').limit(60),'file','home');
   unsubs.push(S.db.collection('config').doc('drop').onSnapshot(s=>{S.drop=s.exists?s.data():{};fill()},()=>{}));
   unsubs.push(S.db.collection('config').doc('drive').onSnapshot(s=>{S.drive=s.exists?s.data():{};fill()},()=>{}));
-  unsubs.push(S.db.collection('config').doc('brandkit').onSnapshot(s=>{S.brandkit=s.exists?s.data():null;fill()},()=>{}));
-  const full=S.level==='A'||S.level==='B';
-  if(full){sub('suppliers',S.db.collection('suppliers'));sub('mailtpl',S.db.collection('mailtpl'));sub('outbox',S.db.collection('outbox').orderBy('sendAt','desc').limit(150))}
-  sub('refitems',S.db.collection('refitems'));
-  sub('pending',S.db.collection('pending'));
-  sub('events',S.db.collection('events'));
-  if(full){sub('metrics',S.db.collection('metrics'));sub('strategies',S.db.collection('strategies'));sub('collabs',S.db.collection('collabs'))}
-  else if(S.level==='C'&&S.myPartnerId){unsubs.push(S.db.collection('collabs').doc(S.myPartnerId).onSnapshot(s=>{S.collabs=s.exists?[{id:s.id,...s.data()}]:[];S.loaded.collabs=true;updateChrome();fill()},()=>{S.loaded.collabs=true;fill()}))}
-  else S.loaded.collabs=true;
-  unsubs.push(S.db.collection('members').onSnapshot(s=>{S.members=toList(s);const me=S.members.find(m=>lc(m.email)===S.email);S.myCanBrand=!!(me&&me.canBrand);if(me&&me.role)S.myRole=me.role;if(me&&!S.isAdmin){const nl=['B','C','D'].includes(me.level)?me.level:'B';if(nl!==S.level||(me.partnerId||'')!==(S.myPartnerId||'')){location.reload();return}}fill()},()=>{}));
+  if(canSee('brand'))unsubs.push(S.db.collection('config').doc('brandkit').onSnapshot(s=>{S.brandkit=s.exists?s.data():null;fill()},()=>{}));
+  const levSig=()=>JSON.stringify(effClass());let mySig=levSig();
+  unsubs.push(S.db.collection('config').doc('levels').onSnapshot(s=>{S.levels=s.exists?s.data():null;if(!s.exists&&S.isAdmin){S.db.collection('config').doc('levels').set({map:DEFAULT_CLASSES,updatedAt:Date.now(),updatedBy:S.email}).catch(()=>{})}if(!S.isAdmin&&levSig()!==mySig){location.reload();return}mySig=levSig();updateChrome();fill()},()=>{}));
+  sub('suppliers',S.db.collection('suppliers'),'fornitori');
+  if(canSee('fornitori')&&!isPartnerView()){sub('mailtpl',S.db.collection('mailtpl'));sub('outbox',S.db.collection('outbox').orderBy('sendAt','desc').limit(150))}else{skip('mailtpl');skip('outbox')}
+  sub('refitems',S.db.collection('refitems'),'moodboard');
+  sub('pending',S.db.collection('pending'),'dove');
+  sub('events',S.db.collection('events'),'eventi','scadenze','home');
+  sub('metrics',S.db.collection('metrics'),'marketing');
+  sub('strategies',S.db.collection('strategies'),'marketing');
+  if(canSee('collab')&&!isPartnerView())sub('collabs',S.db.collection('collabs'));
+  else if(isPartnerView()&&S.myPartnerId&&canSee('collab')){unsubs.push(S.db.collection('collabs').doc(S.myPartnerId).onSnapshot(s=>{S.collabs=s.exists?[{id:s.id,...s.data()}]:[];S.loaded.collabs=true;updateChrome();fill()},()=>{S.loaded.collabs=true;fill()}))}
+  else skip('collabs');
+  // note: mie + condivise
+  const NB={};const nset=(k,L)=>{NB[k]=L;const m=new Map();Object.values(NB).flat().forEach(n=>m.set(n.id,n));S.notes=[...m.values()];S.loaded.notes=true;fill()};
+  unsubs.push(S.db.collection('notes').where('byEmail','==',S.email).onSnapshot(s=>nset('mie',toList(s)),()=>nset('mie',[])));
+  unsubs.push(S.db.collection('notes').where('vis','==','tutti').onSnapshot(s=>nset('tutti',toList(s)),()=>nset('tutti',[])));
+  if(!isPartnerView())unsubs.push(S.db.collection('notes').where('vis','==','team').onSnapshot(s=>nset('team',toList(s)),()=>nset('team',[])));
+  unsubs.push(S.db.collection('members').onSnapshot(s=>{S.members=toList(s);const me=S.members.find(m=>lc(m.email)===S.email);S.myCanBrand=!!(me&&me.canBrand);if(me&&me.role)S.myRole=me.role;if(me&&!S.isAdmin){const nl=me.level||'B';if(nl!==S.level||(me.partnerId||'')!==(S.myPartnerId||'')){location.reload();return}}fill()},()=>{}));
 }
 drawBg();makeGrain();render();
 (function boot(){
@@ -1902,8 +1986,9 @@ drawBg();makeGrain();render();
     S.me=u.uid;S.email=lc(u.email);S.myName=u.displayName||'';S.names[u.uid]=S.myName;
     S.isAdmin=(CFG.admins||[]).map(lc).includes(S.email);S.level=S.isAdmin?'A':'B';S.preview=null;
     let member=S.isAdmin;
-    if(!member){try{const d=await S.db.collection('members').doc(S.email).get();member=d.exists;if(member){const m=d.data();if(m.name)S.myName=m.name;S.myRole=m.role||'Membro';S.level=['B','C','D'].includes(m.level)?m.level:'B';S.myPartnerId=m.partnerId||''}}catch(_){member=false}}
+    if(!member){try{const d=await S.db.collection('members').doc(S.email).get();member=d.exists;if(member){const m=d.data();if(m.name)S.myName=m.name;S.myRole=m.role||'Membro';S.level=m.level||'B';S.myPartnerId=m.partnerId||''}}catch(_){member=false}}
     if(!member){gate(true,'Non sei ancora nel team','Hai fatto l\'accesso come '+S.email+'. Chiedi a Lorenzo di aggiungere questa email in "Team e accessi", poi ricarica la pagina.',false,true);return}
+    try{const lv=await S.db.collection('config').doc('levels').get();S.levels=lv.exists?lv.data():null}catch(_){S.levels=null}
     gate(false);S.canWrite=true;render();startData();
   });
 })();

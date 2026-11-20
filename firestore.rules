@@ -1,9 +1,8 @@
 rules_version = '2';
 // NoKap HQ – chi può leggere e scrivere.
-// Livelli: A = Gabriele e Lorenzo (gestiscono tutto, accessi compresi)
-//          B = team fidato (tutto tranne gli accessi)
-//          C = partner (area ridotta: solo la propria collab, niente marketing né fornitori)
-//          D = collaboratori (foto, video, modelli, PR: niente marketing, fornitori, partnership)
+// Classi: A = Gabriele e Lorenzo (tutto, accessi compresi). Le altre classi (B, C, D, …)
+// e le aree che vedono si decidono dal sito, in Team e accessi → Classi di accesso
+// (documento config/levels). Queste regole leggono la stessa configurazione.
 // Gli amministratori (A) devono essere gli stessi di firebase-config.js.
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -13,13 +12,15 @@ service cloud.firestore {
     function memberDoc() { return /databases/$(database)/documents/members/$(email()); }
     function isMember() { return isAdmin() || (signedIn() && exists(memberDoc())); }
     function me() { return get(memberDoc()).data; }
-    function level() { return isAdmin() ? 'A' : me().get('level', 'B'); }
-    function full() { return isMember() && level() in ['A', 'B']; }
+    function cls() { return get(/databases/$(database)/documents/config/levels).data.map[me().get('level', 'B')]; }
+    // L'utente vede almeno una di queste aree.
+    function can(areas) { return isAdmin() || (isMember() && cls().areas.hasAny(areas)); }
+    function isPartnerCls() { return !isAdmin() && cls().get('partner', false) == true; }
     function partnerId() { return me().get('partnerId', ''); }
-    function canApprove() { return isAdmin() || (full() && me().role == 'Approvatore'); }
-    function canBrand() { return isAdmin() || (full() && me().get('canBrand', false) == true); }
+    function canApprove() { return isAdmin() || (isMember() && !isPartnerCls() && me().role == 'Approvatore'); }
+    function canBrand() { return isAdmin() || (can(['brand']) && me().get('canBrand', false) == true); }
 
-    // Elenco del team: lo leggono tutti i membri, gli accessi li gestiscono solo Gabriele e Lorenzo (A).
+    // Elenco del team: lo leggono tutti i membri, gli accessi li gestisce solo la classe A.
     match /members/{mail} {
       allow read: if isMember() || (signedIn() && email() == mail);
       allow write: if isAdmin();
@@ -28,48 +29,55 @@ service cloud.firestore {
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['city', 'lat', 'lng', 'cityAt']);
     }
 
-    // Bozze: tutti i membri le creano e modificano, ma solo gli approvatori (A o B) le approvano.
+    // Configurazione: classi di accesso (solo A), brand kit, data del drop, cartella Drive.
+    match /config/levels { allow read: if isMember(); allow write: if isAdmin(); }
+    match /config/brandkit { allow read: if can(['brand']); allow write: if canBrand(); }
+    match /config/{id} {
+      allow read: if isMember();
+      allow write: if isAdmin() || (id == 'drop' && can(['home']));
+    }
+
+    // Note: proprie, del team (non partner) o di tutti.
+    match /notes/{id} {
+      allow read: if isMember() && (resource.data.byEmail == email() || resource.data.vis == 'tutti'
+        || (resource.data.vis == 'team' && !isPartnerCls()));
+      allow create: if isMember() && request.resource.data.byEmail == email();
+      allow update: if isMember() && resource.data.byEmail == email() && request.resource.data.byEmail == email();
+      allow delete: if isMember() && (resource.data.byEmail == email() || isAdmin());
+    }
+
+    // Bozze: chi vede Testi le crea e modifica; solo gli approvatori le approvano.
     match /drafts/{id} {
-      allow read, create, delete: if isMember();
-      allow update: if isMember() && (
+      allow read, create, delete: if can(['testi', 'scadenze', 'home']);
+      allow update: if can(['testi', 'scadenze', 'home']) && (
         request.resource.data.status != 'approvato' ||
         resource.data.status == 'approvato' ||
         canApprove());
     }
 
-    // Partnership: il team (A e B) vede e modifica tutto; un partner (C) legge solo la propria scheda.
+    // Partnership: chi ha l'area la gestisce tutta; una classe partner legge solo la propria scheda.
     match /collabs/{id} {
-      allow read: if full() || (isMember() && level() == 'C' && partnerId() == id);
-      allow write: if full();
+      allow read: if can(['collab']) && (!isPartnerCls() || partnerId() == id);
+      allow write: if can(['collab']) && !isPartnerCls();
     }
 
-    // Brand kit: lo leggono tutti, lo modificano solo le persone abilitate.
-    match /config/brandkit {
-      allow read: if isMember();
-      allow write: if canBrand();
-    }
+    // Fornitori ed email ai fornitori.
+    match /suppliers/{id} { allow read, write: if can(['fornitori']); }
+    match /mailtpl/{id} { allow read: if can(['fornitori']) && !isPartnerCls(); allow write: if canApprove(); }
+    match /outbox/{id} { allow read: if can(['fornitori']) && !isPartnerCls(); allow write: if canApprove(); }
 
-    // Modelli email ed email programmate ai fornitori: solo gli approvatori.
-    match /mailtpl/{id} {
-      allow read: if full();
-      allow write: if canApprove();
-    }
-    match /outbox/{id} {
-      allow read: if full();
-      allow write: if canApprove();
-    }
+    // Marketing.
+    match /metrics/{id} { allow read, write: if can(['marketing']); }
+    match /strategies/{id} { allow read, write: if can(['marketing']); }
 
-    // Parte economica e marketing: solo A e B.
-    match /metrics/{id} { allow read, write: if full(); }
-    match /strategies/{id} { allow read, write: if full(); }
-    match /suppliers/{id} { allow read, write: if full(); }
-
-    // Tutto il resto (attività, scadenze, eventi, link, reference e foto, caricamenti, dove siamo, config).
-    match /{col}/{id} {
-      allow read, write: if isMember()
-        && !(col in ['members', 'drafts', 'mailtpl', 'outbox', 'collabs', 'metrics', 'strategies', 'suppliers'])
-        && !(col == 'config' && id == 'brandkit')
-        && (full() || !(col == 'config' && request.method != 'get'));
-    }
+    // Le altre aree.
+    match /tasks/{id} { allow read, write: if can(['attivita', 'scadenze', 'home']); }
+    match /deadlines/{id} { allow read, write: if can(['scadenze', 'home']); }
+    match /events/{id} { allow read, write: if can(['eventi', 'scadenze', 'home']); }
+    match /uploads/{id} { allow read, write: if can(['file', 'home']); }
+    match /refs/{id} { allow read, write: if can(['moodboard']); }
+    match /refitems/{id} { allow read, write: if can(['moodboard']); }
+    match /links/{id} { allow read, write: if can(['link']); }
+    match /pending/{id} { allow read, write: if can(['dove']); }
   }
 }
