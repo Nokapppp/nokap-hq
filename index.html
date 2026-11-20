@@ -497,7 +497,7 @@ const DKINDS=['Post','Carosello','Reel','Story','Caption','Comunicato','DM artis
 const DCHANNELS=['Instagram','TikTok','YouTube','Sito / shop','Stampa','Interno'];
 const DSTATUS={bozza:'Bozza',revisione:'In approvazione',modifiche:'Da rivedere',approvato:'Approvato',pubblicato:'Pubblicato'};
 const USES=['Social','Grafiche','Loghi','Shop','Stampa e merch','Eventi','Reference','Interno','Altro'];
-function treeLeaves(){return USES.map(u=>{const url=destUrl(u),inner=`<b>${USE_NUM[u]}</b><span>${u}</span><small>${u==='Loghi'?'Vettoriali · Immagini · PDF':u==='Grafiche'?'Immagini · Vettoriali · Sorgenti · PDF':u==='Social'?'Immagini · Video · Documenti':'Divisi per formato'}</small>${url?'<small class="go">Apri la cartella ↗</small>':''}`;return url?`<a class="leaf" href="${esc(url)}" target="_blank" rel="noopener">${inner}</a>`:`<div class="leaf">${inner}</div>`}).join('')}
+function treeLeaves(){return USES.map(u=>{const url=destUrl(u),inner=`<b>${USE_NUM[u]}</b><span>${u}</span><small>${u==='Loghi'?'Vettoriali · Immagini · PDF':u==='Grafiche'?'Immagini · Vettoriali · Sorgenti · PDF':u==='Social'?'Immagini · Video · Documenti':'Divisi per formato'}</small>`;return url?`<a class="leaf" href="${esc(url)}" target="_blank" rel="noopener">${inner}</a>`:`<div class="leaf">${inner}</div>`}).join('')}
 function destUrl(u){const n=USE_NUM[u],key=n+' '+u;let m={};try{m=JSON.parse((S.drive&&S.drive.destUrls)||'{}')}catch(e){}
   if(safeUrl(m[key]))return safeUrl(m[key]);
   const L=S.links.filter(l=>safeUrl(l.url)),lo=s=>String(s||'').toLowerCase();
