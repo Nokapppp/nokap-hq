@@ -391,6 +391,10 @@ a.refl{display:contents}
 .evd{display:flex;flex-direction:column;align-items:center;font-size:11px;text-transform:uppercase;color:var(--mute);line-height:1.1}
 .evd b{font-size:24px;color:var(--ink);text-transform:none}.evd small{font-size:10.5px;margin-top:2px}
 #evnext,#evpast{overflow-x:auto}
+/* ---- descrizione attività ---- */
+.tdesc{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;text-align:left;background:none;border:0;padding:0;margin-top:4px;font:inherit;font-size:12.5px;font-weight:400;line-height:1.45;color:var(--mute);cursor:pointer;max-width:56ch;white-space:pre-line}
+.tdesc:hover{color:var(--ink)}
+.tdesc.open{-webkit-line-clamp:unset;display:block;color:var(--ink)}
 /* ---- note ---- */
 .notegrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:14px;align-items:start}
 .ncard{border:1px solid var(--line);background:rgba(255,255,255,.66);padding:16px 16px 10px;position:relative}
@@ -645,7 +649,7 @@ const AREA_OPTS=()=>AREAS.map(a=>[a.id,a.name]);
 const dtLocal=ms=>{if(!ms)return '';const d=new Date(ms);return new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,16)};
 const peopleNames=()=>[...new Set([...people().map(p=>p.name),...S.pending.map(p=>p.name).filter(Boolean)])];
 const GSPEC={
-  tasks:t=>[{k:'title',l:'Attività',t:'text',v:t.title,w:2},{k:'area',l:'Area',t:'select',o:AREA_OPTS(),v:t.area},{k:'owner',l:'Responsabile',t:'owner',v:ownerVal(t)},{k:'helpers',l:'Con',t:'helpers',v:(t.helpers||[]).map(h=>h.email)},{k:'dueDate',l:'Entro il',t:'date',v:t.dueDate},{k:'location',l:'Dove',t:'loc',v:t.location}],
+  tasks:t=>[{k:'title',l:'Nome attività',t:'text',v:t.title,w:2},{k:'desc',l:'Descrizione',t:'textarea',v:t.desc,w:3},{k:'area',l:'Area',t:'select',o:AREA_OPTS(),v:t.area},{k:'owner',l:'Responsabile',t:'owner',v:ownerVal(t)},{k:'helpers',l:'Con',t:'helpers',v:(t.helpers||[]).map(h=>h.email)},{k:'dueDate',l:'Entro il',t:'date',v:t.dueDate},{k:'location',l:'Dove',t:'loc',v:t.location}],
   deadlines:d=>[{k:'title',l:'Scadenza',t:'text',v:d.title,w:2},{k:'date',l:'Data',t:'date',v:d.date,req:1},{k:'area',l:'Area',t:'select',o:AREA_OPTS(),v:d.area},{k:'owner',l:'Responsabile',t:'owner',v:ownerVal(d)},{k:'helpers',l:'Con',t:'helpers',v:(d.helpers||[]).map(h=>h.email)},{k:'location',l:'Dove',t:'loc',v:d.location}],
   drafts:d=>[{k:'title',l:'Titolo',t:'text',v:d.title,w:2},{k:'kind',l:'Tipo',t:'select',o:DKINDS.map(x=>[x,x]),v:d.kind},{k:'channel',l:'Canale',t:'select',o:DCHANNELS.map(x=>[x,x]),v:d.channel},{k:'area',l:'Area',t:'select',o:AREA_OPTS(),v:d.area},{k:'date',l:'Uscita prevista',t:'date',v:d.date},{k:'location',l:'Dove',t:'loc',v:d.location},{k:'author',l:"Chi l'ha scritta",t:'author',v:d.author},{k:'fileUrl',l:'Link allegato',t:'url',v:d.fileUrl,w:2},{k:'body',l:'Testo',t:'textarea',v:d.body,w:3}],
   refs:r=>[{k:'title',l:'Titolo',t:'text',v:r.title,w:2},{k:'area',l:'Area',t:'select',o:[['','Nessuna'],...AREA_OPTS()],v:r.area||''},{k:'url',l:'Link',t:'url',v:r.url,w:2},{k:'tags',l:'Tag (separati da virgola)',t:'tags',v:(r.tags||[]).join(', ')},{k:'note',l:'Nota',t:'text',v:r.note,w:3}],
@@ -789,12 +793,13 @@ function viewHome(){
 }
 function taskForm(prefArea){
   return `<form class="form" id="taskform">
-    <label class="wide" for="tf-title">Cosa<input id="tf-title" required maxlength="140" placeholder="Es. Chiudere il preventivo con il fornitore"></label>
+    <label class="wide" for="tf-title">Nome attività<input id="tf-title" required maxlength="140" placeholder="Es. Chiudere il preventivo con il fornitore"></label>
     <label for="tf-area">Area<select id="tf-area">${areaOpts(prefArea)}</select></label>
     <label for="tf-owner">Responsabile<select id="tf-owner">${teamOpts()}</select></label>
     <label>Con (facoltativo)${multiBox('tf-helpers')}</label>
     <label for="tf-date">Entro il<input id="tf-date" type="date"></label>
     <label for="tf-loc">Dove${locInput('tf-loc','')}</label>
+    <label class="full" for="tf-desc">Descrizione<textarea id="tf-desc" rows="3" maxlength="4000" placeholder="Cosa va fatto nel dettaglio, link utili, a cosa fare attenzione (facoltativa)"></textarea></label>
     <button class="btn" type="submit">Aggiungi attività</button>
   </form>`;
 }
@@ -1268,7 +1273,7 @@ function trackRows(list,empty){
   list.map((t,i)=>{const st=STATUS[t.status]?t.status:'todo',a=AREA[t.area],ck='t:'+t.id;
     return `<div class="tr ${st==='done'?'done':''}">
       <span class="n">${String(i+1).padStart(2,'0')}</span>
-      <span class="tt">${esc(t.title)}<small>${esc(a?a.name:'Senza area')}${locTag(t.location)}</small></span>
+      <span class="tt">${esc(t.title)}<small>${esc(a?a.name:'Senza area')}${locTag(t.location)}</small>${t.desc?`<button type="button" class="tdesc ${S.openDesc===t.id?'open':''}" data-act="tdesc" data-id="${esc(t.id)}" aria-expanded="${S.openDesc===t.id}" title="${S.openDesc===t.id?'Chiudi':'Leggi tutto'}">${esc(t.desc)}</button>`:''}</span>
       <span class="who ${noOwner(t)?'warn':''}">${false?`<select class="osel" data-act="reassign" data-id="${esc(t.id)}" aria-label="Responsabile di ${esc(t.title)}">${teamOpts(ownerVal(t))}</select>`:`${noOwner(t)?'Senza responsabile':esc(t.owner)}${helpersTxt(t)}${S.canWrite?' '+gBtn('tasks',t.id):''}`}${t.ownerEmail&&(t.notifiedOwner===lc(t.ownerEmail)||String(t.notified||'').split(',').includes(lc(t.ownerEmail)))?'<small class="ntf">avvisato</small>':''}</span>
       <span class="note">${dueHtml(t)}</span>
       <span><button class="st ${st}" data-act="cycle" data-id="${esc(t.id)}" ${S.canWrite?'':'disabled'} aria-label="Stato ${STATUS[st]}: clicca per cambiare">${STATUS[st]}</button></span>
@@ -1720,7 +1725,7 @@ document.addEventListener('submit',async e=>{
       if(name){const b=S.db.batch();let n=0;[['tasks',S.tasks],['deadlines',S.deadlines]].forEach(([c,L])=>L.filter(t=>!t.ownerEmail&&lc(t.owner)===lc(name)).forEach(t=>{b.update(S.db.collection(c).doc(t.id),{ownerEmail:em});n++}));if(n){await b.commit();showNote(n+' attività già assegnate a '+name+' ora sono collegate alla sua email.')}}
       f.reset()});}
   if(f.id==='taskform'){const title=$('tf-title').value.trim();if(!title)return;
-    const dd=$('tf-date').value;const data={title,area:$('tf-area').value,...pick($('tf-owner').value),helpers:readMulti('tf-helpers'),location:$('tf-loc').value.trim(),dueDate:isDate(dd)?dd:null,due:isDate(dd)?'':'Da definire',status:'todo',createdAt:Date.now()};
+    const dd=$('tf-date').value;const data={title,desc:$('tf-desc').value.trim(),area:$('tf-area').value,...pick($('tf-owner').value),helpers:readMulti('tf-helpers'),location:$('tf-loc').value.trim(),dueDate:isDate(dd)?dd:null,due:isDate(dd)?'':'Da definire',status:'todo',createdAt:Date.now()};
     await guard(async()=>{await S.db.collection('tasks').add(data);const keep=$('tf-area').value;f.reset();$('tf-area').value=keep});}
   if(f.id==='dlform'){const title=$('df-title').value.trim(),date=$('df-date').value;if(!title||!isDate(date))return;
     await guard(async()=>{await S.db.collection('deadlines').add({title,date,area:$('df-area').value,...pick($('df-owner').value),helpers:readMulti('df-helpers'),location:$('df-loc').value.trim(),createdAt:Date.now()});f.reset()});}
@@ -1778,6 +1783,7 @@ document.addEventListener('change',e=>{
 document.addEventListener('click',e=>{
   const b=e.target.closest('[data-act]');if(!b)return;const act=b.dataset.act,id=b.dataset.id;
   const conf=(key,fn)=>{if(S.confirmDel!==key){S.confirmDel=key;fill();return}S.confirmDel=null;guard(fn)};
+  if(act==='tdesc'){S.openDesc=S.openDesc===id?null:id;fill();return}
   if(act==='gedit'){const col=b.dataset.col;if(col==='outbox'&&!canApprove())return;S.gedit=col+':'+id;S.gdraft={};S.editingTask=null;S.reviewing=null;fill();const f=document.querySelector('.gedit [data-gf]');if(f)f.focus({preventScroll:true});return}
   if(act==='gcancel'){S.gedit=null;S.gdraft=null;if(document.activeElement)document.activeElement.blur();fill();return}
   if(act==='dellink2'){conf('l:'+id,()=>S.db.collection('links').doc(id).delete());return}
