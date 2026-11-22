@@ -298,6 +298,15 @@ a.leaf:hover span{text-decoration:underline;text-underline-offset:3px}
 /* ---- accesso ---- */
 .gate{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:24px;background:rgba(235,234,232,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .gate[hidden]{display:none}
+.gform{display:flex;flex-direction:column;gap:12px;width:min(340px,88vw);text-align:left}
+.gform[hidden],.gverify[hidden]{display:none}
+.gform label{display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:700;color:var(--mute)}
+.gform input{border:0;border-bottom:1px solid var(--ink);background:transparent;padding:7px 0;font-size:15px;color:var(--ink)}
+.gform .btn{align-self:stretch}
+.glinks{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.gmsg{margin:0;font-size:12.5px;color:var(--red);min-height:1em}
+.gmsg.ok{color:var(--ok)}
+.gverify{display:flex;gap:16px;align-items:center}
 .gate img{width:min(300px,70vw);height:auto}
 .gate h1{margin:0;font-size:24px;font-weight:700}
 .gate p{margin:0;color:var(--mute);max-width:44ch}
@@ -526,6 +535,16 @@ body.partner .wordmark{opacity:.5}
   <h1 id="gate-t">NoKap HQ</h1>
   <p id="gate-p">La home del team. Entra con il tuo account Google.</p>
   <button class="gbtn" id="gate-btn" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.3zM12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3.1v2.6A10 10 0 0 0 12 22zM6.4 14a6 6 0 0 1 0-3.9V7.5H3.1a10 10 0 0 0 0 9zM12 5.9c1.5 0 2.8.5 3.8 1.5l2.9-2.9A10 10 0 0 0 3.1 7.5L6.4 10C7.2 7.7 9.4 5.9 12 5.9z"/></svg><span>Accedi con Google</span></button>
+  <button class="linkish dark" id="gate-email" type="button" hidden>Non hai Google? Entra con email (iCloud, Outlook, Libero…)</button>
+  <form class="gform" id="gate-form" hidden novalidate>
+    <label for="gf-email">Email<input id="gf-email" type="email" autocomplete="email" required placeholder="nome@icloud.com"></label>
+    <label for="gf-pass">Password<input id="gf-pass" type="password" autocomplete="current-password" minlength="6" required placeholder="Almeno 6 caratteri"></label>
+    <label for="gf-pass2" id="gf-pass2-l" hidden>Ripeti la password<input id="gf-pass2" type="password" autocomplete="new-password" minlength="6"></label>
+    <p class="gmsg" id="gf-msg" role="status"></p>
+    <button class="btn" type="submit" id="gf-go">Entra</button>
+    <div class="glinks"><button class="linkish" type="button" id="gf-mode">Prima volta? Crea la tua password</button><button class="linkish" type="button" id="gf-reset">Password dimenticata?</button></div>
+  </form>
+  <div class="gverify" id="gate-verify" hidden><button class="btn" type="button" id="gv-done">Ho confermato</button><button class="linkish" type="button" id="gv-resend">Rinvia l'email</button></div>
   <button class="linkish" id="gate-out" type="button" hidden>Esci e cambia account</button>
 </div>
 <div class="grain" id="grain" aria-hidden="true"></div>
@@ -1930,7 +1949,27 @@ window.addEventListener('hashchange',render);
 
 /* ---------- start ---------- */
 const INAPP=/Instagram|FBAN|FBAV|FB_IAB|Messenger|Line\/|TikTok|musical_ly|Bytedance|Snapchat|Twitter|LinkedInApp|GSA\/|; wv\)/i.test(navigator.userAgent||'');
-function gate(show,title,text,btn,out){const g=$('gate');g.hidden=!show;if(!show)return;$('gate-t').textContent=title;if(INAPP&&btn)text='Stai aprendo il sito dentro un\'app (Instagram, TikTok, Messenger…): lì Google blocca l\'accesso. Tocca i tre puntini e scegli "Apri nel browser" (Safari o Chrome), poi entra da lì.';$('gate-p').textContent=text;$('gate-btn').hidden=!btn;$('gate-out').hidden=!out}
+function gate(show,title,text,btn,out){const g=$('gate');g.hidden=!show;if(!show)return;$('gate-t').textContent=title;if(INAPP&&btn)text='Stai aprendo il sito dentro un\'app (Instagram, TikTok, Messenger…): lì Google blocca l\'accesso. Entra con email qui sotto, oppure tocca i tre puntini e scegli "Apri nel browser".';$('gate-p').textContent=text;$('gate-btn').hidden=!btn;$('gate-email').hidden=!btn;if(!btn){$('gate-form').hidden=true}$('gate-verify').hidden=true;$('gate-out').hidden=!out}
+let gfMode='login';
+function openEmailForm(){$('gate-form').hidden=false;$('gate-email').hidden=true;setTimeout(()=>{const e=$('gf-email');if(e)e.focus()},50)}
+function gfSetMode(m){gfMode=m;$('gf-pass2-l').hidden=m!=='signup';$('gf-go').textContent=m==='signup'?'Crea la password ed entra':'Entra';$('gf-mode').textContent=m==='signup'?'Hai già una password? Entra':'Prima volta? Crea la tua password';$('gf-pass').autocomplete=m==='signup'?'new-password':'current-password';gfMsg('')}
+function gfMsg(t,ok){const m=$('gf-msg');m.textContent=t||'';m.classList.toggle('ok',!!ok)}
+const AUTH_ERR={'auth/invalid-credential':'Email o password non corretti. Se è la prima volta, crea la tua password.','auth/wrong-password':'Password non corretta.','auth/user-not-found':'Nessun account con questa email: crea la tua password.','auth/invalid-email':'Email non valida.','auth/email-already-in-use':'Questa email ha già un accesso: usa "Entra" oppure "Password dimenticata?". Se è un indirizzo Gmail, puoi anche entrare con Google.','auth/weak-password':'La password deve avere almeno 6 caratteri.','auth/too-many-requests':'Troppi tentativi. Aspetta qualche minuto e riprova.','auth/network-request-failed':'Connessione assente. Riprova.','auth/operation-not-allowed':'L\'accesso con email non è attivo. Avvisa Lorenzo.'};
+const vUrl=()=>({url:location.origin+location.pathname});
+document.addEventListener('click',async e=>{const t=e.target;if(!t.closest)return;
+  if(t.closest('#gate-email')){openEmailForm();gfSetMode('login');return}
+  if(t.closest('#gf-mode')){gfSetMode(gfMode==='signup'?'login':'signup');return}
+  if(t.closest('#gf-reset')){const em=$('gf-email').value.trim();if(!em){gfMsg('Scrivi prima la tua email.');return}try{await firebase.auth().sendPasswordResetEmail(em,vUrl());gfMsg('Se l\'email ha un accesso, ti è arrivato il link per scegliere una nuova password.',true)}catch(err){gfMsg(AUTH_ERR[err.code]||'Non riesco a mandare l\'email. Riprova.')}return}
+  if(t.closest('#gv-resend')){const u=firebase.auth().currentUser;if(!u)return;try{await u.sendEmailVerification(vUrl());$('gate-p').textContent='Email rimandata a '+u.email+'. Apri il link, poi premi "Ho confermato".'}catch(err){$('gate-p').textContent=AUTH_ERR[err.code]||'Non riesco a rimandare l\'email. Riprova tra poco.'}return}
+  if(t.closest('#gv-done')){const u=firebase.auth().currentUser;if(!u)return;await u.reload();if(firebase.auth().currentUser.emailVerified){await u.getIdToken(true);location.reload()}else $('gate-p').textContent='Non risulta ancora confermata. Apri il link nell\'email che ti abbiamo mandato (anche nella posta indesiderata), poi riprova.';return}
+});
+document.addEventListener('submit',async e=>{if(e.target.id!=='gate-form')return;e.preventDefault();
+  const em=$('gf-email').value.trim(),pw=$('gf-pass').value;if(!em||!pw){gfMsg('Scrivi email e password.');return}
+  const go=$('gf-go');go.disabled=true;gfMsg('');
+  try{if(gfMode==='signup'){if(pw.length<6){gfMsg(AUTH_ERR['auth/weak-password']);return}if(pw!==$('gf-pass2').value){gfMsg('Le due password non coincidono.');return}
+      const c=await firebase.auth().createUserWithEmailAndPassword(em,pw);try{await c.user.sendEmailVerification(vUrl())}catch(_){}}
+    else await firebase.auth().signInWithEmailAndPassword(em,pw)}
+  catch(err){gfMsg(AUTH_ERR[err.code]||'Accesso non riuscito. Riprova.')}finally{go.disabled=false}});
 function signIn(){firebase.auth().signInWithPopup(provider()).then(()=>{S.token=null})
   .catch(e=>{const c=e&&e.code||'';gate(true,'Accesso non riuscito',c==='auth/popup-blocked'?'Il browser ha bloccato la finestra di Google: consenti i popup per questo sito e riprova.':c==='auth/unauthorized-domain'?'Questo indirizzo non è autorizzato in Firebase: aggiungilo nei domini autorizzati (vedi la guida).':'Riprova. Se il problema continua, scrivi a Lorenzo.',true,false)})}
 async function importSeed(){
@@ -1983,12 +2022,13 @@ drawBg();makeGrain();render();
   if(!window.firebase||!window.NOKAP_FIREBASE||!window.NOKAP_FIREBASE.apiKey||/INCOLLA/.test(window.NOKAP_FIREBASE.apiKey)){
     gate(true,'Configurazione mancante','Manca la configurazione di Firebase: compila il file firebase-config.js come spiegato nella guida.',false,false);return}
   firebase.initializeApp(window.NOKAP_FIREBASE);
-  const auth=firebase.auth();S.db=firebase.firestore();
+  const auth=firebase.auth();auth.languageCode='it';S.db=firebase.firestore();
   try{S.db.enablePersistence({synchronizeTabs:true}).catch(()=>{})}catch(_){}
   gate(true,'NoKap HQ','Un attimo…',false,false);
   auth.onAuthStateChanged(async u=>{
     unsubs.forEach(f=>{try{f()}catch(_){}});unsubs=[];
-    if(!u){S.me=null;S.email='';S.token=null;gate(true,'NoKap HQ','La home del team. Entra con il tuo account Google.',true,false);return}
+    if(!u){S.me=null;S.email='';S.token=null;gate(true,'NoKap HQ','La home del team. Entra con il tuo account Google o con la tua email.',true,false);if(INAPP)openEmailForm();return}
+    if(!u.emailVerified&&(u.providerData||[]).some(p=>p.providerId==='password')){gate(true,'Conferma la tua email','Ti abbiamo mandato un\'email a '+u.email+'. Apri il link che contiene (guarda anche nella posta indesiderata), poi torna qui e premi "Ho confermato".',false,true);$('gate-verify').hidden=false;return}
     S.me=u.uid;S.email=lc(u.email);S.myName=u.displayName||'';S.names[u.uid]=S.myName;
     S.isAdmin=(CFG.admins||[]).map(lc).includes(S.email);S.level=S.isAdmin?'A':'B';S.preview=null;
     let member=S.isAdmin;
